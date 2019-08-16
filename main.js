@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const app = express()
 const port = 3000
 
@@ -11,10 +12,24 @@ let options = {
   }
 }
 
-app.get('/', (req,res) => res.sendFile('pages/index.html',options));
-app.get('/register', (req,res) => res.sendFile('pages/register.html',options));
-app.get('/login', (req,res) => res.sendFile('pages/login.html', options));
-app.get('/feed', (req,res) => res.sendFile('pages/feed.html',options));
+app.get('/', (req,res) => {
+  res.sendFile('pages/index.html',options)
+});
+
+app.get('/register', (req,res) => {
+  res.sendFile('pages/register.html',options);
+});
+
+app.get('/login', (req,res) => {
+  res.sendFile('pages/login.html', options);
+});
+
+app.post('/login', (req,res) => {
+
+}
+app.get('/feed', (req,res) => {
+  res.sendFile('pages/feed.html',options);
+});
 
 app.use(express.static('public'));
 
