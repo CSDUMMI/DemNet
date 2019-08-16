@@ -4,7 +4,7 @@
   "description": "A democratic social network",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"  
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/demnet/DemNet#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "passport-local": "^1.0.0"
   }
 }
