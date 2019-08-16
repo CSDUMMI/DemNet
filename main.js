@@ -10,6 +10,7 @@ let options = {
     'x-sent': true
   }
 }
+
 app.get('/', (req,res) => res.sendFile('pages/index.html',options));
 app.get('/register', (req,res) => res.sendFile('pages/register.html',options));
 app.get('/login', (req,res) => res.sendFile('pages/login.html', options));
