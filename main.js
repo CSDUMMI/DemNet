@@ -41,6 +41,10 @@ app.post('/login', (req,res) => {
   }
 
   let auth = lib.login(name,pass);
+  if (!auth) {
+    // Redirect to login if wrong pass/name
+    res.redirect("/login");
+  }
   res.cookie("auth",auth);
 })
 
