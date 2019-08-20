@@ -1,17 +1,15 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const app = express()
 const port = 3000
 
 // Own module
-const lib = require('lib');
+const lib = require('./lib');
 
 let options = {
   root : __dirname
 };
 
-app.use(bodyParser());
 app.use(cookieParser());
 app.use(express.static('public'));
 

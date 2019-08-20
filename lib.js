@@ -19,9 +19,10 @@ function authenticate(req,res,next) {
 }
 
 function login (name,pass) {
-  
+
 }
 
 module.exports = {
-  login : login
+  login : login,
+  authenticate: authenticate
 }
