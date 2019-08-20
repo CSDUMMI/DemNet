@@ -19,7 +19,7 @@ function authenticate(req,res,next) {
 }
 
 function login (name,pass) {
-
+  // Neither name nor pass can be undefined
 }
 
 module.exports = {

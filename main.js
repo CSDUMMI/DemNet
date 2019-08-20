@@ -7,7 +7,8 @@ const port = 3000
 const lib = require('./lib');
 
 let options = {
-  root : __dirname
+  root : __dirname,
+
 };
 
 app.use(cookieParser());
@@ -33,6 +34,11 @@ app.post('/login', (req,res) => {
 
   let name = req.body.name;
   let pass = req.body.pass;
+
+  if( name || pass ) {
+    // Stop, if undefined
+    res.redirect('/login');
+  }
 
   let auth = lib.login(name,pass);
   res.cookie("auth",auth);
