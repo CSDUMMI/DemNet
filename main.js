@@ -31,21 +31,21 @@ app.get('/login', (req,res) => {
 
 app.post('/login', (req,res) => {
   console.log("POST /login");
+  if (req.body.hasOwnProperty('name')
+      && req.body.hasOwnProperty('auth')
+    ) {
+    let name = req.query.name;
+    let pass = req.query.pass;
 
-  let name = req.body.name;
-  let pass = req.body.pass;
-
-  if( name || pass ) {
-    // Stop, if undefined
-    res.redirect('/login');
-  }
-
-  let auth = lib.login(name,pass);
-  if (!auth) {
-    // Redirect to login if wrong pass/name
+    let auth = lib.login(name,pass);
+    if (!auth) {
+      // Redirect to login if wrong pass/name
+      res.redirect("/login");
+    }
+    res.cookie("auth",auth);
+  } else {
     res.redirect("/login");
   }
-  res.cookie("auth",auth);
 })
 
 app.use(lib.authenticate);

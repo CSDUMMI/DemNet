@@ -23,26 +23,36 @@ function pass_of(username) {
 
 // All routes after this middleware are only accessible for logged in users
 function authenticate(req,res,next) {
-  name = req.cookies.get('name');
-  key = req.cookies.get('auth');
-  if ( logged_in[name] == key && key != undefined && name != undefined ) {
-    next();
-  } else {
-    res.redirect("/login");
+  if (
+      req.cookies.hasOwnProperty('name')
+      && req.cookies.hasOwnProperty('auth')
+    ) {
+    name = req.cookies['name'];
+    key = req.cookies['auth'];
+    if ( logged_in[name] == key) {
+      next();
+    } else {
+      res.redirect("/login");
+    }
   }
 }
 
 function login (name,pass) {
 
-  let hash = crypto.createHash('sha256');
-  pass = hash.update(pass).digest('hex');
-  if( pass != pass_of(name)) {
+  let hash = crypto.createHash( 'sha256' );
+  pass = hash.update( pass ).digest( 'hex' );
+  if (
+    pass != pass_of( name )
+  ) {
     return false;
-  } else if (pass_of(name) == "0x0") {
+  } else if (
+    pass_of( name ) == "0x0"
+  ) {
     // Username doesn't exist
     return false;
   }
   return logged_in[name] ? logged_in[name] : false; // Change undefined to false
+
 }
 
 module.exports = {
