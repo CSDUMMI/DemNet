@@ -33,7 +33,7 @@ let logged_in = {}
 Expects the username inside req.params.username
 and the password in req.params.passsword.
 */
-function login(db,login_page="/login") {
+function login(db,login_page="/login",feed_page="/feed") {
   return (req,res,next) => {
     let password = req.body.password;
     let username = req.body.username;
@@ -42,10 +42,10 @@ function login(db,login_page="/login") {
     hmac.update(password);
     password = hmac.digest('hex');
     if( password == db.password_of( username ) ) {
-      let auth = hmac.update( Math.random() ).digest('hex');
+      let auth = crypto.createHmac( 'sha256', db.key).update( Math.random().toString() ).digest('hex');
       logged_in[username] = auth;
       res.cookie('auth',auth);
-      next();
+      res.redirect(feed_page);
 
     } else {
       // no this user didn't provide the right password and cannot proceed
