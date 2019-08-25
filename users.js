@@ -40,7 +40,8 @@ function login(db,login_page="/login") {
     const hmac = crypto.createHmac( 'sha256', db.key );
 
     hmac.update(password);
-    if( hmac.digest('hex') == db.password_of( username ) ) {
+    password = hmac.digest('hex');
+    if( password == db.password_of( username ) ) {
       let auth = hmac.update( Math.random() ).digest('hex');
       logged_in[username] = auth;
       res.cookie('auth',auth);
@@ -49,17 +50,7 @@ function login(db,login_page="/login") {
     } else {
       // no this user didn't provide the right password and cannot proceed
       res.redirect(login_page);
-
     }
-
-
-
-
-    // hell delete this if you run production
-    console.log(`Name: ${username} and ${password}`);
-
-
-
   }
 }
 
