@@ -42,7 +42,7 @@ function login(db,login_page="/login",feed_page="/feed") {
     hmac.update(password);
     password = hmac.digest('hex');
     if( password == db.password_of( username ) ) {
-      let auth = crypto.createHmac( 'sha256', db.key).update( Math.random().toString() ).digest('hex');
+      let auth = crypto.createHmac( 'sha256', db.key).update( Math.random(process.env.SEED).toString() ).digest('hex');
       logged_in[username] = auth;
       res.cookie('auth',auth);
       res.redirect(feed_page);
