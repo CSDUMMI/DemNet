@@ -87,5 +87,6 @@ function authentication(login_page="/login") {
 
 module.exports = {
   authentication : authentication,
-  login : login
+  login : login,
+  register: register
 }
