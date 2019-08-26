@@ -1,13 +1,30 @@
 body {
-  background-color: gray;
+  background-color: white;
 }
 
-h1 {
-  color: white;
+form {
+  color:white;
+  background-color: darkblue;
+  margin-top: 25px;
+  margin-bottom: 100px;
+  margin-right: 600px;
+  margin-left: 600px; // pading
+}
+
+h2 {
+  color: black;
   text-align: center;
 }
 
 p {
   font-family: verdana;
   font-size: 20px;
+}
+
+body {
+ background-image: url("/imgs/demokratie.jpg");
+ background-position: center;
+ height: 1000px;
+ background-repeat: no-repeat, repeat;
+ background-color: #white;
 }
