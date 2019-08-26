@@ -62,11 +62,13 @@ SHA256 of that password and store it into db
 */
 function register(db,register_page="/register") {
   return (req,res,next) => {
-    const hmac = crypto.createHmac('sha256', process.env.SECRET);
-    const username = req.body.username;
-    const password = req.body.password;
+    const hmac          = crypto.createHmac('sha256', process.env.SECRET);
+    const username      = req.body.username;
+    const email         = req.body.email;
+    const password      = req.body.password;
     const password_hash = hmac.update(password).digest('hex');
     db.create_user(username,password_hash);
+    next();
   }
 }
 
