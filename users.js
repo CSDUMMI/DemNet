@@ -60,9 +60,13 @@ Register:
 Create user and convert password into
 SHA256 of that password and store it into db
 */
-function register(register_page="/register") {
-  return (req,res,next()) {
-
+function register(db,register_page="/register") {
+  return (req,res,next) => {
+    const hmac = crypto.createHmac('sha256', process.env.SECRET);
+    const username = req.body.username;
+    const password = req.body.password;
+    const password_hash = hmac.update(password).digest('hex');
+    db.create_user(username,password_hash);
   }
 }
 
