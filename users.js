@@ -45,6 +45,7 @@ function login(db,login_page="/login",feed_page="/feed") {
       let auth = crypto.createHmac( 'sha256', db.key).update( Math.random(process.env.SEED).toString() ).digest('hex');
       logged_in[username] = auth;
       res.cookie('auth',auth);
+      res.cookie('username',username);
       res.redirect(feed_page);
 
     } else {
@@ -58,7 +59,9 @@ function login(db,login_page="/login",feed_page="/feed") {
 // Returns middleware that returns the user to a login_page, if the user doesn't have the right credentials
 function authentication(login_page="/login") {
   return (req,res,next) => {
-    if ( logged_in[req.body.username] == req.body.auth ) {
+    console.log ( req.cookies );
+
+    if ( logged_in[req.cookies.username] == req.cookies.auth && req.cookies.username &&  req.cookies.auth ) {
       next();
     } else {
       res.redirect(login_page);
