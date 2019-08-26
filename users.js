@@ -66,6 +66,11 @@ function register(db,register_page="/register") {
     const username      = req.body.username;
     const email         = req.body.email;
     const password      = req.body.password;
+
+    if (!username || !email || !password) {
+      res.redirect('/register');
+    }
+    
     const password_hash = hmac.update(password).digest('hex');
     db.create_user(username,email,password_hash);
     next();
