@@ -2,7 +2,6 @@ const fs = require('fs');
 
 const db = JSON.parse(fs.readFileSync("database.alpha.json"));
 
-
 function password_of(name) {
   return db.users[name].pass;
 }

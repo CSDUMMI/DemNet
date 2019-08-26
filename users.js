@@ -56,6 +56,17 @@ function login(db,login_page="/login",feed_page="/feed") {
 }
 
 
+/*
+Register:
+Create user in  Database
+and use 
+
+*/
+
+function register(register_page="/register") {
+
+}
+
 // Returns middleware that returns the user to a login_page, if the user doesn't have the right credentials
 function authentication(login_page="/login") {
   return (req,res,next) => {
