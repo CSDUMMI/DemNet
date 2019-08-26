@@ -29,6 +29,8 @@ app.get( '/register', (req,res) => {
   res.sendFile('pages/register.html',options);
 } );
 
+app.post( '/register', users.register(db), () => res.redirect('/feed'))
+
 app.get( '/login', (req,res) => {
   console.log("GET /login");
   res.sendFile('pages/login.html', options);
