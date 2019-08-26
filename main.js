@@ -34,7 +34,7 @@ app.get( '/login', (req,res) => {
   res.sendFile('pages/login.html', options);
 } );
 
-app.post('/login', users.login(db));
+app.post('/login', users.login(db), (req,res,next) => res.redirect('/feed'));
 
 
 app.use(users.authentication());
