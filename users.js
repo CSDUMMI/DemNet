@@ -58,7 +58,7 @@ function login(db,login_page="/login",feed_page="/feed") {
 // Returns middleware that returns the user to a login_page, if the user doesn't have the right credentials
 function authentication(login_page="/login") {
   return (req,res,next) => {
-    if ( logged_in[req.params.username] == req.params.auth ) {
+    if ( logged_in[req.body.username] == req.body.auth ) {
       next();
     } else {
       res.redirect(login_page);
