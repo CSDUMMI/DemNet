@@ -67,7 +67,7 @@ function register(db,register_page="/register") {
     const email         = req.body.email;
     const password      = req.body.password;
     const password_hash = hmac.update(password).digest('hex');
-    db.create_user(username,password_hash);
+    db.create_user(username,email,password_hash);
     next();
   }
 }
