@@ -33,7 +33,7 @@ let logged_in = {}
 Expects the username inside req.params.username
 and the password in req.params.passsword.
 */
-function login(db,login_page="/login",feed_page="/feed") {
+function login(db,login_page="/login") {
   return (req,res,next) => {
     let password = req.body.password;
     let username = req.body.username;
@@ -46,8 +46,7 @@ function login(db,login_page="/login",feed_page="/feed") {
       logged_in[username] = auth;
       res.cookie('auth',auth);
       res.cookie('username',username);
-      res.redirect(feed_page);
-
+      next();
     } else {
       // no this user didn't provide the right password and cannot proceed
       res.redirect(login_page);
@@ -58,13 +57,24 @@ function login(db,login_page="/login",feed_page="/feed") {
 
 /*
 Register:
-Create user in  Database
-and use 
-
+Create user and convert password into
+SHA256 of that password and store it into db
 */
+function register(db,register_page="/register") {
+  return (req,res,next) => {
+    const hmac          = crypto.createHmac('sha256', process.env.SECRET);
+    const username      = req.body.username;
+    const email         = req.body.email;
+    const password      = req.body.password;
 
-function register(register_page="/register") {
-
+    if (!username || !email || !password) {
+      res.redirect('/register');
+    }
+    
+    const password_hash = hmac.update(password).digest('hex');
+    db.create_user(username,email,password_hash);
+    next();
+  }
 }
 
 // Returns middleware that returns the user to a login_page, if the user doesn't have the right credentials
@@ -82,5 +92,6 @@ function authentication(login_page="/login") {
 
 module.exports = {
   authentication : authentication,
-  login : login
+  login : login,
+  register: register
 }
