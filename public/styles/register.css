@@ -11,9 +11,16 @@ form {
   margin-left: 600px; // pading
 }
 
+#register {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 h2 {
-  color: black;
+  color: white;
   text-align: center;
+  padding-top: 10px;
+  margin-bottom: 10px;
 }
 
 p {
@@ -25,6 +32,6 @@ body {
  background-image: url("/imgs/demokratie.jpg");
  background-position: center;
  height: 1000px;
- background-repeat: no-repeat, repeat;
+ background-repeat: repeat;
  background-color: #white;
 }
