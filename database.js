@@ -69,5 +69,7 @@ function save() {
 module.exports = {
   password_of : password_of,
   create_user : create_user,
+  add_content : add_content,
+  get_feed    : get_feed,
   key         : process.env.SECRET,
 }

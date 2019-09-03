@@ -70,7 +70,7 @@ function register(db,register_page="/register") {
     if (!username || !email || !password) {
       res.redirect('/register');
     }
-    
+
     const password_hash = hmac.update(password).digest('hex');
     db.create_user(username,email,password_hash);
     next();
@@ -85,6 +85,7 @@ function authentication(login_page="/login") {
     if ( logged_in[req.cookies.username] == req.cookies.auth && req.cookies.username &&  req.cookies.auth ) {
       next();
     } else {
+      console.log( "ERROR: authentication: Invalid  Username / Password" );
       res.redirect(login_page);
     }
   }

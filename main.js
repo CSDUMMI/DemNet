@@ -41,10 +41,19 @@ app.post('/login', users.login(db), (req,res,next) => res.redirect('/feed'));
 
 app.use(users.authentication());
 
-app.get('/feed', (req,res) => {
-  console.log("GET /feed")
-  res.sendFile('pages/feed.html',options);
+app.get( '/feed', ( req, res ) => {
+  console.log( "GET /feed" );
+  res.sendFile( 'pages/feed.html', options );
 } );
 
+app.post( '/feed', ( req, res ) => {
+  console.log ( "POST /feed" );
+  // req.cookies.username is the username, that is authenticated
+  if ( req.cookies.username == req.body.username ) {
+
+  }
+
+  console.log ( "ERROR /feed identity theft" );
+} )
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
