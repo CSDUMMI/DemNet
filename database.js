@@ -49,9 +49,11 @@ It returns max contents
 */
 function get_feed( username, max=256 ) {
   raw_feed = [];
-  for ( content in db.users[username].feed ) {
+  for ( let i = 0; i < max; i++ ) {
+    content = db.users[ username ].feed[ i ];
     raw_feed.push( db.users[ content.author ].content[ content.index ] );
   }
+  return raw_feed;
 }
 
 // All process.env.CHANGES || 100, save the state
