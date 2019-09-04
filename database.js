@@ -67,9 +67,7 @@ function get_field( field, username ) {
     'followed'  : 'followed',
     'content'   : 'content'
   };
-  console.log( `get_field ${field}`);
   field = fields[ field ] ? field : "ERROR";
-  console.log( `get_field ${field}` );
   const field_values = db.users[ username ][ field ];
   return field_values;
 }

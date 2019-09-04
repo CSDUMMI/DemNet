@@ -3,7 +3,7 @@ const cookieParser  = require('cookie-parser');
 const bodyParser    = require('body-parser');
 
 const app           = express()
-const port          = process.env.PORT | 3000;
+const port          = process.env.PORT;
 
 // Own module
 const users         = require('./users');
@@ -31,6 +31,7 @@ app.get( '/register', (req,res) => {
 
 app.post( '/register', users.register(db), () => res.redirect('/feed'))
 
+
 app.get( '/login', (req,res) => {
   console.log("GET /login");
   res.sendFile('pages/login.html', options);
@@ -52,13 +53,20 @@ app.post( '/feed', ( req, res ) => {
   feed = db.get_feed( req.cookies.username, req.body.maximum );
   res.set( 'Content-Type', 'application/json' );
   res.send( JSON.stringify( { 'feed' : feed } ) );
-} )
-
-
-app.get( '/data', ( req, res ) => {
-  console.log( "POST /data" );
-  res.set( 'Content-Type', 'application/json' );
-  res.send( JSON.stringify( { 'data' : db.get_field( req.query['field'], req.cookies.username ) } ) );
 } );
+
+
+app.post( '/data:field', ( req, res ) => {
+  console.log( "GET /data" );
+  res.set( 'Content-Type', 'application/json' );
+  res.send( JSON.stringify( { 'data' : db.get_field( req.params['field'], req.cookies.username ) } ) );
+} );
+
+app.post( '/create', ( req, res ) => {
+  console.log( "POST /create");
+  db.add_content( req.cookies.username, req.body.content );
+  res.set( 'Content-Type', 'text/plain' );
+  res.send( created.toString() );
+})
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
