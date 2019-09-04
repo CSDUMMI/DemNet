@@ -1,7 +1,13 @@
 {
   "users" : {
     "user": {
-      "pass":"e22ffe992ce28c31b6e075e02f413dd815bd14ab59144e4d2cc9156b8af35f63"
+      "pass":"e22ffe992ce28c31b6e075e02f413dd815bd14ab59144e4d2cc9156b8af35f63",
+      "email":"user@demnet.org",
+      "content": [
+        "My first post"
+      ],
+      "feed": [],
+      "followed":[]
     }
   }
 }

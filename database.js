@@ -56,6 +56,24 @@ function get_feed( username, max=256 ) {
   return raw_feed;
 }
 
+/*
+get_field:
+Get simple fields, without parsing
+*/
+function get_field( field, username ) {
+  const fields = {
+    'email'     : 'email',
+    'feed'      : 'feed',
+    'followed'  : 'followed',
+    'content'   : 'content'
+  };
+  console.log( `get_field ${field}`);
+  field = fields[ field ] ? field : "ERROR";
+  console.log( `get_field ${field}` );
+  const field_values = db.users[ username ][ field ];
+  return field_values;
+}
+
 // All process.env.CHANGES || 100, save the state
 function save() {
   // Save the db in json
@@ -71,5 +89,6 @@ module.exports = {
   create_user : create_user,
   add_content : add_content,
   get_feed    : get_feed,
+  get_field   : get_field,
   key         : process.env.SECRET,
 }

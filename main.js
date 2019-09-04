@@ -3,7 +3,7 @@ const cookieParser  = require('cookie-parser');
 const bodyParser    = require('body-parser');
 
 const app           = express()
-const port          = 3000
+const port          = process.env.PORT | 3000;
 
 // Own module
 const users         = require('./users');
@@ -49,11 +49,16 @@ app.get( '/feed', ( req, res ) => {
 app.post( '/feed', ( req, res ) => {
   console.log ( "POST /feed" );
   // req.cookies.username is the username, that is authenticated
-  if ( req.cookies.username == req.body.username ) {
-
-  }
-
-  console.log ( "ERROR /feed identity theft" );
+  feed = db.get_feed( req.cookies.username, req.body.maximum );
+  res.set( 'Content-Type', 'application/json' );
+  res.send( JSON.stringify( { 'feed' : feed } ) );
 } )
+
+
+app.get( '/data', ( req, res ) => {
+  console.log( "POST /data" );
+  res.set( 'Content-Type', 'application/json' );
+  res.send( JSON.stringify( { 'data' : db.get_field( req.query['field'], req.cookies.username ) } ) );
+} );
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

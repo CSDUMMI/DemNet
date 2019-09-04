@@ -85,7 +85,7 @@ function authentication(login_page="/login") {
     if ( logged_in[req.cookies.username] == req.cookies.auth && req.cookies.username &&  req.cookies.auth ) {
       next();
     } else {
-      console.log( "ERROR: authentication: Invalid  Username / Password" );
+      console.log( "ERROR authentication: Invalid  Username / Password" );
       res.redirect(login_page);
     }
   }
