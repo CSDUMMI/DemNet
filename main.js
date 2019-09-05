@@ -55,7 +55,10 @@ app.post( '/feed', ( req, res ) => {
   res.send( JSON.stringify( { 'feed' : feed } ) );
 } );
 
-
+/*
+API calls:
+Get Data and write data.
+*/
 app.post( '/data:field', ( req, res ) => {
   console.log( "GET /data" );
   res.set( 'Content-Type', 'application/json' );
@@ -64,9 +67,9 @@ app.post( '/data:field', ( req, res ) => {
 
 app.post( '/create', ( req, res ) => {
   console.log( "POST /create");
-  db.add_content( req.cookies.username, req.body.content );
-  res.set( 'Content-Type', 'text/plain' );
-  res.send( created.toString() );
-})
+  db.add_content( req.cookies.username, JSON.parse( req.body.content ) );
+  res.send( "True" );
+});
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
