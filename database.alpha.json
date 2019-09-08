@@ -8,6 +8,15 @@
       ],
       "feed": [],
       "followed":[]
+    },
+    "user1": {
+      "pass"  : "4355c85cd83f9a8ec33ebed3387402287d9f4f9d54de9ff1e0bc2add5d6f553c",
+      "email" : "user1@demnet.org",
+      "content": [
+        "My first post, the second on the network"
+      ],
+      "feed"      : [],
+      "followed"  : [ "user" ]
     }
   }
 }

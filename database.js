@@ -41,6 +41,14 @@ function add_content( username, content ) {
   }
 }
 
+
+/*
+follow( username ):
+follow username
+*/
+function follow( ) {
+  
+}
 /*
 get_feed:
 Return string array of all contents, relevant
