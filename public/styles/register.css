@@ -8,8 +8,8 @@ form {
   margin-top: 10%;
   margin-bottom: 10%;
   padding-bottom: 1%;
-  margin-right: 35%;
-  margin-left: 35%; // pading
+  margin-right: 40%;
+  margin-left: 40%; // pading
   resize: none;
 }
 
@@ -35,11 +35,10 @@ p {
 }
 
 body {
- background-image: url("/imgs/demokratie.jpg");
+background-color: #a6a6a6;
  background-position: center;
  height: 1000px;
  background-repeat: repeat;
- background-color: white;
 }
 
 ul {
@@ -60,7 +59,7 @@ li a {
   display: block;
   color: white;
   text-align: center;
-  padding:  15px 30px;
+  padding:  25px 30px;
   text-decoration: none;
 }
 
