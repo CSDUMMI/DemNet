@@ -23,8 +23,10 @@
       <ul>
   <li><a href="Home.asp">Home</a></li>
   <li><a href="news.asp">News</a></li>
-  <li><a href="feed.asp">feed</a></li>
   <li><a href="contact.asp">Contact</a></li>
+  <li><a href="Feed.asp">Feed</a></li>
 </ul>
 </center> </body>
 </html>
+
+
