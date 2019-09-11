@@ -2,6 +2,7 @@ const express       = require('express');
 const cookieParser  = require('cookie-parser');
 const bodyParser    = require('body-parser');
 const session       = require('express-session');
+const crypto = require('crypto');
 
 const app           = express()
 const port          = process.env.PORT;
@@ -29,13 +30,23 @@ app.use( session( {
   name              : 'sessionId'
 } ) );
 
+app.get( '/login', ( req, res ) => {
+  if( req.session.logged_in ) {
+    res.redirect( '/' );
+  } else {
+    res.render( 'login' );
+  }
+} );
+
 app.post( '/login', ( req, res ) => {
   const password  = req.body.password;
   const username  = req.body.username;
   const hmac      = crypto.createHmac( 'sha256', secret ).update( password );
-  if( db.password_of( username ) == hmac.createHmac('sha256', secret).digest( 'hex' ) ) {
-    res.session.logged_in = true;
+  if( db.password_of( username ) == crypto.createHmac('sha256', secret).digest( 'hex' ) ) {
+    req.session.logged_in = true;
     res.redirect('/');
+  } else {
+    res.redirect('/login');
   }
 });
 

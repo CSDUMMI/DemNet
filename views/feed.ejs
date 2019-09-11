@@ -8,7 +8,14 @@
     <h2> Your personal feed </h2>
     <p> your personal area </p>
     <div id='app'>
-      {{ feed_content }}
+      <% if( feed ) { %>
+        <% feed.forEach( ( post ) => { %>
+          <a href="<%= post.href %>">
+            <h3> <%= post.title %> </h3>
+            <p> <%= post.description %> </p>
+          </a>
+        <% }); %>
+      <% } %>
     </div>
 
     <a href="/"> Back to main </a>
