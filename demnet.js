@@ -6,7 +6,7 @@ const session       = require('express-session');
 const app           = express()
 const port          = process.env.PORT;
 const host_data     = (process.env.DATA=5555,process.env.DATA_PORT);
-const SECRET        = process.env.SECRET;
+const secret        = process.env.SECRET;
 // Own module
 let options         = { root : __dirname };
 
@@ -22,25 +22,29 @@ app.use(bodyParser.urlencoded({ extended : true }));
 app.use(cookieParser());
 app.use(express.static('public'));
 
+app.use( session( {
+  secret            : secret,
+  resave            : true,
+  saveUninitialized : false,
+  name              : 'sessionId'
+} ) );
 
 app.post( '/login', ( req, res ) => {
   const password  = req.body.password;
   const username  = req.body.username;
-
+  const hmac      = crypto.createHmac( 'sha256', secret ).update( password );
+  if( db.password_of( username ) == hmac.createHmac('sha256', secret).digest( 'hex' ) ) {
+    res.session.logged_in = true;
+    res.redirect('/');
+  }
 });
 
-app.use( session( {
-  secret            : SECRET,
-  resave            : true,
-  saveUninitilized  : false,
-  name              : 'sessionId'
-} ) );
 
 app.get(  '/', ( req, res ) => {
   if( req.session.logged_in ) {
-    res.render( 'pages/index', { feed : req.session.feed } );
+    res.render( 'index', { feed : req.session.feed } );
   } else {
-    res.render( 'pages/login' );
+    res.render( 'login' );
   }
 });
 
