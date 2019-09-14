@@ -1,0 +1,69 @@
+body {
+  background-color: white; 
+}
+
+form { // The register fild
+  color:white;
+  background-color: #333; //grey
+  margin-top: 10%;
+  margin-bottom: 10%;
+  padding-bottom: 1%;
+  margin-right: 40%;
+  margin-left: 40%; 
+  resize: none;
+}
+
+
+#register {
+  padding-bottom: 50%;
+  padding-top: 50%; 
+}
+
+
+
+h2 {
+  color: #ffffff; //grey
+  text-align: center;
+  padding-top: 10px;
+  margin-bottom: 10px; 
+}
+
+p {
+  font-family: verdana;
+  font-size: 20px;
+}
+
+body {
+ background-color: #a6a6a6; //grey
+ background-position: center;
+ height: 1000px;
+ background-repeat: repeat;
+}
+
+
+//The navigation bar 
+ul {
+  list-style-type: none;
+  position: fixed;
+  top: -1.5%;
+  left: -1.5%;
+  width: 100%;
+  overflow: hidden;
+  background-color: #333; //grey
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding:  25px 30px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #111; //grey
+}
