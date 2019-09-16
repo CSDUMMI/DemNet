@@ -1,23 +1,30 @@
-const fs = require('fs');
+const sqlite = require('sqlite3').verbose();
 
-const db = JSON.parse( fs.readFileSync( "database.alpha.json" ) );
-const save_point = 0;
-process.env.CHANGES = process.env.CHANGES ? process.env.CHANGES : 10;
+let db = new sqlite.Database( './database.db', print_error );
+
+
+function print_error( error ) {
+  if( error ) {
+    console.error( error.message );
+  }
+}
 
 function password_of( name ) {
-  return db.users[name].pass;
+  const query = `SELECT password_hash FROM users WHERE name = ?`;
+  db.get( query, [name], ( error, row ) => {
+
+    if( error ) { console.error( error ); }
+
+    return row.password_hash;
+
+  });
 }
 
 function create_user( username, email, password_hash ) {
-  if (db.users.hasOwnProperty(username)) res.redirect('/register');
-  db.users[username] = {
-    'pass'      : password_hash,
-    'email'     : email,
-    'content'   : [],
-    'followed'  : [],
-    'feed'      : []
-  }
-  save();
+  const query =
+  `INSERT INTO users ( entry, name, password_hash, email ) VALUES ( ?, ?, ?, ? )`;
+
+  db.run( query, [ Date.now(), username, password_hash, email], print_error);
 }
 
 /*
@@ -26,19 +33,13 @@ After content has been added,
 all followers feeds gets a reference
 to the content.
 */
-function add_content( username, content ) {
-  if( db.users.hasOwnProperty( username ) ) {
-    content_id = {
-      'author'     : username,
-      'index'      : db.users[username].length
-    }
+function add_content( username, content, type ) {
+  const query = `INSERT INTO contents ( name, content, type, date ) VALUES ( ?, ?, ?, ? )`;
 
-    db.users[username].content.push( content );
+  let date = Date.now();
 
-    for( follower in db.users[username].followed ) {
-      db.users[follower].feed.push( content_id );
-    }
-  }
+  db.run( query, [ username, content, type, date ], print_error);
+
 }
 
 
@@ -47,7 +48,7 @@ follow( username ):
 follow username
 */
 function follow( ) {
-  
+
 }
 /*
 get_feed:
@@ -75,23 +76,9 @@ function get_field( field, username ) {
     'followed'  : 'followed',
     'content'   : 'content'
   };
-  field = fields[ field ] ? field : "ERROR";
+  field = fields[ field ] ? field : "content";
   const field_values = db.users[ username ][ field ];
   return field_values;
-}
-
-// All process.env.CHANGES || 100, save the state
-function save() {
-  // Save the db in json
-  if ( save_point > process.env.CHANGES ) {
-    db_string = JSON.stringify ( db );
-    fs.writeFile( "database.alpha.json", db_string, ( error ) => {
-      if ( error ) {
-        console.error( `ERROR Writing to File:\n${ error }` );
-      }
-      console.log( "SAVED state" );
-    } );
-  }
 }
 
 module.exports = {
