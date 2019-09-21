@@ -8,7 +8,7 @@ app            = Flask( __name__, static_folder = 'static', static_url_path = ''
 app.secret_key = Random.new( os.environ [ "SEED" ] ).read(16)
 
 def connect():
-    con = sqlite.connect( 'demnet.db' )
+    con = sqlite.connect( 'data.db' )
     cursor = con.cursor()
     return ( con, cursor )
 
@@ -21,6 +21,6 @@ def index():
         userId = session [ 'userId' ]
         # SELECT all contents from all people userId is following
         query_feed = """
-SELECT * FROM contents WHERE author_id IN  ( SELECT following FROM followers WHERE follower = ? )
+SELECT * FROM contents WHERE author_id IN  ( SELECT follower FROM followers WHERE follower = ? )
         """
-        
+        cursor.execute( query_feed, [ userId ] )

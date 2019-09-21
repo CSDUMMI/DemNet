@@ -20,7 +20,5 @@ def index():
         
         userId = session [ 'userId' ]
         # SELECT all contents from all people userId is following
-        query_feed = """
-SELECT * FROM contents WHERE author_id IN  ( SELECT following FROM followers WHERE follower = ? )
-        """
-        cursor.execute( query_feed, [ userId ] )
+        query_feed = "SELECT 
+        
