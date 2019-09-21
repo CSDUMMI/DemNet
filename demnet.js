@@ -40,9 +40,9 @@ app.get( '/login', ( req, res ) => {
 
 app.post( '/login', ( req, res ) => {
   const password  = req.body.password;
-  const username  = req.body.username;
+  req.session.username  = req.body.username;
   const hmac      = crypto.createHmac( 'sha256', secret ).update( password );
-  if( db.password_of( username ) == crypto.createHmac('sha256', secret).digest( 'hex' ) ) {
+  if( db.password_of( req.session.username ) == hmac.digest( 'hex' ) ) {
     req.session.logged_in = true;
     res.redirect('/');
   } else {
@@ -53,7 +53,7 @@ app.post( '/login', ( req, res ) => {
 
 app.get(  '/', ( req, res ) => {
   if( req.session.logged_in ) {
-    res.render( 'index', { feed : req.session.feed } );
+    res.render( 'index', { feed : db.get_feed( req.session.username ) } );
   } else {
     res.render( 'login' );
   }

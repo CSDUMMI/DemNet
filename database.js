@@ -47,7 +47,7 @@ follow( username ):
 follow username
 */
 function follow( ) {
-  
+
 }
 /*
 get_feed:
@@ -56,9 +56,9 @@ for the username.
 It returns max contents
 */
 function get_feed( username, max=256 ) {
-  raw_feed = [];
+  let raw_feed = [];
   for ( let i = 0; i < max; i++ ) {
-    content = db.users[ username ].feed[ i ];
+    let content = db.users[ username ].feed[ i ];
     raw_feed.push( db.users[ content.author ].content[ content.index ] );
   }
   return raw_feed;

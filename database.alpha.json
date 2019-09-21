@@ -15,7 +15,9 @@
       "content": [
         "My first post, the second on the network"
       ],
-      "feed"      : [],
+      "feed"      : [
+        { "author" : "user", "index" : 0 }
+      ],
       "followed"  : [ "user" ]
     }
   }
