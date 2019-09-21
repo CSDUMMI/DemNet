@@ -24,6 +24,7 @@
     "express-session": "^1.16.2",
     "nodemon": "^1.19.2",
     "passport-local": "^1.0.0",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "sqlite3": "^4.1.0"
   }
 }
