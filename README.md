@@ -42,6 +42,9 @@ side effect, which is that everybody can count the votes ( I would call that
 principles checkable or controllable ).
 
 ## The Process of an Election
+
+![Process Description](election.svg)
+
 Every Election needs a trusted party,
 which counts the votes and
 administers the Election.
