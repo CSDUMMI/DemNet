@@ -1,4 +1,6 @@
-# Abstract
+# Elections using IPFS and a supervisor
+
+## Abstract
 I want to introduce a system, that ensures
 that all voter's choice is secret and
 that everybody can check the tally,
@@ -10,7 +12,7 @@ on a Blockchain, that can access IPFS.
 Otherwise the whole Election is decentralized  
 and can be validated by anyone who wants to.
 
-# Introduction
+## Introduction
 I wanted to build a social network,
 where every user would have a vote
 and could decided upon the future development
@@ -39,7 +41,7 @@ But it can ensure both a free and secret Election, as well as another
 side effect, which is that everybody can count the votes ( I would call that
 principles checkable or controllable ).
 
-# The Supervisor of an Election
+## The Process of an Election
 Every Election needs a trusted party,
 which counts the votes and
 administers the Election.
@@ -49,3 +51,44 @@ meaning they can't be part of a political party or movement.
 Our supervisor initializes an Election by giving each voter a
 temporary private key and publishing the public keys on an
 IPFS File, which I will call the Public Key Index.
+
+Now each Voter creates and signs, using their
+temporary private key, their Vote File on IPFS or abstains,
+this can happen privately or through the supervisor.
+But perhaps the supervisor could log the traffic and associated certain traffic
+with a voter and encrypt the vote using the Public Key Index?
+Well, they could do that, but that wouldn't be necessary for the supervisor,
+after all, the supervisor has already created and assigned the keys and could
+just have kept a copy of the assignment, thus making it an unreal vulnerability.
+But this illustrates how important it is that the supervisor is trusted,
+because if not, the whole Election cannot be considered valid.
+
+The CID ( Content ID or Hash of the Vote File) of the vote is then added by the
+voter, again through an external or the supervisor, to another Index, called
+the ballot.
+After the deadline for the election is met,
+the supervisor or anybody else, who wants to count the ballot,
+can do so.
+
+## Counting the results
+To do this you have to download all the Files behind the CIDs in the ballot
+and the public keys in the Public Key Index.
+All these Files are Newline separated values.
+Then you have to try to encrypt each vote with the keys until
+the file begins with the sentence:
+`Vote-<Election>\n`
+Where `Election` is the name of the election
+( which can have any kind of characters, except a newline )
+Any file, that can't be encrypted, is thrown out.
+And any key, whose vote was encrypted, is thrown out, thus nobody can vote twice.
+Now you can count the votes by parsing the content of the vote file.
+
+## Conclusion
+With this method you can't associated a vote with a user, because you
+don't have the public key, for a user, thus secrecy is ensured.
+And check ability is ensured because anything you need to calculate
+the results, is public on IPFS.
+Again, this process doesn't provide free, equal or immediate
+elections and I don't think that this is possible, because all these
+principles are part of the execution of the results of the election
+and this process can only securely and check able provide the results of an election.
