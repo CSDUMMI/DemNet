@@ -74,17 +74,15 @@ the supervisor or anybody else, who wants to count the ballot,
 can do so.
 
 ## Counting the results
-To do this you have to download all the Files behind the CIDs in the ballot
-and the public keys in the Public Key Index.
-All these Files are Newline separated values.
-Then you have to try to encrypt each vote with the keys until
-the file begins with the sentence:
-`Vote-<Election>\n`
-Where `Election` is the name of the election
-( which can have any kind of characters, except a newline )
-Any file, that can't be encrypted, is thrown out.
-And any key, whose vote was encrypted, is thrown out, thus nobody can vote twice.
-Now you can count the votes by parsing the content of the vote file.
+If you want to count the results, you have to:
+
+1. Download the Ballot File and Public Key Index
+2. Download vote files in the ballot
+3. Encode vote files and throw out any key used already
+4. Count the encoded votes
+
+Anybody can do this because all these files are
+public on IPFS.
 
 ## Conclusion
 With this method you can't associated a vote with a user, because you
