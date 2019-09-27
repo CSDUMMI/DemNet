@@ -43,7 +43,7 @@ principles checkable or controllable ).
 
 ## The Process of an Election
 
-![Process Description](election.svg)
+![Process Description](election.png)
 
 Every Election needs a trusted party,
 which counts the votes and
