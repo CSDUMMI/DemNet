@@ -84,6 +84,31 @@ If you want to count the results, you have to:
 Anybody can do this because all these files are
 public on IPFS.
 
+## Ballot File
+The Ballot File isn't a File, like the Vote File.
+Because a Vote File or the Public Key Index File,
+don't need to change, so you can simply add them
+to IPFS and only have to cat them later.
+But Ballot File is different as every voter needs
+to change it, to cast their vote.
+So, we can't use IPFS?
+We can, just differently!
+The Ballot will now be just a file containing a unique
+token containing the deadline, the name, the options ( aye, nay, etc.)
+and some random content to make it impossible to overlap with other elections.
+Now each vote has two parts:
+
+```
+ballot: <hash CID of Ballot File>
+vote: <encrypted vote>
+```
+After that, the voter adds the CID of his vote to the supervisor's
+index.
+After the deadline passes, the supervisor publishes all CIDs the supervisor
+received in a ballot reference index file, which is now immutable
+and can be published on IPFS.
+This is done, so everyone can check and the election result is transparent.
+
 ## Conclusion
 With this method you can't associated a vote with a user, because you
 don't have the public key, for a user, thus secrecy is ensured.
