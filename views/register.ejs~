@@ -22,8 +22,7 @@
       <li><a href="/">Home</a></li>
       <li><a href="/Login">Login</a></li>
       <li><a href="/feed">Feed</a></li>
-      <li><a href="/donate">Donate</a></li>
-      <li><a href="/vote">Vote</a></a></li>
+      <li><a href="/Donate">Donate</a></li>
       </ul>
 
 </body>
