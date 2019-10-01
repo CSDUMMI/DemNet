@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>DemNet</title>
+    <link rel="stylesheet" href="/styles/login.css">
+  </head>
+  <body>
+    <h2> The Democratic social network </h2>
+    <p>  </p>
+
+  <!--  <a href="/login"> Login </a> <br>
+    <a href="/feed"> To your home </a> <br>
+    <a href="/register"> Register </a> <br>
+     link to donactions
+    <a href="https://www.patreon.com/">Donations</a> -->
+    
+          <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/Login">Login</a></li>
+      <li><a href="/feed">Feed</a></li>
+      <li><a href="https://www.patreon.com/">Donations</a></li>
+      <input type="text" placeholder="Search...">
+      </ul>
+      
+
+  </body>
+</html>
