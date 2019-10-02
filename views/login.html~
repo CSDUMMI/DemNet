@@ -6,14 +6,15 @@
     <link rel="stylesheet" href="/styles/login.css">
   </head>
   <body>
-    <h2> your login </h2>
+  <center>
 
     <form method="post" action="/login">
+     <h2> Login </h2>
       Username:<br>
-      <input type="text" name="username"> <br>
-      Pasword: <br>
-      <input type="password" name="password">
-      <input type="submit" value="Login"> <!-- Button -->
+      <input type="text" name="Username"> <br>
+      Password: <br>
+      <input type="password" name="password"> <br>
+      <input type="submit" value="Login" id="Login"> <!-- Button -->
       
             <ul>
       <li><a href="/">Home</a></li>
