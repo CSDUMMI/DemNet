@@ -1,6 +1,3 @@
-body {
-  background-color: white;
-}
 
 form {
   color:white;
@@ -9,10 +6,14 @@ form {
   margin-bottom: 10%;
   padding-bottom: 5%;
   padding-top: 2%;
-  margin-right: 37%;
-  margin-left: 37%; // pading
+  margin-right: 27%;
+  margin-left: 47%; // pading
   resize: none;
 }
+ #submit {
+ font-size: 100%
+ 
+ }
 
 #Username,#Mail,#pass,#repeat {
 font-size: 125%;
@@ -47,7 +48,7 @@ p {
 }
 
 body {
-background-color: #a6a6a6;
+background-color: #FFFAFA;
  background-position: center;
  height: 1000px;
  background-repeat: repeat;
