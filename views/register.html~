@@ -23,8 +23,8 @@
       <h4>By Register, you agree to our Terms .</h4>
       <h4>Have an account?</h4>
       <div class="auto-rezize">
-    <input type="submit" value="log in" id="submit">  
-    <img src="demokratie.jpg" alt="demnet" id="DemNet" >
+    <input type="submit" value="log in" id="submit"> 
+    <img src="demokratie.jpg" alt="Demo" />
 
       
  

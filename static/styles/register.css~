@@ -14,6 +14,13 @@ form {
  font-size: 100%
  
  }
+ 
+ #Demnet {
+  margin-right: 47% ; 
+  margin-left: 27% ;
+ 
+ 
+ }
 
 #Username,#Mail,#pass,#repeat {
 font-size: 125%;
