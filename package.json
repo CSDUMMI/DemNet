@@ -1,0 +1,26 @@
+{
+  "name": "demnet",
+  "version": "1.0.0",
+  "description": "## Abstract I want to introduce a system, that ensures that all voter's choice is secret and that everybody can check the tally, without knowing who voted how. But to ensure the secrecy we need to have a trusted party, called the supervisor. This might be automatized by using a Smart Contract on a Blockchain, that can access IPFS. Otherwise the whole Election is decentralized   and can be validated by anyone who wants to.",
+  "main": "supervisor.js",
+  "dependencies": {
+    "browserify": "^16.5.0",
+    "crypto": "^1.0.1",
+    "fs": "^0.0.1-security",
+    "ipfs": "^0.38.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/demnet/demnet.git"
+  },
+  "author": "Joris Gutjahr & Abbashan",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/demnet/demnet/issues"
+  },
+  "homepage": "https://github.com/demnet/demnet#readme"
+}

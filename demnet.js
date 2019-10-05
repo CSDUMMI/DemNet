@@ -14,13 +14,15 @@ const password  = process.argv[3];
 const util      = require('util');
 const IPFS      = require( 'ipfs');
 
-function init_node( password, user_id ) {
-  const node      = new IPFS();
-  const node_once = util.promisify( node.once );
+function init_node( node , password, user_id ) {
 
-  let node_ready  = node_once( 'ready' );
+  node.on( 'ready', () => {
+    node.cat( user_id, user => {
+      user = JSON.parse( user );
+      const public_key =
+    } );
+  } );
 
-  node_ready.then( node => {
     cat   = util.promisify( node.cat );
     user  = cat( user_id );
 
@@ -47,8 +49,6 @@ function init_node( password, user_id ) {
       }
 
     });
-
-    user.catch( console.error );
 
   });
 
