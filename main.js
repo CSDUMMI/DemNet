@@ -26,15 +26,16 @@ async function main() {
   app.get( "/read", async ( req, res ) => {
     const id          = req.query.id;
     const content     = await node.cat( id );
-    res.json( { content: content.toString() } );
+    res.json( content.toString() );
   });
 
   app.get( "/read_json", async ( req, res ) => {
     const id          = req.query.id;
     const encoding    = req.query.encoding ? req.query.encoding : "utf-8";
     const content     = await node.cat( id );
-    res.json( content.toString( encoding ) );
+    res.json( JSON.parse( content.toString( encoding ) ) );
   });
+
 
   app.listen( PORT, () => console.log( `Listening on localhost:${PORT}` ) );
 }
