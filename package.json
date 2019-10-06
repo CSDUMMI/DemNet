@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/demnet/demnet/issues"
   },
-  "homepage": "https://github.com/demnet/demnet#readme"
+  "homepage": "https://github.com/demnet/demnet#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ipfs": "^0.38.0"
+  }
 }

@@ -40,4 +40,8 @@ async function main() {
   app.listen( PORT, () => console.log( `Listening on localhost:${PORT}` ) );
 }
 
-main();
+try {
+  main();
+} catch( e ) {
+  console.error( e );
+}
