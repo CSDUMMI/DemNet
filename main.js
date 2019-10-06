@@ -4,8 +4,6 @@ and create new files on IPFS
 */
 
 async function main() {
-  const crypto      = require( 'crypto' );
-  const util        = require( 'util' );
   const IPFS        = require( 'ipfs' );
   const express     = require( 'express' );
   const bodyParser  = require( 'body-parser' );
