@@ -3,43 +3,28 @@ Server to access IPFS Files encrypted
 and create new files on IPFS
 */
 
-async function main() {
+async function init_node() {
   const IPFS        = require( 'ipfs' );
-  const express     = require( 'express' );
-  const bodyParser  = require( 'body-parser' );
-  const app         = express();
-  const PORT        = 3000;
   const node        = await IPFS.create();
+  const result      = { node : node } // result object, add functions to this.
 
-  app.use( bodyParser() );
-
-  app.get( "/create", async ( req, res ) => {
-    const type        = req.query.type;
-    const content     = req.query.content;
+  result.create     = async ( type, content ) => {
     const content_id  = await node.add( JSON.stringify( { type : type, content : content } ) );
-    console.log( content_id );
-    res.json( content_id );
-  });
+    return content_id;
+  }
 
-  app.get( "/read", async ( req, res ) => {
-    const id          = req.query.id;
+  result.read       = async ( id, encoding ) => {
     const content     = await node.cat( id );
-    res.json( content.toString() );
-  });
+    return content.toString( encoding );
+  };
 
-  app.get( "/read_json", async ( req, res ) => {
-    const id          = req.query.id;
-    const encoding    = req.query.encoding ? req.query.encoding : "utf-8";
+  result.read_json  = async ( id, encoding = "utf-8" ) => {
     const content     = await node.cat( id );
-    res.json( JSON.parse( content.toString( encoding ) ) );
-  });
-
-
-  app.listen( PORT, () => console.log( `Listening on localhost:${PORT}` ) );
+    return JSON.parse( content.toString( encoding ) );
+  };
+  return result;
 }
 
-try {
-  main();
-} catch( e ) {
-  console.error( e );
+module.exports = {
+  init_node : init_node
 }
