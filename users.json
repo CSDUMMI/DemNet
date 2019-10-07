@@ -1,3 +1,12 @@
 {
-  
+  "QmABC" : {
+    "messages" : [
+      {
+        "title" : "Welcome to DemNet",
+        "content"  : "We are happy to see, that you use DemNet. Hopefully you will participate in upcoming elections.",
+        "type"  : "text",
+        "author" : "DemNet Team" 
+      }
+    ]
+  }
 }

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title> DemNet </title>
+  </head>
+  <body>
+    <h2> <%= name %> </h2>
+
+    <% for( message in messages ) { %>
+      <h3> <%= message.title %> </h3>
+      <% switch( type ) { %>
+        <% case 'img': %>
+      <img src="<%= message.content" alt="Unavilable">
+        <% break; %>
+        <% default: %>
+        <p> <%= message.content %> </p>
+        <% break; %>
+    <% } %>
+
+  </body>
+</html>
