@@ -1,12 +1,1 @@
-{
-  "joris" : {
-    "messages" : [
-      {
-        "title" : "Welcome to DemNet",
-        "content"  : "We are happy to see, that you use DemNet. Hopefully you will participate in upcoming elections.",
-        "type"  : "text",
-        "author" : "DemNet Team"
-      }
-    ]
-  }
-}
+{"joris":{"messages":[{"title":"Welcome to DemNet","content":"We are happy to see, that you use DemNet. Hopefully you will participate in upcoming elections.","type":"text","author":"DemNet Team"},{"content":"ABC","author":"joris"},{"content":"\"Welcome to the DemNet\"","author":"joris"}]},"team_demnet":{"messages":[{"title":"Welcome to DemNet","content":"We are happy to see, that you use DemNet.\nHopefully you will participate in upcoming elections.","author":"joris","type":"text"}],"password_encrypted":"8bf27d18eef6b0a72ea139caa353cf7a1a91b7432efa953b4df02d4ba5c414c8","email":"team@demnet.org"},"demnet":{"messages":[{"title":"Welcome to DemNet","content":"We are happy to see, that you use DemNet.\nHopefully you will participate in upcoming elections.","author":"joris","type":"text"}],"password_encrypted":"8bf27d18eef6b0a72ea139caa353cf7a1a91b7432efa953b4df02d4ba5c414c8","email":"demnet@demnet.org"}}

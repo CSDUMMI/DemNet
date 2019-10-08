@@ -4,73 +4,116 @@ logging in users, counting votes,
 publishing results.
 */
 
-const fs      = require( 'fs' );
-const crypto  = require( 'crypto' );
-const express = require( 'express' );
-const cookieParser = require( 'cookie-parser' );
-const bodyParser = require( 'body-parser' );
+const fs            = require( 'fs' );
+const crypto        = require( 'crypto' );
+const express       = require( 'express' );
+const app           = express();
+
+const bodyParser    = require( 'body-parser' );
+
+app.use( bodyParser.urlencoded( { extended: false } ) );
+
+app.use( bodyParser.json() );
+
 const cookieSession = require( 'cookie-session' );
-const app     = express();
-
-app.use( cookieParser() );
-app.use( bodyParser() );
 app.use( cookieSession( {
-  name: 'session',
-  keys: process.env.SECRET
-} ) );
+  name : 'session',
+  keys: [ process.env.SECRET ]
+} ) )
 
-const users = JSON.parse( fs.readFileSync( 'users.json' ) );
+const users     = JSON.parse( fs.readFileSync( 'users.json' ) );
 const elections = JSON.parse( fs.readFileSync( 'elections.json' ) );
 
-const PORT = 3000;
-
-app.set( 'view engine', 'ejs' );
-
 app.get( '/', ( req, res ) => {
-    console.log( 'GET index' );
-    res.render( 'index' );
-});
-
-app.get( '/home', ( req, res ) => {
-  console.log( 'GET home' );
   if( req.session.username ) {
-    const username = req.body.username;
+    // is logged in.
 
-    res.render( 'home', { messages : users[ username ].messages, name : username } );
+    res.send( JSON.stringify( users[ req.session.username ].messages ) );
   } else {
-    res.redirect( '/' );
+    req.session.username = "joris";
+    res.send( "Please login <a href=\"\/\"> Home </a>" );
   }
 });
 
-app.post( '/register', ( req, res ) => {
+app.get( '/create', ( req, res ) => {
   if( req.session.username ) {
-    res.redirect( '/' );
+    const content       = req.query.content;
+    const recipient     = req.query.recipient;
+    users[ recipient ].messages.push( {
+      content : content,
+      author  : req.session.username
+    } );
+    res.send( "Created" );
+    fs.writeFileSync( 'users.json', JSON.stringify( users ) );
+  } else {
+    res.send( "Not created" );
+  }
+});
+
+app.get( '/login', ( req, res ) => {
+  const username = req.query.username;
+  const password = req.query.password;
+
+  const encrypted = crypto.createHmac( 'SHA256', process.env.SUPER_SECRET )
+                          .update( password )
+                          .digest( 'hex' );
+
+  if( users[ username ].password_encrypted == encrypted ) {
+    req.session.username = username;
+    res.send( 'logged in' );
+  } else {
+    res.send( 'failure' );
+  }
+
+});
+
+app.get( '/register', ( req, res ) => {
+  const username  = req.query.username;
+  const email     = req.query.email;
+  const password  = req.query.password;
+
+  const encrypted = crypto.createHmac( 'SHA256', process.env.SUPER_SECRET )
+                          .update( password )
+                          .digest( 'hex' );
+
+  if( !( username in users ) ) {
+    users[ username ] = {
+      'messages' : [
+        {
+          'title'   : 'Welcome to DemNet',
+          'content' :
+          'We are happy to see, that you use DemNet.\nHopefully you will participate in upcoming elections.',
+          'author'  : 'joris',
+          'type'    : 'text'
+        }
+      ],
+      'password_encrypted' : encrypted,
+      'email'              : email
+    };
+    fs.writeFileSync( 'users.json', JSON.stringify( users ) );
+    res.send( 'Registered' );
+  } else {
+    res.send( 'Already registered' );
+  }
+});
+
+app.get( '/vote', ( req, res ) => {
+
+  const vote      = req.query.vote;
+  const election  = req.query.election;
+  const username  = req.session.username;
+
+  if( !( username in elections[ election ].participants ) && username ) {
+    elections[ election ].participants.push( username );
+    elections[ election ].votes.push( vote );
+    fs.writeFileSync( 'elections.json', JSON.stringify( elections ) );
+    res.send( "Voted, thank you!" );
+
   } else {
 
-    const username = req.body.username;
-    const email = req.body.email;
-    const password = crypto.createHmac('sha256', process.env.SUPER_SECRET ).update( req.body.password );
-
-    console.log( 'POST /register' );
-    if( !( username in users ) ) {
-
-      users[ username ] = {
-        'email'     : email,
-        'password'  : password.digest( 'hex' ),
-        'messages'  : [
-          {
-            title   : "Welcome",
-            author  : "DemNet Team",
-            content : 'Welcome to DemNet. Hope you will participate in the next vote.'
-          }
-        ]
-      };
-      req.session.username = username;
-      res.redirect( '/home' );
-    }
-
-    res.redirect( '/' );
+    res.send( "Not voted, because already voted. You can't take back your vote." );
   }
-} );
 
-app.listen( PORT, () => console.log( `Listening on ${PORT}` ) );
+})
+
+app.listen( 3000 );
