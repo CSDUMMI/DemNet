@@ -28,7 +28,7 @@ p {
 }
 
 body {
-background-color: #a6a6a6;
+background-color: white;
  background-position: center;
  height: 1000px;
  background-repeat: repeat;
@@ -65,6 +65,6 @@ ul input[type=text] {
   float: right;
   padding: 1%;
   border: none;
-  margin-top: 0.4%;
-  margin-right: 1%;
+  margin-top: 0.8%;
+  margin-right: 2%;
   font-size: 100%;

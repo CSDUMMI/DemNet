@@ -28,7 +28,7 @@ p {
 }
 
 body {
-background-color: #a6a6a6;
+background-color: white;
  background-position: center;
  height: 1000px;
  background-repeat: repeat;
@@ -63,9 +63,8 @@ li a:hover {
 
 ul input[type=text] {
   float: right;
-  padding: 6px;
+  padding: 1%;
   border: none;
-  margin-top: 8px;
-  margin-right: 16px;
-  font-size: 17px;
-
+  margin-top: 0.4%;
+  margin-right: 2%;
+  font-size: 100%;

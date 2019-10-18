@@ -6,9 +6,12 @@
     <link rel="stylesheet" href="/styles/feed.css">
   </head>
   <body>
+  		<form>
+  		<form>
 
       <ul>
       <li><a href="/">Home</a></li>
+      <li><a href="vote">Vote</a></li>
 
       <li><a href="https://www.patreon.com/">Donations</a></li>
       <input type="text" placeholder="Search...">
