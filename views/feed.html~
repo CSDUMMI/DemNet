@@ -6,13 +6,10 @@
     <link rel="stylesheet" href="/styles/feed.css">
   </head>
   <body>
-    <h2> Feed </h2>
 
-    
       <ul>
       <li><a href="/">Home</a></li>
-      <li><a href="/Login">Login</a></li>
-      <li><a href="/Register">Register</a></li>
+
       <li><a href="https://www.patreon.com/">Donations</a></li>
       <input type="text" placeholder="Search...">
       </ul>

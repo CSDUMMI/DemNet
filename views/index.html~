@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>DemNet</title>
-    <link rel="stylesheet" href="/styles/login.css">
+    <link rel="stylesheet" href="/styles/home.css">
   </head>
   <body>
     <h2> The Democratic social network </h2>
@@ -19,6 +19,7 @@
       <li><a href="/Register">Register</a></li>
       <li><a href="/Login">Login</a></li>
       <li><a href="/feed">Feed</a></li>
+      <li><a href="/vote">Vote</a><li>
       <li><a href="https://www.patreon.com/">Donations</a></li>
       <input type="text" placeholder="Search...">
       </ul>
