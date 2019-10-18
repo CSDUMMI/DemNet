@@ -9,13 +9,13 @@
   <body> <center>
     <form method="post" action="/login">
       <h1>DemNet</h1>
-      <h3>Log in for your world </h3>
+      <h3>sign up for your world </h3>
       Username:<br>
        <div class="auto-resize-input">
      <input type="text" name="Username" id="Username"> <br>
       Password: <br>
       <input type="password" name="pass" id="pass"> <br>
-      <input type="submit" value="Logina" id="Login"> <!-- Button -->
+      <input type="submit" value="sign up" id="Login"> <!-- Button -->
       <h4>Haven't an account?</h4>
       <div class="auto-rezize">
     <input type="submit" value="Register" id="submit"> 
