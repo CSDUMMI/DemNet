@@ -17,12 +17,26 @@ body {
  background-repeat: repeat;
 }
 
-h2 {
-  color: #ffffff;
-  text-align: center;
-  padding-top: 10px;
-  margin-bottom: 10px; //problem
+h3{
+   float: left;
+   margin-left: 2%;
+   margin-top: 4.5%;
 }
+
+h4 {
+   float: left;
+   margin-left: 15%;
+   margin-top: 5%
+}
+
+img {
+   float: left;
+   margin-left: 15%;
+   margin-top: 5%;
+   
+}
+
+
 
 p {
   font-family: verdana;
