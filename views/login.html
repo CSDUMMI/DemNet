@@ -3,21 +3,26 @@
   <head>
     <meta charset="utf-8">
     <title>DemNet</title>
+    <!-- Include CSS File(s) -->
     <link rel="stylesheet" href="/styles/login.css">
   </head>
-  <body>
-  <center>
-
+  <body> <center>
     <form method="post" action="/login">
-     <h2> Login </h2>
+      <h1>DemNet</h1>
+      <h3>Log in for your world </h3>
       Username:<br>
-      <input type="text" name="Username"> <br>
+       <div class="auto-resize-input">
+     <input type="text" name="Username" id="Username"> <br>
       Password: <br>
-      <input type="password" name="password"> <br>
+      <input type="password" name="pass" id="pass"> <br>
       <input type="submit" value="Login" id="Login"> <!-- Button -->
-      
+      <h4>Haven't an account?</h4>
+      <div class="auto-rezize">
+    <input type="submit" value="Register" id="submit"> 
+    <form>
+    
 
       
-    </form>
-  </body>
+ 
+</body>
 </html>

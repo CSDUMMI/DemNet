@@ -3,27 +3,26 @@
   <head>
     <meta charset="utf-8">
     <title>DemNet</title>
+    <!-- Include CSS File(s) -->
     <link rel="stylesheet" href="/styles/login.css">
   </head>
-  <body>
-  <center>
-
+  <body> <center>
     <form method="post" action="/login">
-     <h2> Login </h2>
+      <h1>DemNet</h1>
+      <h3>Log in for your world </h3>
       Username:<br>
-      <input type="text" name="Username"> <br>
+       <div class="auto-resize-input">
+     <input type="text" name="Username" id="Username"> <br>
       Password: <br>
-      <input type="password" name="password"> <br>
-      <input type="submit" value="Login" id="Login"> <!-- Button -->
+      <input type="password" name="pass" id="pass"> <br>
+      <input type="submit" value="Logina" id="Login"> <!-- Button -->
+      <h4>Haven't an account?</h4>
+      <div class="auto-rezize">
+    <input type="submit" value="Register" id="submit"> 
+    <form>
+    
+
       
-            <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="/Register">Register</a></li>
-      <li><a href="/feed">Feed</a></li>
-      <li><a href="https://www.patreon.com/">Donations</a></li>
-      <input type="text" placeholder="Search...">
-      </ul>
-      
-    </form>
-  </body>
+ 
+</body>
 </html>

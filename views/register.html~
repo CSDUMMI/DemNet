@@ -24,6 +24,8 @@
       <h4>Have an account?</h4>
       <div class="auto-rezize">
     <input type="submit" value="log in" id="submit"> 
+    <form>
+    
     <img src="demokratie.jpg" alt="Demo" />
 
       
