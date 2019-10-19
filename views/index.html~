@@ -6,18 +6,19 @@
     <link rel="stylesheet" href="/styles/home.css">
   </head>
   <body>
-    <h2> The Democratic social network </h2>
-    <p>  </p>
-
-  <!--  <a href="/login"> Login </a> <br>
-    <a href="/feed"> To your home </a> <br>
-    <a href="/register"> Register </a> <br>
-     link to donactions
-    <a href="https://www.patreon.com/">Donations</a> -->
+     <form id="mitte">
+     <h2>| Die post und vorschläge anderer personen die am meisten gelikt wurden |</h2>
+     </form>
+     <form id="links">
+     <h2>freundeslieste und vorschläge für freunde </h2>
+     </form>
+     <form id="rechts">
+     <h2>| Ein infinity bild ,dass permanet wiederholt wierd ersetzbar durch anderes|</h2>
+     </form>
     
-          <ul>
-      <li><a href="/Register">Register</a></li>
-      <li><a href="/Login">Login</a></li>
+
+    
+      <ul>
       <li><a href="/feed">Feed</a></li>
       <li><a href="/vote">Vote</a><li>
       <li><a href="https://www.patreon.com/">Donations</a></li>
