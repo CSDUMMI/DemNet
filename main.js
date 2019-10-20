@@ -1,4 +1,3 @@
-
 /*
 Simple Server, registering users,
 logging in users, counting votes,
@@ -116,5 +115,24 @@ app.get( '/vote', ( req, res ) => {
   }
 
 })
+
+app.get( '/elections', ( req, res ) => {
+  // Implementing Alternative Vote
+  for (election of elections) {
+    // All options have 0 support, meaning 0 votes in favor
+    let choices = election.options.map( element => {
+      "option" : element,
+      "support" : [] // Votes, which are currently being sorted to this option
+    });
+
+    while( choices.length > 2 ) {
+        let min_support = Math.min( ... map( e => e.support.length, choices ) );
+        minimum_supported_options = filter( e => e == min_support, choices );
+        // Resort the votes for these options to their next prefered vote.
+        for( option in minimum_supported_options )
+    }
+  }
+
+});
 
 app.listen( 3000 );
