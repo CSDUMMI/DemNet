@@ -2,7 +2,7 @@
 form {
   color:white;
   background-color: #333;
-  margin-top: 1%;
+  margin-top: 6%;
   margin-bottom: 10%;
   padding-bottom: 5%;
   padding-top: 2%;
@@ -30,7 +30,7 @@ font-size: 125%;
 }
 
 
-#Register {
+#Login {
 margin-top: 5%;
 font-size: 125%;
 
@@ -57,11 +57,9 @@ p {
 }
 
 body {
- background-color: white;
+background-color: #FFFAFA;
  background-position: center;
  height: 1000px;
  background-repeat: repeat;
 }
-
-
 

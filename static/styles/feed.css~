@@ -65,6 +65,6 @@ ul input[type=text] {
   float: right;
   padding: 1%;
   border: none;
-  margin-top: 0.8%;
+  margin-top: 0.4%;
   margin-right: 2%;
   font-size: 100%;

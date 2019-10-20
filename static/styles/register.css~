@@ -57,7 +57,7 @@ p {
 }
 
 body {
- background-color: white;
+ background-color: #FFFAFA;
  background-position: center;
  height: 1000px;
  background-repeat: repeat;
