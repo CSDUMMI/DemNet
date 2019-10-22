@@ -1,9 +1,7 @@
 module Main where
 
-import Control.Monad
-import Happstack.Server ( nullConf, simpleHTTP,  toResponse, ok, dir )
+import Happstack.Server
 
 main :: IO ()
-main = simpleHTTP nullConf $ msum [ dir "vote" $ ok "No Voting possible yet"
-                                  , dir "post" $ ok "No Postin possible yet"
-                                  ]
+main = do
+  simpleHTTP nullConf $ ok "Hello, World!"
