@@ -16,9 +16,11 @@ def _count_votes( votes, particpant_count, ballot ):
                             lambda v: v[ len(v)-1] == option["option"], votes
                             )
                             )
+
     ballot = sorted( ballot, key=lambda option: len(option["support"]), reverse=True )
+
     # If any option got more than 50% of the support, that is the winner.
-    if len( ballot[0]['support'] ) > particpant_count*0.5 or len(ballot) == 0:
+    if len( ballot[0]['support'] ) > particpant_count/2:
         return ballot[0]
     else:
         # Eliminate least popular option and recount those results
@@ -30,12 +32,14 @@ def _count_votes( votes, particpant_count, ballot ):
         return _count_votes( looser, particpant_count, ballot )
 # Expected Winner = C
 votes = [
-            [ 'A', 'B', 'C' ],
-            [ 'B', 'C', 'A' ],
+            [ 'C', 'B', 'A' ],
+            [ 'C', 'B', 'A' ],
             [ 'C', 'B', 'A' ],
             [ 'A', 'B', 'C' ],
-            [ 'A', 'C', 'B' ],
-            [ 'B', 'A', 'C' ]
+            [ 'A', 'B', 'C' ],
+            [ 'A', 'B', 'C' ]
         ]
 
-print ( count_votes( votes, len( votes ), [ 'A', 'B', 'C' ] ) )
+result =  count_votes( votes, len( votes ), [ 'A', 'B', 'C' ] )
+
+print( f"Winner { result['option'] } with { len( result['support'] )/len(votes) }")
