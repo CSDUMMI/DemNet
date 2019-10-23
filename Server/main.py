@@ -43,4 +43,4 @@ votes = [
 
 result =  count_votes( votes, len( votes ), [ 'A', 'B', 'C' ] )
 
-print( f"Winner { result['option'] } with { len( result['support'] )/len(votes) }")
+print( f"Winner { result['option'] } with { round( len( result['support'] )/len(votes) * 100) }%")
