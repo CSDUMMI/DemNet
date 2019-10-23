@@ -1,57 +1,45 @@
-import json
+from flask import Flask, request, session
+from election import count_votes
+from Crypto import SHA256
+import sqlite3 as sqlite
 
-def count_votes( votes, participant_count, options ):
-    ballot = map( lambda option : { "option" : option, "support" : list() }, options )
-    return _count_votes( votes, participant_count, list(ballot) )
+app = Flask(__name__)
 
+def connect():
+    return sqlite.connect('data.db')
 
-def _count_votes( votes, participant_count, ballot ):
-    # Base case
-    if len(ballot) == 1:
-        return ballot[0]
+@app.route('/login')
+def login():
+    # Logout automatically
+    if request.form.get('username') and request.form.get('password'):
+        hash = SHA256.new( request.form.get('password') ).hexdigest()
+        username = request.form.get('username')
 
-    # Sort the votes to their first choice
-    for option in ballot:
-        option["support"] = option["support"] + list(
-                            filter(
-                            lambda v: v[ len(v)-1] == option["option"], votes
-                            )
-                            )
+        connection = connect()
+        cursor = connection.cursor()
+        cursor.execute('SELECT password FROM users WHERE username = ?', username )
 
-    ballot = sorted( ballot, key=lambda option: len(option["support"]), reverse=True )
+        if hash == cursor.fetchone():
+            session['username'] = username
+            return 'ok'
 
-    # If any option got more than 50% of the support, that is the winner.
-    if len( ballot[0]['support'] ) > participant_count/2:
-        return ballot[0]
+        cursor.close()
     else:
-        # Eliminate least popular option and recount those results
-        looser = ballot.pop()
-        print(f"Looser: {looser['option']} " )
-        looser = list(map( lambda v: v[:-1], looser['support']))
+        return 'fail'
 
-        print( looser )
-        return _count_votes( looser, participant_count, ballot )
+@app.route('/register')
+def register():
 
+    if (
+        request.form.get('username')
+        and request.form.get('password')
+        and request.form.get('email')
+        ):
 
+        username = request.form.get('username')
+        hash = SHA256.new( request.form.get('password')).hexdigest()
+        email = request.form.get('email')
 
-
-
-
-# Expected Winner = C
-votes = [
-            [ 'C', 'B', 'A' ],
-            [ 'C', 'B', 'A' ],
-            [ 'C', 'B', 'A' ],
-            [ 'A', 'C', 'B' ],
-            [ 'C', 'A', 'B' ],
-            [ 'A', 'C', 'B' ],
-            [ 'A', 'B', 'C' ]
-
-        ]
-
-result =  count_votes( votes, len( votes ), [ 'A', 'B', 'C' ] )
-
-if result == "ERROR":
-    print( "Malformatted votes, options or participant_count" )
-else:
-    print( f"Winner { result['option'] } with { round( len( result['support'] )/len(votes) * 100) }%")
+        connection = connect()
+        cursor = connection.cursor()
+        cursor.execute('INSERT INTO users VALUES ( ?, ?, ? )')
