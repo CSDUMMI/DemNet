@@ -37,7 +37,8 @@ votes = [
             [ 'C', 'B', 'A' ],
             [ 'A', 'B', 'C' ],
             [ 'A', 'B', 'C' ],
-            [ 'A', 'B', 'C' ]
+            [ 'A', 'B', 'C' ],
+            [ 'B', 'A', 'C' ]
         ]
 
 result =  count_votes( votes, len( votes ), [ 'A', 'B', 'C' ] )
