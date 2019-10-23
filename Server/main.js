@@ -1,138 +1,64 @@
 /*
-Simple Server, registering users,
-logging in users, counting votes,
-publishing results.
+Vote and Publish Election
 */
+const express = require('express');
+const app = express();
 
-const fs            = require( 'fs' );
-const crypto        = require( 'crypto' );
-const express       = require( 'express' );
-const app           = express();
+function count_votes( votes, participants, options )
+{
 
-const bodyParser    = require( 'body-parser' );
-
-app.use( bodyParser.urlencoded( { extended: false } ) );
-
-app.use( bodyParser.json() );
-
-const cookieSession = require( 'cookie-session' );
-app.use( cookieSession( {
-  name : 'session',
-  keys: [ process.env.SECRET ]
-} ) )
-
-const users     = JSON.parse( fs.readFileSync( 'users.json' ) );
-const elections = JSON.parse( fs.readFileSync( 'elections.json' ) );
-
-app.get( '/', ( req, res ) => {
-  if( req.session.username ) {
-    // is logged in.
-
-    res.send( JSON.stringify( users[ req.session.username ].messages ) );
-  } else {
-    req.session.username = "joris";
-    res.send( "Please login <a href=\"\/\"> Home </a>" );
-  }
-});
-
-app.get( '/create', ( req, res ) => {
-  if( req.session.username ) {
-    const content       = req.query.content;
-    const recipient     = req.query.recipient;
-    users[ recipient ].messages.push( {
-      content : content,
-      author  : req.session.username
-    } );
-    res.send( "Created" );
-    fs.writeFileSync( 'users.json', JSON.stringify( users ) );
-  } else {
-    res.send( "Not created" );
-  }
-});
-
-app.get( '/login', ( req, res ) => {
-  const username = req.query.username;
-  const password = req.query.password;
-
-  const encrypted = crypto.createHmac( 'SHA256', process.env.SUPER_SECRET )
-                          .update( password )
-                          .digest( 'hex' );
-
-  if( users[ username ].password_encrypted == encrypted ) {
-    req.session.username = username;
-    res.send( 'logged in' );
-  } else {
-    res.send( 'failure' );
-  }
-
-});
-
-app.get( '/register', ( req, res ) => {
-  const username  = req.query.username;
-  const email     = req.query.email;
-  const password  = req.query.password;
-
-  const encrypted = crypto.createHmac( 'SHA256', process.env.SUPER_SECRET )
-                          .update( password )
-                          .digest( 'hex' );
-
-  if( !( username in users ) ) {
-    users[ username ] = {
-      'messages' : [
-        {
-          'title'   : 'Welcome to DemNet',
-          'content' :
-          'We are happy to see, that you use DemNet.\nHopefully you will participate in upcoming elections.',
-          'author'  : 'joris',
-          'type'    : 'text'
-        }
-      ],
-      'password_encrypted' : encrypted,
-      'email'              : email
-    };
-    fs.writeFileSync( 'users.json', JSON.stringify( users ) );
-    res.send( 'Registered' );
-  } else {
-    res.send( 'Already registered' );
-  }
-});
-
-app.get( '/vote', ( req, res ) => {
-
-  const vote      = req.query.vote;
-  const election  = req.query.election;
-  const username  = req.session.username;
-
-  if( !( username in elections[ election ].participants ) && username ) {
-    elections[ election ].participants.push( username );
-    elections[ election ].votes.push( vote );
-    fs.writeFileSync( 'elections.json', JSON.stringify( elections ) );
-    res.send( "Voted, thank you!" );
-
-  } else {
-
-    res.send( "Not voted, because already voted. You can't take back your vote." );
-  }
-
-})
-
-app.get( '/elections', ( req, res ) => {
-  // Implementing Alternative Vote
-  for (election of elections) {
-    // All options have 0 support, meaning 0 votes in favor
-    let choices = election.options.map( element => {
-      "option" : element,
-      "support" : [] // Votes, which are currently being sorted to this option
-    });
-
-    while( choices.length > 2 ) {
-        let min_support = Math.min( ... map( e => e.support.length, choices ) );
-        minimum_supported_options = filter( e => e == min_support, choices );
-        // Resort the votes for these options to their next prefered vote.
-        for( option in minimum_supported_options )
+  for( let i = 0; i < options.length; i++ ) {
+    options[i] = {
+      option : options[i],
+      support : new Array(votes.filter( vote => options[i] == vote[vote.length-1] ) )
     }
   }
+  console.log( options );
+  _count_votes( [], options, participants );
+}
 
-});
+function _count_votes( votes, options, participants ) {
+  // Add votes to the selected options
+  for( let i = 0; i < options.length; i++ ) {
+    options[i].support.push( ... votes.filter( vote => options[i].option == vote[vote.length-1] ))
+  }
 
-app.listen( 3000 );
+  console.log( typeof( options[0].support ) );
+  options.sort( ( fE, sE ) => {
+    if (fE.support.length > sE.suppport.length) {
+      return -1;
+    } else if( fE.support.length < sE.support.length ) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+
+  if( options[0].support.length > participants *0.5 ) {
+    return options[0]; // Winner by virtue of having more than 50% of the support
+  } else {
+    options[options.length-1] = options[options.length-1].support.map( e => e.pop() );
+    options.pop();
+    return _count_votes( options[ options.length-1 ], options, participants )
+  }
+}
+
+
+votes = [
+          [
+            'A', 'B', 'C'
+          ],
+          [
+            'B', 'C', 'A'
+          ],
+          [
+            'C', 'A', 'B'
+          ],
+          [
+            'A', 'B', 'C'
+          ]
+        ];
+
+console.log( count_votes( votes, 4, ['A','B','C']));
+
+module.exports = count_votes;
