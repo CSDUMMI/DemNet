@@ -11,5 +11,5 @@ Folgende URI-Routes sind vorhanden:
 /login : Login mit Benutzername und Passwort
 /register : Registriere dich mit Benutzername, Vor- und Nachnamen, einer Mail Addresse und einem Passwort
 /vote : Wenn du eingeloggt bist, kannst du zu jeder aktuellen Wahl deine Stimme abgeben, indem du alle Optionen von deinem unbeliebtesten zu deinem Favoriten ordnest, du Teilst die Optionen mit ;
-/election : Sehe die Wahlergebnisse vergangener Wahlen an.
+[/election](#election) : Sehe die Wahlergebnisse vergangener Wahlen an.
 ```
