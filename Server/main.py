@@ -82,7 +82,7 @@ def vote():
 
 @app.route('/election')
 def election():
-    if( request.values.get('election') ):
+    if( request.values.get('election') and elctions.get( request.values.get('election') )):
 
         election = request.values.get('election')
 
@@ -98,7 +98,7 @@ def election():
         else:
             return jsonify( count_votes( votes, participants_count, options ) )
     else:
-        return 'NoElectionProvided'
+        return 'NotAnElection'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
