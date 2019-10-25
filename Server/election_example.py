@@ -7,4 +7,6 @@ def load_sample_votes():
 
 sample_votes = load_sample_votes()
 
-print(f"\nResult:{count_votes(sample_votes,len(sample_votes), ['A','B','C','D','E','F','G','H','I','J'])}")
+result = count_votes(sample_votes,len(sample_votes), ['A','B','C','D','E','F','G','H','I','J'])
+
+print("\nResult:{}".format(result))
