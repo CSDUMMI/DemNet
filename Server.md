@@ -79,18 +79,18 @@ Antwort (Response).
 - Wenn es die Wahl gibt und sie vorbei ist, gibt es einen JSON Response: (eine Beispiel Wahl, wo 'D' gewonnen hat)
 ```json
 {
-  'option': 'D', 
-  'support': [
-              ['A', 'B', 'C', 'D'], 
-              ['B', 'C', 'A', 'D'], 
-              ['B', 'C', 'A', 'D'], 
-              ['C', 'A', 'D'], 
-              ['C', 'A', 'D'], 
-              ['A', 'B', 'D'],
-              ['C', 'A', 'D'],
-              ['C', 'A', 'D']
+  "option": "D", 
+  "support": [
+              ["A", "B", "C", "D"], 
+              ["B", "C", "A", "D"], 
+              ["B", "C', "A", "D"], 
+              ["C", "A", "D"], 
+              ["C", "A", "D"], 
+              ["A", "B", "D"],
+              ["C", "A", "D"],
+              ["C", "A", "D"]
              ],
-  'participants_count' : 12
+  "participants_count": 12
 } 
 ```
 
