@@ -1,4 +1,13 @@
 from election import count_votes
+import random, os
+
+random.seed( a=os.environ['SEED'] )
+
+def generate_random_vote(options):
+    vote = []
+    for option in options:
+        vote.append(options[ random.randint(0,len(options)-1) ])
+    return vote
 
 def load_sample_votes():
     sample_votes = open('sample_votes.txt').read().split('\n')
