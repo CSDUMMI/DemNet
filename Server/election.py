@@ -19,7 +19,6 @@ def distribute_votes( votes, participant_count, ballot ):
 
         looser = least_popular(ballot)
         ballot.remove(looser)
-        print(f"Eliminated {looser}\n\n")
         looser['support'] = list(map(lambda v: v[:-1], looser['support']))
         return distribute_votes(looser['support'], participant_count, ballot)
 
@@ -30,14 +29,6 @@ def least_popular( ballot ):
         option2 = ballot[-2]
         alternative_votes = list( map( lambda option: option['support'][:-1], ballot ) )
         alternative_votes = functools.reduce( lambda x, y : x + y, alternative_votes )
-
-        print(f"TIE: between {option1['option']} and {option2['option']}")
-        print(f"{option1['option']}: {len(option1['support'])}")
-        print(f"{option1['support']}")
-        print(f"{option2['option']}: {len(option2['support'])}")
-        print(f"{option2['support']}")
-
-        print(f"Alternative Votes:{ alternative_votes}")
 
         i = -1
         least_popular = False
