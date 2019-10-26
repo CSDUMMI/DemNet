@@ -82,7 +82,7 @@ def vote():
 
 @app.route('/election')
 def election():
-    if( request.values.get('election') and elctions.get( request.values.get('election') )):
+    if( request.values.get('election') and elections.get( request.values.get('election') )):
 
         election = request.values.get('election')
 
@@ -99,6 +99,27 @@ def election():
             return jsonify( count_votes( votes, participants_count, options ) )
     else:
         return 'NotAnElection'
+
+@app.route('/post')
+def post():
+    if ( request.values.get('posting')
+        and request.values.get('type')
+        and session.get('username')
+        and request.values.get('recipient')
+        and users.get('recipient') ):
+
+        content     = request.values['posting']
+        type        = request.values['type']
+        author      = session['username']
+        recipient   = request.values['recipient']
+
+        users[recipient]['messages'].append({ "content" : content, "type" : type, "author" : author })
+        if type == "image":
+            img = request.files['uploaded_img']
+            f.save( "/static" + secure_filename(f.filename) )
+
+        return "Posted"
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
