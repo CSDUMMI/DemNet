@@ -18,8 +18,11 @@ def generate_elections( options, participants ):
         votes.append( generate_random_vote(options) )
         participants -= 1
 
-    print(f"Votes:{votes}")
-    print(f"Result:{count_votes(votes,len(votes),options)}")
+    winner = count_votes( votes, len(votes), options )
+    winner_in_first = list(map( lambda vote: vote[-1],votes )).count(winner['option'])
+
+    print(f"Result:{winner}")
+    print(f"Winner occured in first election {winner_in_first} times")
 
 if __name__ == '__main__':
     i = 10
