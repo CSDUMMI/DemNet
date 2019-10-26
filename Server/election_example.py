@@ -4,9 +4,7 @@ import random, os
 random.seed( a=os.environ['SEED'] )
 
 def generate_random_vote(options):
-    vote = []
-    for option in options:
-        vote.append(options[ random.randint(0,len(options)-1) ])
+    vote = random.sample( options, k = len(options) )
     return vote
 
 def load_sample_votes():
@@ -14,8 +12,17 @@ def load_sample_votes():
     sample_votes = list(map( lambda v: v.split(';'), sample_votes ))
     return sample_votes
 
-sample_votes = load_sample_votes()
+def generate_elections( options, participants ):
+    votes = []
+    while( participants > 0 ):
+        votes.append( generate_random_vote(options) )
+        participants -= 1
 
-result = count_votes(sample_votes,len(sample_votes), ['A','B','C','D','E','F','G','H','I','J'])
+    print(f"Votes:{votes}")
+    print(f"Result:{count_votes(votes,len(votes),options)}")
 
-print("\nResult:{}".format(result))
+if __name__ == '__main__':
+    i = 10
+    while(i > 0):
+        generate_elections(['A','B','C','D'],random.randint(5,10))
+        i -= 1
