@@ -7,7 +7,7 @@ def count_votes( votes, participant_count, options ):
 
 def distribute_votes( votes, participant_count, ballot ):
     if len(ballot[0]['support']) > participant_count * 0.5 or len(ballot) <= 1:
-        return ballot # Winner!
+        return ballot[0] # Winner!
     else:
         # Distribute votes
         for option in ballot:
