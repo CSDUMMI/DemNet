@@ -19,13 +19,21 @@ def generate_elections( options, participants ):
         participants -= 1
 
     winner = count_votes( votes, len(votes), options )
-    winner_in_first = list(map( lambda vote: vote[-1],votes )).count(winner['option'])
 
-    print(f"Result:{winner}")
-    print(f"Winner occured in first election {winner_in_first} times")
+    winners = []
+    for i in range(len(options)):
+        votes_in_i = list(map( lambda vote: vote[-i],votes ))
+        winner_votes = votes_in_i.count(winner['ballot']['option'])
+        winners.append( ( winner_votes, len(votes_in_i) ))
+
+    print(f"Result:{winner['ballot']['option']}")
+
+    for i in range(len(winners)):
+        percentage = round((winners[i][0]/winners[i][1]) * 100, ndigits=2)
+        print(f"Winner' votes in Vote #{i}:\t{winners[i][0]} of {winners[i][1]},\t{ percentage }% ")
 
 if __name__ == '__main__':
     i = 10
     while(i > 0):
-        generate_elections(['A','B','C','D'],random.randint(5,10))
+        generate_elections(['A','B','C','D', 'E', 'F', 'G', 'H', 'I'],random.randint(10**2,10**3))
         i -= 1
