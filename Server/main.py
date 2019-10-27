@@ -120,6 +120,12 @@ def post():
 
         return "Posted"
 
+@app.route('/messages')
+def messages():
+    if( session.get('username') ):
+        return jsonify(session['username']['messages'])
+    else:
+        return "NotLoggedIn"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
