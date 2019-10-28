@@ -1,42 +1,50 @@
 module Login exposing (..)
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Html exposing (Html, Attribute, div, input, text)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onInput)
 
+-- MAIN
 
--- Main
 
 main =
   Browser.sandbox { init = init, update = update, view = view }
 
--- Model
 
-type alias Model = Int
+-- MODEL
+
+
+type alias Model =
+  { content : String
+  }
+
 
 init : Model
 init =
-  0
+  { content = "" }
 
 
--- update
+-- UPDATE
 
-type Msg = Increment | Decrement
+
+type Msg
+  = Change String
+
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Increment ->
-      model + 1
+    Change newContent ->
+      { model | content = newContent }
 
-    Decrement ->
-      model - 1
 
--- view
+
+-- VIEW
+
 
 view : Model -> Html Msg
 view model =
   div []
-    [ button [ onClick Decrement ] [ text "-" ]
-    , div [] [ text (String.fromInt model) ]
-    , button [ onClick Increment ] [ text "+" ]
+    [ input [ placeholder "Text to reverse", value model.content, onInput Change ] []
+    , div [] [ text (String.reverse model.content) ]
     ]
