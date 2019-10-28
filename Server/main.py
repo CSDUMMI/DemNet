@@ -123,7 +123,7 @@ def post():
 @app.route('/messages')
 def messages():
     if( session.get('username') ):
-        return jsonify(session['username']['messages'])
+        return jsonify(users[session['username']]['messages'])
     else:
         return "NotLoggedIn"
 
