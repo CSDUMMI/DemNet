@@ -15,13 +15,9 @@ main = Browser.element
         , view = view
         }
 
-descriptions =  Array.fromList
-                [ "Democracy"
-                , "DemNet"
-                , "The democratic social network"
-                ]
-
-type alias Model =  { cycle : Cycle.Cycle String }
+type alias Model =  { cycle : Cycle.Cycle String
+                    , news : List Posting
+                    }
 
 init : () -> (Model, Cmd Msg)
 init _ = ({ cycle = Cycle.init "Democratic"
@@ -30,6 +26,8 @@ init _ = ({ cycle = Cycle.init "Democratic"
                 , "Libre"
                 , "The democratic social network"
                 ]
+          , news =  [ Posting { title = "Welcome", content = Text "We welcome you to DemNet" }
+                    ]
          }, Cmd.none )
 type Msg = Change
 
@@ -44,8 +42,9 @@ subscriptions model = Time.every 4000 (\_ -> Change)
 
 view : Model -> Html.Html Msg
 view model =
-  let element = Element.collumn []
+  let element = Element.column []
                   [ viewHeader
                   , Element.text (Cycle.next model.cycle)
+                  , viewPosts model.news
                   ]
   in Element.layout [] element
