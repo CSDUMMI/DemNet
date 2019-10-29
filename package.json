@@ -20,5 +20,6 @@
   "bugs": {
     "url": "https://github.com/demnet/DemNet/issues"
   },
-  "homepage": "https://github.com/demnet/DemNet#readme"
+  "homepage": "https://github.com/demnet/DemNet#readme",
+  "prestart": "elm make src/Home.elm --output Server/static/Home.html"
 }
