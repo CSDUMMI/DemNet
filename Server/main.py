@@ -3,7 +3,7 @@ from election import count_votes
 from Crypto.Hash import SHA256
 import json, os
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='/static')
 app.secret_key = os.environ['SECRET_KEY']
 
 users = json.load(open( 'users.json'))
