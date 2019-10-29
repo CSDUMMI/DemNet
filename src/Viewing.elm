@@ -1,14 +1,19 @@
 module Viewing exposing (..)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Element exposing (Element, text, link)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
 
-viewHeader : Html a
-viewHeader =
-  div [ class "header_v" ]
-    [ viewLink "/home" [text "Home"]
-    , viewLink "/login" [text "Login"]
-    , viewLink "/register" [text "Register"]
+viewHeader : Element a
+viewHeader = Element.row []
+    [ viewLink "/" (text "Home")
+    , viewLink "/login" (text "Login")
+    , viewLink "/register" (text "Register")
+    , viewLink "/news" (text "News")
     ]
 
-viewLink : String -> List (Html a) -> Html a
-viewLink reference content = a [ href reference ] content
+viewLink : String -> Element msg -> Element msg
+viewLink url label = link []
+                        { url = url
+                        , label = label
+                        }

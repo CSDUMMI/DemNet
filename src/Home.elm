@@ -1,11 +1,12 @@
 module Home exposing (..)
 import Browser
-import Html exposing (..)
+import Element
 import Time
 import Viewing exposing (..)
 import Array
 import Delay
 import Cycle
+import Html
 
 main = Browser.element
         {  init = init
@@ -41,9 +42,10 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model = Time.every 4000 (\_ -> Change)
 
-view : Model -> Html Msg
+view : Model -> Html.Html Msg
 view model =
-  div []
-    [ viewHeader
-    , text (Cycle.next model.cycle)
-    ]
+  let element = Element.collumn []
+                  [ viewHeader
+                  , Element.text (Cycle.next model.cycle)
+                  ]
+  in Element.layout [] element
