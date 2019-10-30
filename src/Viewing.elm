@@ -16,6 +16,13 @@ link_color = Element.rgb255 153 153 255
 text_attr = [ Background.color text_bg_color
             , Border.rounded 20 ]
 
+type Nav_Items =
+    Home (List Nav_Items)
+  | Login (List Nav_Items)
+  | Register (List Nav_Items)
+  | News (List Nav_Items)
+  | Feed (List Nav_Items)
+    
 viewNavigation : Nav_Items -> Element.Element msg
 viewNavigation = Element.wrappedRow
 
