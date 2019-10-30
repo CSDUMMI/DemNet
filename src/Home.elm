@@ -52,5 +52,5 @@ view (Model model) =
       body = Element.column [ Element.centerX, Element.alignTop ]
               [ viewNavigation
               , text (description_adjective ++ " Network")
-              , viewNews news ]
-  in  Element.layout [ Background.color Viewing.grey ] body
+              , viewPosts news ]
+  in  Element.layout [ Background.color Viewing.background_color ] body
