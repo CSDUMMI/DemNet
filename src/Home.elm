@@ -1,50 +1,49 @@
 module Home exposing (..)
-import Browser
-import Element
-import Time
-import Viewing exposing (..)
-import Array
-import Delay
+
 import Cycle
+import Time
+import Viewing
 import Html
+import Element.Region as Region
+import Browser
 
-main = Browser.element
-        {  init = init
-        , update = update
-        , subscriptions = subscriptions
-        , view = view
-        }
+-- MAIN
+main =
+  Browser.element
+    { init = init
+    , update = update
+    , subscriptions = subscriptions
+    , view = view
+    }
 
-type alias Model =  { cycle : Cycle.Cycle String
-                    , news : List Posting
+-- MODEL
+type Model = Model  { cycle : Cycle.Cycle String
+                    , news : List Viewing.Posting
                     }
 
 init : () -> (Model, Cmd Msg)
-init _ = ({ cycle = Cycle.init "Democratic"
-                [ "Transparent"
-                , "Free"
-                , "Libre"
-                , "The democratic social network"
-                ]
-          , news =  [ Posting { title = "Welcome", content = Text "We welcome you to DemNet" }
-                    ]
-         }, Cmd.none )
+init _ = ( Model { cycle = Cycle.init "Democractic" ["Social", "Transperant" ]
+                 , news = []
+                 }
+         , Cmd.none )
+
+-- UPDATE
 type Msg = Change
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg model =
+update msg (Model model ) =
   case msg of
-    Change -> ({ model | cycle = Cycle.step model.cycle }, Cmd.none )
+    Change -> (Model { model | cycle = Cycle.step model.cycle }, Cmd.none)
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
-subscriptions model = Time.every 4000 (\_ -> Change)
+subscriptions model =
+  Time.every 1000 (\_ -> Change)
 
+-- VIEW
 view : Model -> Html.Html Msg
 view model =
-  let element = Element.column []
-                  [ viewHeader
-                  , Element.text (Cycle.next model.cycle)
-                  , viewPosts model.news
-                  ]
-  in Element.layout [] element
+  let description_adjective = Cycle.next model.cycle
+  in Html.div []  [ viewNavigation
+                  , Html.text description_adjective
+                  , viewNews ]
