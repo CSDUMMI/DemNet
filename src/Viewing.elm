@@ -17,23 +17,34 @@ text_attr = [ Background.color text_bg_color
             , Border.rounded 20 ]
 
 type Nav_Items =
-    Home (List Nav_Items)
-  | Login (List Nav_Items)
-  | Register (List Nav_Items)
-  | News (List Nav_Items)
-  | Feed (List Nav_Items)
-    
+    Home Nav_Items
+  | Login Nav_Items
+  | Register Nav_Items
+  | News Nav_Items
+  | Feed Nav_Items
+  | None
+
+reduceNavs : List (Element.Element msg)-> Nav_Items -> List (Element.Element msg)
+reduceNavs navs nav_items =
+    case nav_items of
+      Home ns -> reduceNavs ((viewLink "/" "Home") :: navs) ns
+      Login ns -> reduceNavs ((viewLink "/login" "Login") :: navs)ns
+      Register ns -> reduceNavs ((viewLink "/register" "Register") :: navs) ns
+      News ns -> reduceNavs ((viewLink "/news" "News") :: navs) ns
+      Feed ns -> reduceNavs ((viewLink "/feed" "Feed") :: navs) ns
+      None -> navs
+
 viewNavigation : Nav_Items -> Element.Element msg
-viewNavigation = Element.wrappedRow
+viewNavigation nav_items =
+  let navs = reduceNavs [] nav_items
+  in Element.wrappedRow
 
-               (text_attr ++ [ spacing 10
-                             , padding 10
-                             , Font.color link_color ])
+                 (text_attr ++ [ spacing 10
+                               , padding 10
+                               , Font.color link_color ])
+                               navs
 
-                             [ viewLink "/" "Home"
-                             , viewLink "/login" "Login"
-                             , viewLink "/register" "Register"
-                             , viewLink "/news" "News" ]
+
 
 viewLink : String -> String -> Element.Element msg
 viewLink url description = link [] { url = url, label = text description }

@@ -50,7 +50,7 @@ view (Model model) =
   let description_adjective = Cycle.next model.cycle
       news = model.news
       body = Element.column [ Element.centerX, Element.alignTop ]
-              [ viewNavigation
+              [ (viewNavigation << News << Register << Login << Home ) None
               , text (description_adjective ++ " Network")
               , viewPosts news ]
   in  Element.layout [ Background.color Viewing.background_color ] body
