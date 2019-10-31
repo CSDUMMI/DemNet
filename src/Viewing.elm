@@ -132,7 +132,7 @@ type Actions
   | No_Action Actions
 
 viewNavBar : Nav_Items -> Element.Element msg
-viewNavBar navs =
+viewNavBar = viewNavigation
 
 viewUser : Maybe User -> Element.Element msg
 
