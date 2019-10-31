@@ -35,12 +35,15 @@ import Markdown exposing  ( toHtmlWith
 
 -- General Attributes, which are used often.
 text_bg_color = Element.rgb255 255 255 255
+bar_bg_color = Element.rgb255 17 69 240
 background_color  = Element.rgb255 96 96 96
 link_color = Element.rgb255 153 153 255
 
 text_attr = [ Background.color text_bg_color
             , Border.rounded 20 ]
 
+bar_attr = [ Background.color bar_bg_color
+           , Border.solid ]
 -- NAVIGATION
 type Nav_Items =
     Home Nav_Items
@@ -120,9 +123,9 @@ type User = User  { username : String
                   , img_logo : Maybe String -- SRC of the User's Image
                   }
 type Main_Page
-  = Feed
-  | Editing
-  | Reading
+  = Feed List (Post msg)
+  | Editing (Post msg)
+  | Reading (Post msg)
   | Login
   | Register
 
@@ -141,11 +144,19 @@ viewUser : Maybe User -> Element.Element msg
 viewUser u =
   case u of
     Just (User user) ->
-      let img_src =
-        case user.img_logo of
-          Just src -> src
-          Nothing -> defaultSrc
+      let img_src = case user.img_logo of
+                      Just src -> src
+                      Nothing -> defaultSrc
+          firstName = Element.text user.firstName
+          lastName = Element.text user.lastName
+      in Element.row bar_attr [ Element.image [ Border.rounded 45 ] { src = img_src, description = "User's Image" }
+                              , firstName
+                              , lastName
+                              ]
 
-viewMainPage : Main_Page -> Element.Element msg
-
+viewMainPage : Main_Page -> -> Element.Element msg
+viewMainPage page messages =
+  case page of
+    Feed messages -> viewPosts messages
+    Editing post -> Element.textColumn
 viewActions : Actions -> Element.Element msg

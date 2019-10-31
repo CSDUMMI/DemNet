@@ -41,7 +41,7 @@ type Msg
   = EnterPassword
 
 update : Msg -> Model -> Model
-update
+update msg model = model
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
@@ -65,5 +65,7 @@ view (Model model) =
             (Element.column []
               [ viewNavBar navigation
               , viewUser model.user
-              , viewMainPage model.main_page
-              , viewActions]
+              , viewMainPage model.main_page model.messages
+              , viewActions
+              ])
+  }
