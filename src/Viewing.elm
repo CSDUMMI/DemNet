@@ -8,6 +8,12 @@ module Viewing exposing ( Post
                         , viewPost
                         , viewPosts
                         , pairToPost
+                        , Main_Page (..)
+                        , Actions (..)
+                        , viewNavBar
+                        , viewUser
+                        , viewMainPage
+                        , viewActions
                         )
 
 import Element exposing ( link
@@ -40,7 +46,6 @@ type Nav_Items =
     Home Nav_Items
   | Login Nav_Items
   | Register Nav_Items
-  | News Nav_Items
   | None
 
 reduceNavs : List (Element.Element msg)-> Nav_Items -> List (Element.Element msg)
@@ -49,7 +54,6 @@ reduceNavs navs nav_items =
       Home ns -> reduceNavs ((viewLink "/" "Home") :: navs) ns
       Login ns -> reduceNavs ((viewLink "/login" "Login") :: navs)ns
       Register ns -> reduceNavs ((viewLink "/register" "Register") :: navs) ns
-      News ns -> reduceNavs ((viewLink "/news" "News") :: navs) ns
       None -> navs
 
 viewNavigation : Nav_Items -> Element.Element msg
@@ -107,3 +111,29 @@ stringToPost str_post =
       content_lines = List.filter ((/=) title) post_lines
       content = (Element.html << (toHtmlWith opts []) << (String.join "\n")) content_lines
   in  Post { title = title, content = content }
+
+
+-- PAGE VIEWS
+type User = User  { username : String
+                  , firstName : String
+                  , lastName : String
+                  , img_logo : String -- SRC of the User's Image
+                  }
+type Main_Page
+  = Feed
+  | Editing
+  | Reading
+
+type Actions
+  = Create_Post Actions
+  | Publish_Post Actions
+  | No_Action Actions
+
+viewNavBar : Nav_Items -> Element.Element msg
+viewNavBar navs = 
+
+viewUser : Maybe User -> Element.Element msg
+
+viewMainPage : Main_Page -> Element.Element msg
+
+viewActions : Actions -> Element.Element msg
