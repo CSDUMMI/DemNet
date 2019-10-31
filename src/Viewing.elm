@@ -117,7 +117,7 @@ stringToPost str_post =
 type User = User  { username : String
                   , firstName : String
                   , lastName : String
-                  , img_logo : String -- SRC of the User's Image
+                  , img_logo : Maybe String -- SRC of the User's Image
                   }
 type Main_Page
   = Feed
@@ -134,7 +134,17 @@ type Actions
 viewNavBar : Nav_Items -> Element.Element msg
 viewNavBar = viewNavigation
 
+-- SRC of default user image
+defaultSrc =
+
 viewUser : Maybe User -> Element.Element msg
+viewUser u =
+  case u of
+    Just (User user) ->
+      let img_src =
+        case user.img_logo of
+          Just src -> src
+          Nothing -> defaultSrc
 
 viewMainPage : Main_Page -> Element.Element msg
 
