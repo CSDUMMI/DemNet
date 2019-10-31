@@ -135,7 +135,7 @@ viewNavBar : Nav_Items -> Element.Element msg
 viewNavBar = viewNavigation
 
 -- SRC of default user image
-defaultSrc =
+defaultSrc = "/static/img/defaultUser.jpg"
 
 viewUser : Maybe User -> Element.Element msg
 viewUser u =
