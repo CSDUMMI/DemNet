@@ -123,6 +123,8 @@ type Main_Page
   = Feed
   | Editing
   | Reading
+  | Login
+  | Register
 
 type Actions
   = Create_Post Actions
@@ -130,7 +132,7 @@ type Actions
   | No_Action Actions
 
 viewNavBar : Nav_Items -> Element.Element msg
-viewNavBar navs = 
+viewNavBar navs =
 
 viewUser : Maybe User -> Element.Element msg
 
