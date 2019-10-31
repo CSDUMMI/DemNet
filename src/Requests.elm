@@ -32,10 +32,10 @@ foldTwo_ folded folding list =
 foldTwo : (a -> a -> (a,a)) -> List a -> List (a,a)
 foldTwo = foldTwo_ []
 
-parseFetched : String -> List (Viewing.Posting msg)
+parseFetched : String -> List (Viewing.Post msg)
 parseFetched fetched =
   -- Tab Seperated Values
   let parts = String.split "\t" fetched
       parts_folded = foldTwo (\a b -> (a,b)) parts
-      posts = List.map (\(title, content) -> Viewing.Posting { title = title, content = text content }) parts_folded
+      posts = List.map Viewing.pairToPost parts_folded
   in posts

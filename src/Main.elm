@@ -1,6 +1,8 @@
 module Main exposing (..)
 
 import Browser
+import Browser.Navigation as Nav
+import Url
 
 import Viewing
 import Requests
@@ -15,3 +17,19 @@ main = Browser.application
   , onUrlRequest = onUrlRequest
   , onUrlChange = onUrlChange
   }
+
+-- MODEL
+type User = User { username : String }
+
+type Model = Model
+  { navigation : Viewing.Nav_Items
+  , user : User
+  , messages : List (Viewing.Post Msg)
+  , key : Nav.Key
+  , url : Url.Url
+  }
+
+
+-- UPDATE
+type Msg
+  = EnterPassword
