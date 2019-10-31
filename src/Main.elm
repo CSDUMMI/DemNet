@@ -8,7 +8,14 @@ import Element exposing ( Element
                         , row
                         )
 import Element.Background as Background
-import Viewing
+import Viewing exposing ( viewUser
+                        , viewMainPage
+                        , viewActions
+                        , viewHeadBar
+                        , Nav_Items (..)
+                        , Main_Page (..)
+                        , Actions (..)
+                        )
 import Requests
 import Cycle
 
@@ -18,8 +25,8 @@ main = Browser.application
   , view = view
   , update = update
   , subscriptions = subscriptions
-  , onUrlRequest = onUrlRequest
-  , onUrlChange = onUrlChange
+  , onUrlRequest = LinkClicked
+  , onUrlChange = UrlChanged
   }
 
 -- MODEL
@@ -31,17 +38,31 @@ type Model = Model
   , key : Nav.Key
   , url : Url.Url
   , title : String -- Page Title
-  , main_page : Viewing.Main_Page -- Use of the current Main Page
-  , actions : Viewing.Actions --- All possible Action Buttons
+  , main_page : Viewing.Main_Page Msg -- Use of the current Main Page
+  , actions : Viewing.Actions Msg--- All possible Action Buttons
   }
 
-
+-- Landing Page settings
+init : () -> Url.Url -> Nav.Key -> Model
+init flags url key = Model  { navigation = (Register << Login << Home) None
+                            , user = Nothing
+                            , messages = []
+                            , key = key
+                            , url = url
+                            , title = "DemNet"
+                            , main_page = Login_Page
+                            , actions = No_Action
+                            }
 -- UPDATE
 type Msg
-  = EnterPassword
+  = ChangedPassword
+  | UrlChanged
+  | LinkClicked
 
 update : Msg -> Model -> Model
-update msg model = model
+update msg model =
+  case msg of
+
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
@@ -63,8 +84,7 @@ view (Model model) =
   { title = model.title
   , body = Element.layout []
             (Element.column []
-              [ viewNavBar navigation
-              , viewUser model.user
+              [ viewHeadBar model.navigation model.user
               , viewMainPage model.main_page model.messages
               , viewActions
               ])
