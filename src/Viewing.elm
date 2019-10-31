@@ -7,7 +7,7 @@ import Element.Font as Font
 import Element.Border as Border
 
 type Posting msg = Posting  { title : String
-                        , content : Element.Element msg }
+                            , content : Element.Element msg }
 
 text_bg_color = Element.rgb255 255 255 255
 background_color  = Element.rgb255 96 96 96
