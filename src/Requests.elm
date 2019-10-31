@@ -22,20 +22,9 @@ fetchNews = fetch "/news"
 fetchPosts : ((Result Http.Error String -> msg) -> Cmd msg)
 fetchPosts = fetch "/messages"
 
-foldTwo_ : List (a,a) -> (a -> a -> (a,a) ) -> List a -> List (a,a)
-foldTwo_ folded folding list =
-  case list of
-    [] -> folded
-    [x] -> folded
-    x::y::xs -> foldTwo_ ((folding x y)::folded) folding xs
-
-foldTwo : (a -> a -> (a,a)) -> List a -> List (a,a)
-foldTwo = foldTwo_ []
-
 parseFetched : String -> List (Viewing.Post msg)
 parseFetched fetched =
-  -- Tab Seperated Values
-  let parts = String.split "\t" fetched
-      parts_folded = foldTwo (\a b -> (a,b)) parts
-      posts = List.map Viewing.pairToPost parts_folded
+  -- Each Post is seperated by a line of #
+  let parts = String.split "######################" fetched
+      posts = List.map Viewing.stringToPost parts
   in posts
