@@ -55,13 +55,29 @@ init flags url key = Model  { navigation = (Register << Login << Home) None
                             }
 -- UPDATE
 type Msg
-  = ChangedPassword
-  | UrlChanged
-  | LinkClicked
+  = ChangedPassword String
+  | ChangedUsername String
+  | Login_Requested
+  | UrlChanged Url.Url
+  | LinkClicked Browser.UrlRequest
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
+    ChangedPassword password ->
+      let new_user = case model.user of
+
+    ChangedUsername _ -> (model, Cmd.none)
+    Login_Requested -> model
+    UrlChanged url -> ( { model | url = url }, Cmd.none )
+    LinkClicked urlRequest ->
+      case urlRequest of
+        Browser.Internal url ->
+          ( model, Nav.pushUrl model.key (Url.toString url) )
+
+        Browser.External href ->
+          ( model, Nav.load href )
+
 
 
 -- SUBSCRIPTIONS
@@ -82,10 +98,5 @@ subscriptions model = Sub.none
 view : Model -> Browser.Document Msg
 view (Model model) =
   { title = model.title
-  , body = Element.layout []
-            (Element.column []
-              [ viewHeadBar model.navigation model.user
-              , viewMainPage model.main_page model.messages
-              , viewActions
-              ])
+  , body = Element.layout [] [Element.text "Hello"]
   }
