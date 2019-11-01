@@ -1,21 +1,14 @@
+
 module Viewing exposing ( Post
                         , text_bg_color
                         , background_color
                         , link_color
                         , text_attr
-                        , User (..)
                         , Nav_Items (..)
-                        , viewNavigation
                         , viewPost
                         , viewPosts
                         , pairToPost
                         , stringToPost
-                        , Main_Page (..)
-                        , Actions (..)
-                        , viewHeadBar
-                        , viewUser
-                        , viewMainPage
-                        , viewActions
                         )
 
 import Element exposing ( link

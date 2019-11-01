@@ -3,19 +3,14 @@ module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Url
+import Array
+
 import Element exposing ( Element
                         , text
                         , row
                         )
 import Element.Background as Background
-import Viewing exposing ( viewUser
-                        , viewMainPage
-                        , viewActions
-                        , viewHeadBar
-                        , Nav_Items (..)
-                        , Main_Page (..)
-                        , Actions (..)
-                        )
+
 import Requests
 import Cycle
 
@@ -30,46 +25,69 @@ main = Browser.application
   }
 
 -- MODEL
+type Post = Post  { title : String
+                  , content : String -- Markdown
+                  }
 
-type Model = Model
-  { navigation : Viewing.Nav_Items
-  , user : Maybe Viewing.User
-  , messages : List (Viewing.Post Msg)
-  , key : Nav.Key
-  , url : Url.Url
-  , title : String -- Page Title
-  , main_page : Viewing.Main_Page Msg -- Use of the current Main Page
-  , actions : Viewing.Actions Msg--- All possible Action Buttons
-  }
+type alias User = { img_src : String
+                  , first_name : String
+                  , last_name : String
+                  }
+
+type Main_Page
+  = Feed  {  messages : Array.Array Post
+          }
+  | Writing { post : Post
+            }
+  | Reading { message : Post
+            }
+
+type Actions
+  = Publish_Post Actions { onClick : Msg }
+  | Create_Post Actions { onClick : Msg }
+  | No_Action
+
+type Nav_Items
+  = Home Nav_Items
+  | Register Nav_Items
+  | Login Items
+  | No_Nav_Item
+
+type Model
+  = Model { navigation : Nav_Items
+          , user : Maybe User
+          , main_page : Main_Page
+          , actions : Actions
+          }
 
 -- Landing Page settings
 init : () -> Url.Url -> Nav.Key -> Model
 init flags url key = Model  { navigation = (Register << Login << Home) None
                             , user = Nothing
-                            , messages = []
                             , key = key
                             , url = url
                             , title = "DemNet"
-                            , main_page = Login_Page
+                            , main_page = Feed { messages = Array.empty }
                             , actions = No_Action
                             }
 -- UPDATE
 type Msg
-  = ChangedPassword String
-  | ChangedUsername String
-  | Login_Requested
+  = Feed_Message_Clicked Int
+  | Publish_Request
+  | Create_Post_Request
+
+  | Writing_Title_Changed String -- Save the post on server
+  | Writing_Content_Changed String -- Save the post on server
+
   | UrlChanged Url.Url
   | LinkClicked Browser.UrlRequest
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    ChangedPassword password ->
-      let new_user = case model.user of
 
-    ChangedUsername _ -> (model, Cmd.none)
-    Login_Requested -> model
     UrlChanged url -> ( { model | url = url }, Cmd.none )
+
     LinkClicked urlRequest ->
       case urlRequest of
         Browser.Internal url ->
@@ -77,6 +95,16 @@ update msg model =
 
         Browser.External href ->
           ( model, Nav.load href )
+
+    Feed_Message_Clicked message_id ->
+      case model.main_page of
+        Feed messages ->
+          let message = case Array.get message_id messages of
+                Just m -> m
+                Nothing -> emptyPost -- Feed will redirect to Feed.
+          in (if message == emptyPost then ( model, Cmd.none ) else 
+
+
 
 
 
