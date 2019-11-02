@@ -25,21 +25,18 @@ main = Browser.application
   }
 
 -- MODEL
-type Post = Post  { title : String
-                  , content : String -- Markdown
-                  }
-
 type alias User = { img_src : String
                   , first_name : String
                   , last_name : String
                   }
 
 type Main_Page
-  = Feed  {  messages : Array.Array Post
+  = Feed  {  messages : Array.Array Post.Post
           }
-  | Writing { post : Post
+  | Writing { post : Post.Post
+            , saved : Bool
             }
-  | Reading { message : Post
+  | Reading { message : Post.Post
             }
 
 type Actions
@@ -79,11 +76,16 @@ type Msg
   | Writing_Title_Changed String -- Save the post on server
   | Writing_Content_Changed String -- Save the post on server
 
+  | Saved (Result Http.Error String)
+
   | UrlChanged Url.Url
   | LinkClicked Browser.UrlRequest
 
+switchToWriting : Model -> Model
+switchToWriting (Model model) = Model { model | main_page = Writing Post.emptyPost }
+
 update : Msg -> Model -> Model
-update msg model =
+update msg (Model model)  =
   case msg of
 
     UrlChanged url -> ( { model | url = url }, Cmd.none )
@@ -102,10 +104,54 @@ update msg model =
           let message = case Array.get message_id messages of
                 Just m -> m
                 Nothing -> emptyPost -- Feed will redirect to Feed.
-          in (if message == emptyPost then ( model, Cmd.none ) else 
+              m_id_str = String.fromInt messages
+              url = Nav.pushUrl model.key (Builder.absolute [ "message" ] [])
+          in (if message == emptyPost
+              then ( model, Cmd.none )
+              else ( Model { model | main_page = Reading { message = message } }, url )
+              )
 
+        Writing _ -> (model, Cmd.none) -- Do Nothing
+        Reading _ -> (model, Cmd.none)
 
+    Publish_Request ->
+      case model.main_page of
+        Feed _ -> (model, Cmd.none)
+        Writing { post } -> ( model, Requests.publishPost post )
+        Reading _ -> ( model, Cmd.none )
 
+    Create_Post_Request ->
+      let url = Builder.absolute [ "writing" ]
+      in (case model.main_page of
+          Feed _ -> ( switchToWriting model, Nav.pushUrl model.key url )
+          Reading _ -> ( switchToWriting model, Nav.pushUrl model.key url )
+          Writing { post } -> ( model, Cmd.none )
+         )
+
+    -- Change Title and save on server
+    Writing_Title_Changed title ->
+      case model.main_page of
+        Writing (Post post) ->
+          let changed_post = { post | title = title }
+              save_request = Requests.save_post Saved_Title changed_post
+          in ( Model { model | main_page = Writing (Post changed_post) }, save_request )
+
+        Reading _ -> ( model, Cmd.none )
+        Feed _ -> ( model, Cmd.none )
+
+    Writing_Content_Changed content ->
+      case model.main_page of
+        Writing { post } ->
+          let changed_post = Post { post | content = content }
+              save_request = Requests.save_post Saved_Content changed_post
+          in ( Model { model | main_page = Writing (Post changed_post) }, save_request )
+
+        Reading _ -> ( model, Cmd.none )
+        Feed _ -> ( model, Cmd.none )
+
+    Saved result ->
+      case model.main_page of
+        Writing (Post post)
 
 
 -- SUBSCRIPTIONS
