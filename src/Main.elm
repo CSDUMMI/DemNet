@@ -39,6 +39,7 @@ type Msg
   | Writing_Title String -- Write Title to Data Type
   | Writing_Content String -- Write Content to Data Type
   | Save_Writing
+  | PublishPost
   | Switch_To_Feed -- Go to Feed
   | Recv_Posts String
 
@@ -75,6 +76,12 @@ update msg model =
         Reading p -> ( Reading p, Cmd.none )
         Feed ps -> ( Feed ps, Cmd.none )
 
+    PublishPost ->
+      case model of
+        Writing p -> ( Writing p, Requests.published p )
+        Reading p -> ( Reading p, Cmd.none )
+        Feed ps   -> ( Feed ps, Cmd.none )
+
     Switch_To_Feed ->
       case model of
         Writing p -> ( Feed [], Requests.request_posts Recv_Posts )
@@ -86,4 +93,3 @@ update msg model =
         Writing p -> ( Writing p, Cmd.none )
         Reading p -> ( Reading p, Cmd.none )
         Feed ps   -> ( Feed ( ( Requests.parsePosts posts ) ++ ps ), Cmd.none )
-    
