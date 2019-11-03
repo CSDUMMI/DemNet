@@ -24,10 +24,18 @@ main = Browser.element
 
 -- MODEL
 type Model
-  = Navigation
+  = Reading Post
+  | Writing Post
+  | Feed (List Post)
+
+init : flags ->  ( Model, Cmd Msg )
+init _ = ( Feed [], Cmd.none )
 
 
 -- UPDATE
 type Msg
-  = LinkClicked Browser.UrlRequest
-  | UrlChanged Url.Url
+  = Read Post
+  | Writing_Title String
+  | Switch_To_Feed
+
+update : Msg -> Model -> ( Model, Cmd Msg ) 
