@@ -77,4 +77,13 @@ update msg model =
 
     Switch_To_Feed ->
       case model of
-        Writing p -> ( Feed [], Requests.save_post p )
+        Writing p -> ( Feed [], Requests.request_posts Recv_Posts )
+        Reading p -> ( Feed [], Request.request_posts Recv_Posts )
+        Feed ps   ->  ( Feed ps, Requests.request_posts Recv_Posts )
+
+    Recv_Posts posts ->
+      case model of
+        Writing p -> ( Writing p, Cmd.none )
+        Reading p -> ( Reading p, Cmd.none )
+        Feed ps   -> ( Feed ( ( Requests.parsePosts posts ) ++ ps ), Cmd.none )
+    
