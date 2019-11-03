@@ -40,6 +40,7 @@ type Msg
   | Writing_Content String -- Write Content to Data Type
   | Save_Writing
   | Switch_To_Feed -- Go to Feed
+  | Recv_Posts String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -71,3 +72,9 @@ update msg model =
     Save_Writing ->
       case model of
         Writing p -> ( Writing p, Requests.save_post p)
+        Reading p -> ( Reading p, Cmd.none )
+        Feed ps -> ( Feed ps, Cmd.none )
+
+    Switch_To_Feed ->
+      case model of
+        Writing p -> ( Feed [], Requests.save_post p )
