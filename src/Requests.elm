@@ -2,6 +2,7 @@ module Requests exposing ( save_post
                          , publish_post
                          , request_posts
                          , Post
+                         , parsePosts
                          )
 
 import Http
@@ -33,9 +34,10 @@ parsePosts : String -> List Post
 parsePosts post_str
   = let single_posts = String.split "\n#########################################\n" post_str
     in List.filterMap stringToPost single_posts
+
 stringToPost : String -> Maybe Post
 stringToPost str_post =
     let post_lines = String.lines str_post
         title = List.head post_lines
         content = List.tail post_lines
-    in if title == Nothing or content == Nothing then Nothing else Just { title = title, content = content }
+    in if title == Nothing || content == Nothing then Nothing else Just { title = title, content = content }
