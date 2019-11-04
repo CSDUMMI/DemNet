@@ -9,7 +9,7 @@ import Element exposing ( Element
                         )
 import Element.Background as Background
 
-import Requests
+import Requests exposing ( Post )
 
 -- MAIN
 main = Browser.element
@@ -30,11 +30,6 @@ init _ = ( Feed [], Cmd.none )
 
 
 -- UPDATE
-
-type alias Post = { title : String
-                  , content : String
-                  }
-
 type Post_Element = Title | Content
 
 type Upload_Type = Publish | Save
@@ -84,7 +79,7 @@ update msg model =
     Switch_To_Feed ->
       case model of
         Writing p -> ( Feed [], Requests.request_posts Recv_Posts )
-        Reading p -> ( Feed [], Request.request_posts Recv_Posts )
+        Reading p -> ( Feed [], Requests.request_posts Recv_Posts )
         Feed ps   ->  ( Feed ps, Requests.request_posts Recv_Posts )
 
     Recv_Posts posts ->
