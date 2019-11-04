@@ -1,8 +1,6 @@
 module Main exposing (..)
 
 import Browser
-import Browser.Navigation as Nav
-import Url
 import Array
 
 import Element exposing ( Element
@@ -12,7 +10,6 @@ import Element exposing ( Element
 import Element.Background as Background
 
 import Requests
-import Cycle
 
 -- MAIN
 main = Browser.element
@@ -33,13 +30,15 @@ init _ = ( Feed [], Cmd.none )
 
 
 -- UPDATE
+type Post_Element = Title | Content
+
+type Upload_Type = Publish | Save
+
 type Msg
   = Read Post -- Switch to Reading with this Post
   | Write Post -- Writing with the Writing with this post
-  | Writing_Title String -- Write Title to Data Type
-  | Writing_Content String -- Write Content to Data Type
-  | Save_Writing
-  | PublishPost
+  | Changed  Post_Element String -- Change data structure accordingly
+  | Upload Upload_Type Post
   | Switch_To_Feed -- Go to Feed
   | Recv_Posts String
 
@@ -48,7 +47,7 @@ update msg model =
   case msg of
     Read post ->
       case model of
-        Writing p -> ( Write p, Cmd.none )
+        Writing p -> ( Writing p, Cmd.none )
         Reading p -> ( Reading post, Cmd.none )
         Feed ps -> ( Reading post, Cmd.none )
 
@@ -58,29 +57,24 @@ update msg model =
         Reading p -> ( Writing post, Cmd.none )
         Feed ps -> ( Writing post, Cmd.none )
 
-    Writing_Title title ->
+    Changed element post_element ->
       case model of
-        Writing p -> ( Writing (Post { p | title = title }), Cmd.none )
+        Writing p ->
+          case element of
+            Title -> ( { p | title = post_element }, Cmd.none )
+            Content -> ( { p | content = post_element }, Cmd.none )
         Reading p -> ( Reading p, Cmd.none )
         Feed ps -> ( Feed ps, Cmd.none )
 
-    Writing_Content content ->
+    Upload kind post ->
       case model of
-        Writing p -> ( Writing (Post { p | content = content }), Cmd.none )
+        Writing p ->
+          let new_cmd = case kind of
+                  Publish -> Requests.publish_post post
+                  Save -> Requests.save_post post
+          in (model,new_cmd)
         Reading p -> ( Reading p, Cmd.none )
         Feed ps -> ( Feed ps, Cmd.none )
-
-    Save_Writing ->
-      case model of
-        Writing p -> ( Writing p, Requests.save_post p)
-        Reading p -> ( Reading p, Cmd.none )
-        Feed ps -> ( Feed ps, Cmd.none )
-
-    PublishPost ->
-      case model of
-        Writing p -> ( Writing p, Requests.published p )
-        Reading p -> ( Reading p, Cmd.none )
-        Feed ps   -> ( Feed ps, Cmd.none )
 
     Switch_To_Feed ->
       case model of
