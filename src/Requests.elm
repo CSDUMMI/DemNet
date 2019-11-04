@@ -38,14 +38,14 @@ parsePosts post_str
 stringToPost : String -> Maybe Post
 stringToPost str_post =
     let post_lines = String.lines str_post
-        ( title,sucess_t )
+        ( title, success_t )
               = case List.head post_lines of
                     Just t -> ( t, Just t )
                     Nothing -> ( "", Nothing )
 
         ( content, success_c )
             = case List.tail post_lines of
-                    Just c -> ( c, Just c )
+                    Just c -> ( String.join "\n" c, Just c )
                     Nothing -> ( "", Nothing )
 
-    in if succes_c == Nothing || success_t == Nothing then Nothing else Just { title = title, content = content }
+    in if success_c == Nothing || success_t == Nothing then Nothing else Just { title = title, content = content }
