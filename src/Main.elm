@@ -30,6 +30,11 @@ init _ = ( Feed [], Cmd.none )
 
 
 -- UPDATE
+
+type alias Post = { title : String
+                  , content : String
+                  }
+
 type Post_Element = Title | Content
 
 type Upload_Type = Publish | Save
