@@ -2,16 +2,16 @@ from flask import Flask, request, session, jsonify
 from election import count_votes
 from Crypto.Hash import SHA256
 import json, os
+from pymongo import MongoClient
 
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
 
-users = json.load(open( 'users.json'))
-elections = json.load( open('elections.json'))
-
-def save():
-    json.dump(users, open("users.json", "w+") )
-    json.dump(elections, open("elections.json", "w+") )
+# MongoDb connection
+client = MongoClient()
+db = client.demnet
+users = db.users
+elections = db.elections
 
 @app.route('/login')
 def login():
@@ -20,6 +20,7 @@ def login():
         hash = SHA256.new( request.values.get('password') ).hexdigest()
         username = request.values.get('username')
 
+        user = users.find_one({ 'username' : username })
         if hash == users[username]['password']:
             session['username'] = username
             return 'LoggedIn'
@@ -35,8 +36,9 @@ def register():
         and request.values.get('password')
         and request.values.get('email')
         and request.values.get('firstName')
-        and request.values.get('secondName')
-        and not users.get( request.values.get('username'))
+        and request.values.get('lastName')
+        and request.values.get('phone')
+        and users.find_one({ 'username' : request.values.get('username') }) == None
         ):
 
         username = request.values.get('username')
@@ -44,16 +46,19 @@ def register():
         secondName = request.values.get('secondName')
         hash = SHA256.new( request.values.get('password').encode('utf-8')).hexdigest()
         email = request.values.get('email')
+        phone = request.values.get('phone')
 
         session['username'] = username # Login automatically
-        users[username] = {
-            "username" : username,
-            "firstName" : firstName,
-            "secondName" : secondName,
-            "email" : email,
-            "password" : hash
+        user = {
+         'username'  : username,
+         'password'  : hash,
+         'email'     : email,
+         'first_name': first_name,
+         'last_name' : last_name,
+         'phone'     : phone
         }
-        save()
+        users.insert_one(user)
+
         return "Registered"
     else:
         return "NotRegistered"
@@ -75,7 +80,6 @@ def vote():
         else:
             elections[election]['participants'].append( username )
             elections[election]['votes'].append( vote )
-            save()
             return "Voted"
     else:
         return "NotVoted"
