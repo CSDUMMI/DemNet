@@ -3,6 +3,7 @@ from election import count_votes
 from Crypto.Hash import SHA256
 import json, os
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
@@ -71,9 +72,11 @@ def vote():
         and session.get('username')
         ):
 
-        vote = request.values.get('vote').split(';')
+        vote = request.values.get('vote')
         election = request.values.get('election')
         username = session.get('username')
+
+        election = elections.find_one({ '_id' : ObjectId(election) })
 
         if username in elections[election]['participants']:
             return "AlreadyVoted"
