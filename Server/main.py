@@ -24,6 +24,7 @@ A User Document:
     'lastName' :
     'email' :
     'phone' :
+    'messages' : ObjectIds of the Messages in  messages
 }
 
 Layout of the elections:
@@ -39,6 +40,7 @@ A Message Document:
 {
     'type' : 'Type of the Message' - Currently only 'text'
     'content' : 'Content of the Message'
+    'title' : Title
     'author' : 'Username of the author of the message'
     'recipient' : Username of the user, to receive the message.
 }
@@ -87,7 +89,7 @@ def register():
          'first_name': first_name,
          'last_name' : last_name,
          'phone'     : phone,
-         'messages'  : []
+         'messages'  : [messages.find_one({ 'title' : 'Welcome to DemNet', 'author' : 'devteam' })['_id']]
         }
         users.insert_one(user)
 
@@ -154,18 +156,24 @@ def post():
         and request.values.get('type')
         and session.get('username')
         and request.values.get('recipient')
+        and request.values.get('title')
         and users.get('recipient') ):
 
+        title       = request.values['title']
         content     = request.values['posting']
         type        = request.values['type']
         author      = session['username']
         recipient   = request.values['recipient']
 
-        users[recipient]['messages'].append({ "content" : content, "type" : type, "author" : author })
-        if type == "image":
-            img = request.files['uploaded_img']
-            f.save( "/static" + secure_filename(f.filename) )
-
+        message = {
+            'title' : title,
+            'content' : content,
+            'type' : type,
+            'author' : author,
+            'recipient' : recipient
+        }
+        id = messages.insert_one(message).inserted_id
+        users.update_one({ 'username' : recipient }, { '$push' : { 'messages' : id }})
         return "Posted"
 
 @app.route('/messages')
