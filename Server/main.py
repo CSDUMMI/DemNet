@@ -14,6 +14,27 @@ db = client.demnet
 users = db.users
 elections = db.elections
 
+"""
+Layout of the users:
+A User Document:
+{
+    'username' : Unique identification string
+    'password' :
+    'firstName' :
+    'lastName' :
+    'email' :
+    'phone' :
+}
+
+Layout of the elections:
+An Election Document:
+{
+    'participants' : Array of all usernames of those, who voted already
+    'votes' : Array of all votes, without any association to a user
+    'options' : Array of all the possibilities for a vote
+    'deadline' : Unix-Timestamp of closing the election.
+}
+"""
 @app.route('/login')
 def login():
     # Logout automatically
@@ -56,7 +77,8 @@ def register():
          'email'     : email,
          'first_name': first_name,
          'last_name' : last_name,
-         'phone'     : phone
+         'phone'     : phone,
+         'messages'  : []
         }
         users.insert_one(user)
 
@@ -76,29 +98,39 @@ def vote():
         election = request.values.get('election')
         username = session.get('username')
 
-        election = elections.find_one({ '_id' : ObjectId(election) })
+        election_id = ObjectId(election)
+        election = elections.find_one({ '_id' : election })
+        options = election.get('options')
+        deadline = int(election.get('deadline'))
 
-        if username in elections[election]['participants']:
+        if username in election.get('participants') or not (vote in options):
             return "AlreadyVoted"
+        elif deadline < time.time():
+            return "BallotClosed"
         else:
-            elections[election]['participants'].append( username )
-            elections[election]['votes'].append( vote )
+            elections.update_one({ '_id' : election_id },
+                                 { '$push' :
+                                    {
+                                        'participants' : username,
+                                        'votes': vote
+                                    }
+                                })
             return "Voted"
     else:
         return "NotVoted"
 
 @app.route('/election')
 def election():
-    if( request.values.get('election') and elections.get( request.values.get('election') )):
+    if( request.values.get('election') and elections.find_one({ '_id' : ObjectId(request.values.get('election')) }) ):
 
-        election = request.values.get('election')
+        election_id = ObjectId(request.values.get('election'))
 
-        deadline = elections[election]['deadline']
-        participants = elections[election]['participants']
-        votes = elections[election]['votes']
-        options = elections[election]['options']
-        participant_count = len(participants)
+        election = elections.find_one({ '_id' : ObjectId(election_id) })
 
+        deadline = election.get('deadline')
+        votes = election.get('votes')
+        participants_count = len(election.get('participants'))
+        options = election.get('options')
 
         if int(deadline) > time.time():
             return "BallotNotClosed"
