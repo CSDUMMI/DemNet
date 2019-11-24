@@ -13,7 +13,7 @@ client = MongoClient()
 db = client.demnet
 users = db.users
 elections = db.elections
-
+messages = db.messages
 """
 Layout of the users:
 A User Document:
@@ -32,8 +32,17 @@ An Election Document:
     'participants' : Array of all usernames of those, who voted already
     'votes' : Array of all votes, without any association to a user
     'options' : Array of all the possibilities for a vote
-    'deadline' : Unix-Timestamp of closing the election.
+    'deadline' : UTC Timestamp
 }
+Layout of messages:
+A Message Document:
+{
+    'type' : 'Type of the Message' - Currently only 'text'
+    'content' : 'Content of the Message'
+    'author' : 'Username of the author of the message'
+    'recipient' : Username of the user, to receive the message.
+}
+All messages are public!
 """
 @app.route('/login')
 def login():
