@@ -11,14 +11,14 @@ type alias Expect_Msg msg = ( Result Http.Error String -> msg )
 type alias Post = { title : String, content : String }
 
 save_post : Expect_Msg msg -> Post -> Cmd msg
-save_post = upload "/save"
+save_post = upload "save"
 
 publish_post : Expect_Msg msg -> Post -> Cmd msg
-publish_post = upload "/publish"
+publish_post = upload "publish"
 
 upload : String -> Expect_Msg msg ->  Post -> Cmd msg
 upload url expect { title, content }
-  = Http.post { url = url
+  = Http.post { url = "/content/" ++ url
               , body = Http.stringBody "plain/text" ( "# " ++ title ++ "\n" ++ content)
               , expect = Http.expectString expect
               }
