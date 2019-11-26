@@ -8,7 +8,7 @@ module Requests exposing ( save_post
 import Http
 
 type alias Expect_Msg msg = ( Result Http.Error String -> msg )
-type alias Post = { title : String, content : String }
+type alias Post = { title : String, content : String, saved : Bool }
 
 save_post : Expect_Msg msg -> Post -> Cmd msg
 save_post = upload "save"
@@ -48,4 +48,4 @@ stringToPost str_post =
                     Just c -> ( String.join "\n" c, Just c )
                     Nothing -> ( "", Nothing )
 
-    in if success_c == Nothing || success_t == Nothing then Nothing else Just { title = title, content = content }
+    in if success_c == Nothing || success_t == Nothing then Nothing else Just { title = title, content = content, saved = True }
