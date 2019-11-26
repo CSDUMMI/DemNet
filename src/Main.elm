@@ -4,13 +4,6 @@ import Browser
 import Array
 import Http
 import Html
-
-import Element exposing ( Element
-                        , text
-                        , row
-                        )
-import Element.Background as Background
-
 import Requests exposing ( Post )
 
 -- MAIN
@@ -107,4 +100,4 @@ subscriptions model = Sub.none
 
 -- VIEW
 view : Model -> Html Msg
-view model = 
+view model =
