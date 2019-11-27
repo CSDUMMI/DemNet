@@ -4,11 +4,13 @@ import Browser
 import Array
 import Http
 import Html
+import Element
 
 import Requests exposing ( Post )
 import Views exposing ( Post_Element (..), Upload_Type (..))
 
 -- MAIN
+main : Program () Model Msg
 main = Browser.element
   { init = init
   , view = view
@@ -23,7 +25,7 @@ type Model
   | Feed (List Post)
 
 init : flags ->  ( Model, Cmd Msg )
-init _ = ( Feed [], Cmd.none )
+init _ = ( Feed [], Requests.request_posts Recv_Posts )
 
 
 -- UPDATE
@@ -55,8 +57,8 @@ update msg model =
       case model of
         Writing p ->
           let post = case element of
-            Title -> { p | title = post_element, saved = False }
-            Content -> { p | content = post_element, saved = False }
+                Title -> { p | title = post_element, saved = False }
+                Content -> { p | content = post_element, saved = False }
           in ( Writing post, Cmd.none )
         Reading p -> ( Reading p, Cmd.none )
         Feed ps -> ( Feed ps, Cmd.none )
@@ -104,7 +106,9 @@ subscriptions model = Sub.none
 
 -- VIEW
 view : Model -> Html.Html Msg
-view model = case model of
-  Writing p -> Views.writing p
-  Reading p -> Views.reading p
-  Feed ps -> Views.feed ps
+view model =
+  let element = case model of
+        Writing p -> Views.writing Changed p
+        Reading p -> Views.reading p
+        Feed ps -> Views.feed ps
+  in Element.layout [] <| Element.column [] [ Element.wrappedRow [] [ Element.text "Home", Element.text "Feed" ], element]
