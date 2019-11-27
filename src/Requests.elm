@@ -41,16 +41,14 @@ parsePosts post_str
 
 stringToPost : String -> Maybe Post
 stringToPost str_post =
-    let (title, author, content) = case String.lines str_post of
-          title::author::content -> (title, author,content)
-          title::content -> (title, "", content)
-          content -> ("","",content)
-          [] -> ("","","")
-
-    in if title == "" or content == "" or author == ""
+    let ( title, author, content ) = case String.lines str_post of
+          t::a::c -> ( t, a, c )
+          t::c -> ( t, "", c )
+          c -> ( "", "", c )
+    in if title == "" || content == [] || author == ""
         then Nothing
         else Just { title = title
-                  , content = content
+                  , content = String.join "\n" content
                   , author = author
                   , saved = True
                   }

@@ -99,5 +99,5 @@ subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
 
 -- VIEW
-view : Model -> Html Msg
-view model = Element.layout [] [] 
+view : Model -> Html.Html Msg
+view model = Element.layout [] []
