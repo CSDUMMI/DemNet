@@ -1,4 +1,9 @@
-module Views exposing ( reading, writing, feed,vote, elections, Post_Element (..), Upload_Type (..) )
+module Views exposing ( reading
+                      , writing
+                      , feed
+                      , Post_Element (..)
+                      , Upload_Type (..)
+                      )
 
 
 import Element exposing ( Element )
@@ -17,6 +22,7 @@ edit_title_attr = [ Input.focusedOnLoad ]
 
 edit_content_attr = []
 
+list_attr = []
 -- Datatypes for distinction:
 type Post_Element = Title | Content
 
@@ -28,6 +34,14 @@ view_post header footer fromTitle fromContent post =
     [ header
     , fromTitle post.title
     , fromContent post.content
+    , footer
+    ]
+
+view_posts : Element msg -> Element msg -> List Post -> Element msg
+view_posts header footer posts =
+  Element.column list_attr
+    [ header
+    , Element.paragraph <| List.foldl (\acc p -> (Element.text p.title)::acc) [] posts
     , footer
     ]
 
@@ -55,4 +69,4 @@ writing change_msg
                                                , label = Input.labelAbove [] (Element.text "Content")
                                                })
 feed : List Post -> Element msg
-feed posts = 
+feed posts = Element.none
