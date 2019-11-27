@@ -53,7 +53,7 @@ reading
       (Element.text title_attr)
       (Element.paragraph reading_content_attr << List.singleton << Element.text)
 
-writing : (Post_Element -> msg) -> Post -> Element msg
+writing : (Post_Element -> String -> msg) -> Post -> Element msg
 writing change_msg
   = view_post
       Element.none
@@ -66,6 +66,7 @@ writing change_msg
       (\c -> Input.multiline edit_content_attr { onChange = change_msg Content
                                                , text = c
                                                , placeholder = Nothing
+                                               , spellcheck = True
                                                , label = Input.labelAbove [] (Element.text "Content")
                                                })
 feed : List Post -> Element msg
