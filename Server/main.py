@@ -14,6 +14,9 @@ db = client.demnet
 users = db.users
 elections = db.elections
 messages = db.messages
+welcome_msg = messages.find_one({ 'title' : 'Welcome', 'author' : 'devteam' })
+print(welcome_msg)
+print(welcome_msg['_id'])
 """
 Layout of the users:
 A User Document:
@@ -50,16 +53,14 @@ All messages are public!
 def login():
     # Logout automatically
     if request.values.get('username') and request.values.get('password'):
-        hash = SHA256.new( request.values.get('password') ).hexdigest()
+        hash = SHA256.new( request.values.get('password').encode('utf-8') ).hexdigest()
         username = request.values.get('username')
 
         user = users.find_one({ 'username' : username })
         if hash == users[username]['password']:
             session['username'] = username
             return 'LoggedIn'
-
-    else:
-        return 'NotLoggedIn'
+    return 'NotLoggedIn'
 
 @app.route('/register')
 def register():
@@ -75,13 +76,14 @@ def register():
         ):
 
         username = request.values.get('username')
-        firstName = request.values.get('firstName')
-        secondName = request.values.get('secondName')
+        first_name = request.values.get('firstName')
+        last_name = request.values.get('secondName')
         hash = SHA256.new( request.values.get('password').encode('utf-8')).hexdigest()
         email = request.values.get('email')
         phone = request.values.get('phone')
 
         session['username'] = username # Login automatically
+
         user = {
          'username'  : username,
          'password'  : hash,
@@ -89,7 +91,7 @@ def register():
          'first_name': first_name,
          'last_name' : last_name,
          'phone'     : phone,
-         'messages'  : [messages.find_one({ 'title' : 'Welcome to DemNet', 'author' : 'devteam' })['_id']]
+         'messages'  : [welcome_msg['_id']]
         }
         users.insert_one(user)
 
@@ -175,6 +177,8 @@ def post():
         id = messages.insert_one(message).inserted_id
         users.update_one({ 'username' : recipient }, { '$push' : { 'messages' : id }})
         return "Posted"
+    else:
+        return "InsufficentArguments"
 
 @app.route('/messages')
 def messages():
@@ -184,4 +188,4 @@ def messages():
         return "NotLoggedIn"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=8600)
