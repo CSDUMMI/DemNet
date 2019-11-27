@@ -92,7 +92,7 @@ update msg model =
         Reading p -> ( Reading p, Cmd.none )
         Feed ps   ->
           ( case posts of
-              Ok new_posts -> Feed (Requests.parsePosts ++ ps)
+              Ok new_posts -> Feed (Requests.parsePosts new_posts ++ ps)
               Err e -> Feed ps
           , Cmd.none
           )
