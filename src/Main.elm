@@ -54,9 +54,10 @@ update msg model =
     Changed element post_element ->
       case model of
         Writing p ->
-          case element of
-            Title -> ( { p | title = post_element, saved = False }, Cmd.none )
-            Content -> ( { p | content = post_element, saved = False }, Cmd.none )
+          let post = case element of
+            Title -> { p | title = post_element, saved = False }
+            Content -> { p | content = post_element, saved = False }
+          in ( Writing post, Cmd.none )
         Reading p -> ( Reading p, Cmd.none )
         Feed ps -> ( Feed ps, Cmd.none )
 
@@ -64,8 +65,8 @@ update msg model =
       case model of
         Writing p ->
           let new_cmd = case kind of
-                  Publish -> Requests.publish_post post Saved
-                  Save -> Requests.save_post post Saved
+                  Publish -> Requests.publish_post Saved post
+                  Save -> Requests.save_post Saved post
           in (model,new_cmd)
         Reading p -> ( Reading p, Cmd.none )
         Feed ps -> ( Feed ps, Cmd.none )
