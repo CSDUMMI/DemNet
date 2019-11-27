@@ -34,7 +34,7 @@ type Msg
   | Upload Upload_Type Post
   | Saved ( Result Http.Error String )
   | Switch_To_Feed -- Go to Feed
-  | Recv_Posts String
+  | Recv_Posts ( Result Http.Error String )
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -90,7 +90,12 @@ update msg model =
       case model of
         Writing p -> ( Writing p, Cmd.none )
         Reading p -> ( Reading p, Cmd.none )
-        Feed ps   -> ( Feed ( ( Requests.parsePosts posts ) ++ ps ), Cmd.none )
+        Feed ps   ->
+          ( case posts of
+              Ok new_posts -> Feed (Requests.parsePosts ++ ps)
+              Err e -> Feed ps
+          , Cmd.none
+          )
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
