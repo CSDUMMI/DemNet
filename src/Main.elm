@@ -6,7 +6,7 @@ import Http
 import Html
 
 import Requests exposing ( Post )
-import Views
+import Views exposing ( Post_Element (..), Upload_Type (..))
 
 -- MAIN
 main = Browser.element
@@ -27,10 +27,6 @@ init _ = ( Feed [], Cmd.none )
 
 
 -- UPDATE
-type Post_Element = Title | Content
-
-type Upload_Type = Publish | Save
-
 type Msg
   = Read Post -- Switch to Reading with this Post
   | Write Post -- Writing with the Writing with this post
