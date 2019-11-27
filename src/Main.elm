@@ -4,7 +4,9 @@ import Browser
 import Array
 import Http
 import Html
+
 import Requests exposing ( Post )
+import Views
 
 -- MAIN
 main = Browser.element
@@ -100,4 +102,7 @@ subscriptions model = Sub.none
 
 -- VIEW
 view : Model -> Html.Html Msg
-view model = Element.layout [] []
+view model = case model of
+  Writing p -> Views.writing p
+  Reading p -> Views.reading p
+  Feed ps -> Views.feed ps
