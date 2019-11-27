@@ -5,8 +5,8 @@ import Element exposing ( Element )
 import Element.Background as Background
 import Requests exposing ( Post )
 
-view_post : Post -> Element -> Element -> (String -> Element) -> (String -> Element) -> Element
-view_post post header footer fromTitle fromContent =
+view_post : Element -> Element -> (String -> Element) -> (String -> Element) -> Post -> Element
+view_post header footer fromTitle fromContent post =
   Element.textColumn post_attr
     [ header
     , fromTitle post.title
