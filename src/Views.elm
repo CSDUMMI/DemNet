@@ -41,7 +41,7 @@ view_posts : Element msg -> Element msg -> List Post -> Element msg
 view_posts header footer posts =
   Element.column list_attr
     [ header
-    , Element.paragraph <| List.foldl (\acc p -> (Element.text p.title)::acc) [] posts
+    , Element.paragraph [] <| List.foldl (\p acc -> (Element.text p.title)::acc) [] posts
     , footer
     ]
 
@@ -50,7 +50,7 @@ reading
   = view_post
       Element.none
       Element.none
-      (Element.text title_attr)
+      (Element.el title_attr << Element.text)
       (Element.paragraph reading_content_attr << List.singleton << Element.text)
 
 writing : (Post_Element -> String -> msg) -> Post -> Element msg
