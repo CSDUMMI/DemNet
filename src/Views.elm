@@ -5,10 +5,11 @@ import Element exposing ( Element )
 import Element.Background as Background
 import Requests exposing ( Post )
 
-view_post : Post -> (String -> Element) -> (String -> Element) -> Element
-view_post post fromTitle fromContent =
+view_post : Post -> Element -> Element -> (String -> Element) -> (String -> Element) -> Element
+view_post post header footer fromTitle fromContent =
   Element.textColumn post_attr
-    [ fromTitle post.title
+    [ header
+    , fromTitle post.title
     , fromContent post.content
-    , additional_fields
+    , footer
     ]
