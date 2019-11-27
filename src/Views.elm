@@ -13,3 +13,5 @@ view_post header footer fromTitle fromContent post =
     , fromContent post.content
     , footer
     ]
+
+reading : Post -> 

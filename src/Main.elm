@@ -100,4 +100,4 @@ subscriptions model = Sub.none
 
 -- VIEW
 view : Model -> Html Msg
-view model =
+view model = Element.layout [] [] 

@@ -8,7 +8,11 @@ module Requests exposing ( save_post
 import Http
 
 type alias Expect_Msg msg = ( Result Http.Error String -> msg )
-type alias Post = { title : String, content : String, saved : Bool }
+type alias Post = { title : String
+                  , content : String
+                  , saved : Bool
+                  , author : String
+                  }
 
 save_post : Expect_Msg msg -> Post -> Cmd msg
 save_post = upload "save"
@@ -37,15 +41,16 @@ parsePosts post_str
 
 stringToPost : String -> Maybe Post
 stringToPost str_post =
-    let post_lines = String.lines str_post
-        ( title, success_t )
-              = case List.head post_lines of
-                    Just t -> ( t, Just t )
-                    Nothing -> ( "", Nothing )
+    let (title, author, content) = case String.lines str_post of
+          title::author::content -> (title, author,content)
+          title::content -> (title, "", content)
+          content -> ("","",content)
+          [] -> ("","","")
 
-        ( content, success_c )
-            = case List.tail post_lines of
-                    Just c -> ( String.join "\n" c, Just c )
-                    Nothing -> ( "", Nothing )
-
-    in if success_c == Nothing || success_t == Nothing then Nothing else Just { title = title, content = content, saved = True }
+    in if title == "" or content == "" or author == ""
+        then Nothing
+        else Just { title = title
+                  , content = content
+                  , author = author
+                  , saved = True
+                  }
