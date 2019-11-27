@@ -152,8 +152,8 @@ def election():
     else:
         return 'NotAnElection'
 
-@app.route('/post')
-def post():
+@app.route('/content/<kind>')
+def post(kind):
     if ( request.values.get('posting')
         and request.values.get('type')
         and session.get('username')
@@ -172,7 +172,8 @@ def post():
             'content' : content,
             'type' : type,
             'author' : author,
-            'recipient' : recipient
+            'recipient' : recipient,
+            'draft' : kind == 'save'
         }
         id = messages.insert_one(message).inserted_id
         users.update_one({ 'username' : recipient }, { '$push' : { 'messages' : id }})
