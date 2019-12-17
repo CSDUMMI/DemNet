@@ -27,7 +27,7 @@ type Model
   | Feed (List Post)
 
 init : flags ->  ( Model, Cmd Msg )
-init _ = ( Feed [Post.welcome_post], Post.fetch Recv_Posts )
+init _ = ( Feed [Post.welcome], Post.fetch Recv_Posts )
 
 
 -- UPDATE
@@ -113,4 +113,4 @@ view model =
         Writing p -> Views.writing Changed p
         Reading p -> Views.reading p
         Feed ps -> Views.feed Read ps
-  in E.layout [] <| E.column [] [ E.wrappedRow [] [(E.el [Events.onClick Switch_To_Feed] << E.text) "Feed", (E.el [Events.onClick Write]) ], element]
+  in E.layout [] <| E.column [] [ E.wrappedRow [] [(E.el [Events.onClick Switch_To_Feed] << E.text) "Feed", (E.el [Events.onClick <| Write Post.empty] << El.text) "Write"], element]
