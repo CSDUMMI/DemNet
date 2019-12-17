@@ -1,4 +1,5 @@
-module Post exposing ( Post
+module Post exposing     ( Post
+                         , welcome_post
                          , save
                          , publish
                          , fetch
@@ -11,7 +12,7 @@ It provides all utility functions for handeling
 the Post type.
 
 # Definition
-@docs Post
+@docs Post, welcome_post
 # Networking functions
 @docs save, publish, upload, fetch
 # Conversion
@@ -34,6 +35,23 @@ type alias Post = { saved : Bool
                   , content : String
                   , author : String
                   }
+
+{-| An example post, that also functions as test and welcome message.
+-}
+welcome_post : Post
+welcome_post =      { saved = True
+                    , title = "Welcome to DemNet"
+                    , content = """This is a democratic social network.
+We designed it to be as direct and democratic as possible.
+For every change there is an election where more than 50 % of the users
+approve of the change.
+If it affects the Election logic this number is raised to 80 %.
+We use an Alternative Vote System.
+- If you want an easy explaination of the concept [watch this](https://invidio.us/watch?v=3Y3jE3B8HsE)
+- I'll write a long explaination specifically about DemNet's elections soon.
+"""
+                    , author = "Joris Gutjahr"
+                    }
 {-| Save a Post on the server, but don't publish it.
 If you want to publish a Post use [`publish`](#publish)
 -}

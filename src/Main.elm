@@ -4,7 +4,8 @@ import Browser
 import Array
 import Http
 import Html
-import Element
+import Element as E
+import Element.Events as Events
 import Json.Decode as D
 
 import Post exposing ( Post )
@@ -26,7 +27,7 @@ type Model
   | Feed (List Post)
 
 init : flags ->  ( Model, Cmd Msg )
-init _ = ( Feed [], Post.fetch Recv_Posts )
+init _ = ( Feed [Post.welcome_post], Post.fetch Recv_Posts )
 
 
 -- UPDATE
@@ -112,4 +113,4 @@ view model =
         Writing p -> Views.writing Changed p
         Reading p -> Views.reading p
         Feed ps -> Views.feed ps
-  in Element.layout [] <| Element.column [] [ Element.wrappedRow [] [ Element.text "Home", Element.text "Feed" ], element]
+  in E.layout [] <| E.column [] [ E.wrappedRow [] [(E.el [Events.onClick Switch_To_Feed] << E.text) "Feed" ], element]
