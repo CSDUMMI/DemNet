@@ -24,7 +24,7 @@ import Json.Encode as E
 
 {-| Utility type for all response messages (for when packets arive)
 -}
-type alias Expect_Msg msg = ( Result Http.Error String -> msg )
+type alias Expect_Msg result msg = ( Result Http.Error result -> msg )
 
 {-| Post, a simple data type to store a single Post.
 content is special in that it is actually parsed as markdown.
@@ -37,7 +37,7 @@ type alias Post = { saved : Bool
 {-| Save a Post on the server, but don't publish it.
 If you want to publish a Post use [`publish`](#publish)
 -}
-save : Expect_Msg msg -> Post -> Cmd msg
+save : Expect_Msg String msg -> Post -> Cmd msg
 save = upload "save"
 
 {-| Publish a Post on the network.
@@ -45,7 +45,7 @@ After this the Post is immutably on the network.
 If you just want to save your post for later and not yet publish,
 use [`save`](#save)
 -}
-publish : Expect_Msg msg -> Post -> Cmd msg
+publish : Expect_Msg String msg -> Post -> Cmd msg
 publish = upload "publish"
 
 {-| The function behing both [`save`](#save) and [`upload`](#upload).
@@ -53,7 +53,7 @@ The only difference between the two is that they speck to different
 routes. The Request is the same.
 **This function isn't exposed.**
 -}
-upload : String -> Expect_Msg msg ->  Post -> Cmd msg
+upload : String -> Expect_Msg String msg ->  Post -> Cmd msg
 upload url expect p
   = Http.post { url = "/content/" ++ url
               , body = Http.jsonBody <| encode p
@@ -64,7 +64,7 @@ upload url expect p
 You should use this command in combination
 with [`new`](#new), which has the type: `String -> List Post`
 -}
-fetch : Expect_Msg msg  -> Cmd msg
+fetch : Expect_Msg (List Post) msg  -> Cmd msg
 fetch expect
   = Http.post { url = "/feed"
               , body = Http.emptyBody
