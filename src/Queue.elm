@@ -21,7 +21,7 @@ type Queue a = Queue (List a)
 
 {-| An empty Queue is a Queue with a certain length, but always the same element inside itself.
 -}
-empty : a -> Int -> Queue a
+empty : Int -> a -> Queue a
 empty length default = Queue (List.repeat length default)
 
 {-| Create a Queue from an already existing list
