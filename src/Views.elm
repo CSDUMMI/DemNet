@@ -10,6 +10,8 @@ import Element exposing ( Element )
 import Element.Background as Background
 import Element.Input as Input
 import Element.Events as Events
+import Markdown
+
 import Post exposing ( Post )
 
 -- Attribute Lists, that are used often:
@@ -52,7 +54,7 @@ reading
       Element.none
       Element.none
       (Element.el title_attr << Element.text)
-      (Element.paragraph reading_content_attr << List.singleton << Element.text)
+      (Element.paragraph reading_content_attr << List.singleton << Element.text << Element.html << Markdown.toHtml)
 
 writing : (Post_Element -> String -> msg) -> Post -> Element msg
 writing change_msg
