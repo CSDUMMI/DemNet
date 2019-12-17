@@ -71,4 +71,4 @@ writing change_msg
                                                })
 feed : List Post -> Element msg
 feed posts = posts
-            |> view_posts Element.none Element.none []
+            |> view_posts Element.none Element.none
