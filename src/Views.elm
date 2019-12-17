@@ -70,6 +70,6 @@ writing change_msg
                                                , spellcheck = True
                                                , label = Input.labelAbove [] (Element.text "Content")
                                                })
-feed : msg -> List Post -> Element msg
+feed : (Post -> msg) -> List Post -> Element msg
 feed on_click posts = posts
             |> view_posts on_click Element.none Element.none
