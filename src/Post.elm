@@ -1,5 +1,6 @@
 module Post exposing     ( Post
-                         , welcome_post
+                         , empty
+                         , welcome
                          , save
                          , publish
                          , fetch
@@ -37,10 +38,15 @@ type alias Post = { saved : Bool
                   , author : String
                   }
 
+{-| An empty post, especially useful for starting to write a new one.
+The only thing left to apply is an author
+-}
+empty : String -> Post
+empty = Post True "" ""
 {-| An example post, that also functions as test and welcome message.
 -}
-welcome_post : Post
-welcome_post =      { saved = True
+welcome : Post
+welcome =      { saved = True
                     , title = "Welcome to DemNet"
                     , content = """This is a democratic social network.
 We designed it to be as direct and democratic as possible.
