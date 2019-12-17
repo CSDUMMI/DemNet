@@ -54,7 +54,7 @@ reading
       Element.none
       Element.none
       (Element.el title_attr << Element.text)
-      (Element.paragraph reading_content_attr << List.singleton << Element.text << Element.html << Markdown.toHtml)
+      (Element.paragraph reading_content_attr << List.singleton << Element.text << Element.html << Markdown.toHtml [])
 
 writing : (Post_Element -> String -> msg) -> Post -> Element msg
 writing change_msg
