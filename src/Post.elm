@@ -50,14 +50,16 @@ publish = upload "publish"
 
 {-| The function behing both [`save`](#save) and [`upload`](#upload).
 The only difference between the two is that they speck to different
-routes. The Request is the same
+routes. The Request is the same.
+**This function isn't exposed.**
 -}
 upload : String -> Expect_Msg msg ->  Post -> Cmd msg
-upload url expect { title, content }
+upload url expect p
   = Http.post { url = "/content/" ++ url
-              , body = Http.stringBody "plain/text" ( "# " ++ title ++ "\n" ++ content)
+              , body = Http.jsonBody <| encode p
               , expect = Http.expectString expect
               }
+
 {-|  Fetch a few Posts.
 You should use this command in combination
 with [`new`](#new), which has the type: `String -> List Post`
@@ -66,15 +68,13 @@ fetch : Expect_Msg msg  -> Cmd msg
 fetch expect
   = Http.post { url = "/feed"
               , body = Http.emptyBody
-              , expect = Http.expectString expect
+              , expect = Http.expectJson expect new
               }
 
 {-| Decoder to turn a string into a List of Posts
 -}
-new : String -> List Post
-new str = case D.decodeString (D.list decoder) str of
-  Ok ps -> ps
-  Err _ -> []
+new : D.Decoder (List Post)
+new = D.list decoder
 
 {-| Decoder for a single Post
 
@@ -92,6 +92,13 @@ decoder =
     (D.field "author" D.string)
 
 {-| Encode a Post into a E.Value to transmit to the server.
+Used in the [`save`](#save) and [`publish`](#publish) functions
+underlying [`upload`](#upload) function.
+
+    Post { saved = False, title = "Welcome", content = "To demnet", author = "Joris Gutjahr" }
+    |> encode
+    |> Http.jsonBody
+
 -}
 encode : Post -> E.Value
 encode post =
