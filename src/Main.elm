@@ -21,10 +21,17 @@ main = Browser.element
   }
 
 -- MODEL
-type Model
+type Main_Page
   = Reading Post
   | Writing Post
   | Feed (List Post)
+
+type Model = Model { user : User
+                   , main_page : Main_Page
+                   , stored_writings : List Post -- Written posts, that are in waiting (not actually shown)
+                   , stored_feed : List Post -- Fetched posts, that are not shown.
+                   , stored_readings : Queue Post -- Post that have been read recently. This queue deletes one for each post added.
+                   }
 
 init : flags ->  ( Model, Cmd Msg )
 init _ = ( Feed [Post.welcome], Post.fetch Recv_Posts )
