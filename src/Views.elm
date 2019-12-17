@@ -70,4 +70,6 @@ writing change_msg
                                                , label = Input.labelAbove [] (Element.text "Content")
                                                })
 feed : List Post -> Element msg
-feed posts = Element.none
+feed posts = posts
+            |> view_posts Element.none Element.none []
+            |> Element.column []
