@@ -9,6 +9,7 @@ module Views exposing ( reading
 import Element exposing ( Element )
 import Element.Background as Background
 import Element.Input as Input
+import Element.Events as Events
 import Post exposing ( Post )
 
 -- Attribute Lists, that are used often:
@@ -37,11 +38,11 @@ view_post header footer fromTitle fromContent post =
     , footer
     ]
 
-view_posts : Element msg -> Element msg -> List Post -> Element msg
-view_posts header footer posts =
+view_posts : (Post -> msg) -> Element msg -> Element msg -> List Post -> Element msg
+view_posts on_click header footer posts =
   Element.column list_attr
     [ header
-    , Element.paragraph [] <| List.foldl (\p acc -> (Element.text p.title)::acc) [] posts
+    , Element.paragraph [] <| List.foldl (\p acc -> (Element.el [Events.onClick (on_click p)] <| Element.text p.title)::acc) [] posts
     , footer
     ]
 
@@ -69,6 +70,6 @@ writing change_msg
                                                , spellcheck = True
                                                , label = Input.labelAbove [] (Element.text "Content")
                                                })
-feed : List Post -> Element msg
-feed posts = posts
-            |> view_posts Element.none Element.none
+feed : msg -> List Post -> Element msg
+feed on_click posts = posts
+            |> view_posts on_click Element.none Element.none
