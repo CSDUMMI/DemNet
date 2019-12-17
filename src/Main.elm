@@ -10,6 +10,7 @@ import Json.Decode as D
 
 import Post exposing ( Post )
 import Views exposing ( Post_Element (..), Upload_Type (..))
+import Queue exposing (Queue)
 
 -- MAIN
 main : Program () Model Msg
@@ -26,6 +27,10 @@ type Main_Page
   | Writing Post
   | Feed (List Post)
 
+type alias User = { username : String
+                  , first_name : String
+                  , last_name : String
+                  }
 type Model = Model { user : User
                    , main_page : Main_Page
                    , stored_writings : List Post -- Written posts, that are in waiting (not actually shown)
@@ -34,7 +39,15 @@ type Model = Model { user : User
                    }
 
 init : flags ->  ( Model, Cmd Msg )
-init _ = ( Feed [Post.welcome], Post.fetch Recv_Posts )
+init _ = ( Model { user = { username = ""
+                          , first_name = ""
+                          , last_name = ""
+                          }
+                  , main_page = Feed [Post.welcome]
+                  , stored_writings = []
+                  , stored_feed = []
+                  , stored_readings = Queue.empty 50 (Post.empty "") -- The limit may be changed as storage space increases.
+                  } Post.fetch Recv_Posts )
 
 
 -- UPDATE
