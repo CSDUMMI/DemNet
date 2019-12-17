@@ -29,6 +29,7 @@ type alias Expect_Msg result msg = ( Result Http.Error result -> msg )
 
 {-| Post, a simple data type to store a single Post.
 content is special in that it is actually parsed as markdown.
+To convert a Post into HTML [`view_post`](#Views/view_post)
 -}
 type alias Post = { saved : Bool
                   , title : String
