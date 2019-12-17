@@ -37,7 +37,7 @@ type Msg
   | Upload Upload_Type Post
   | Saved ( Result Http.Error String )
   | Switch_To_Feed -- Go to Feed
-  | Recv_Posts ( Result Http.Error String )
+  | Recv_Posts ( Result Http.Error (List Post) )
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -96,8 +96,8 @@ update msg model =
         Reading p -> ( Reading p, Cmd.none )
         Feed ps   ->
           ( case posts of
-              Ok new_posts -> Feed ((Post.new new_posts) ++ ps)
-              Err e -> Feed ps
+              Ok new_posts -> Feed (new_posts ++ ps)
+              Err error -> Feed ps
           , Cmd.none
           )
 
