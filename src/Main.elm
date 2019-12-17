@@ -5,8 +5,9 @@ import Array
 import Http
 import Html
 import Element
+import Json.Decode as D
 
-import Requests exposing ( Post )
+import Post exposing ( Post )
 import Views exposing ( Post_Element (..), Upload_Type (..))
 
 -- MAIN
@@ -25,7 +26,7 @@ type Model
   | Feed (List Post)
 
 init : flags ->  ( Model, Cmd Msg )
-init _ = ( Feed [], Requests.request_posts Recv_Posts )
+init _ = ( Feed [], Post.fetch Recv_Posts )
 
 
 -- UPDATE
@@ -67,8 +68,8 @@ update msg model =
       case model of
         Writing p ->
           let new_cmd = case kind of
-                  Publish -> Requests.publish_post Saved post
-                  Save -> Requests.save_post Saved post
+                  Publish -> Post.publish Saved post
+                  Save -> Post.save Saved post
           in (model,new_cmd)
         Reading p -> ( Reading p, Cmd.none )
         Feed ps -> ( Feed ps, Cmd.none )
@@ -84,10 +85,10 @@ update msg model =
     Switch_To_Feed ->
       case model of
         Writing p -> case p.saved of
-          True -> ( Feed [], Requests.request_posts Recv_Posts )
-          False -> ( Writing p, Requests.save_post Saved p )
-        Reading p -> ( Feed [], Requests.request_posts Recv_Posts )
-        Feed ps   ->  ( Feed ps, Requests.request_posts Recv_Posts )
+          True -> ( Feed [], Post.fetch Recv_Posts )
+          False -> ( Writing p, Post.save Saved p )
+        Reading p -> ( Feed [], Post.fetch Recv_Posts )
+        Feed ps   ->  ( Feed ps, Post.fetch Recv_Posts )
 
     Recv_Posts posts ->
       case model of
@@ -95,7 +96,7 @@ update msg model =
         Reading p -> ( Reading p, Cmd.none )
         Feed ps   ->
           ( case posts of
-              Ok new_posts -> Feed (Requests.parsePosts new_posts ++ ps)
+              Ok new_posts -> Feed ((Post.new new_posts) ++ ps)
               Err e -> Feed ps
           , Cmd.none
           )

@@ -9,7 +9,7 @@ module Views exposing ( reading
 import Element exposing ( Element )
 import Element.Background as Background
 import Element.Input as Input
-import Requests exposing ( Post )
+import Post exposing ( Post )
 
 -- Attribute Lists, that are used often:
 post_attr = []
