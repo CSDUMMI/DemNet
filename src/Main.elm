@@ -170,7 +170,7 @@ subscriptions model = Sub.none
 view : Model -> Html.Html Msg
 view model =
   let element = case model.main_page of
-        Writing p -> Views.writing Changed p
+        Writing p -> Views.writing Changed (Upload ) p
         Reading p -> Views.reading p
         Feed ps -> Views.feed Read ps
   in E.layout [E.moveRight 600]

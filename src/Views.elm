@@ -35,9 +35,6 @@ view_post : Element msg -> Element msg -> (String -> Element msg) -> (String -> 
 view_post header footer fromTitle fromContent post =
   Element.textColumn post_attr
     [ header
-    , Element.text <| case post.saved of
-          True -> "Saved"
-          False -> "Not Saved"
     , fromTitle post.title
     , fromContent post.content
     , Element.text post.author
@@ -60,22 +57,31 @@ reading
       (Element.el title_attr << Element.text)
       (Element.paragraph reading_content_attr << List.singleton << Element.html << Markdown.toHtml [])
 
-writing : (Post_Element -> String -> msg) -> Post -> Element msg
-writing change_msg
-  = view_post
-      Element.none
-      Element.none
-      (\t -> Input.text edit_title_attr { onChange = change_msg Title
-                                        , text = t
-                                        , placeholder = Nothing
-                                        , label = Input.labelAbove [Element.moveRight 350] (Element.text "Title")
-                                        })
-      (\c -> Input.multiline edit_content_attr { onChange = change_msg Content
-                                               , text = c
-                                               , placeholder = Nothing
-                                               , spellcheck = True
-                                               , label = Input.labelAbove [Element.moveRight 345] (Element.text "Content")
-                                               })
+writing : (Post_Element -> String -> msg) -> (Upload_Type -> Post -> msg) -> Post -> Element msg
+writing change_msg upload post
+  = let header = (Element.text <| case post.saved of
+            True -> "Saved"
+            False -> "Not Saved"
+            )
+        footer = (Element.row [Element.spacing 5]
+            [ Element.el [Events.onClick <| upload Save post] <| Element.text "Save"
+            , Element.el [Events.onClick <| upload Publish post] <| Element.text "Publish"
+            ]
+          )
+        fromTitle = (\t -> Input.text edit_title_attr { onChange = change_msg Title
+                                          , text = t
+                                          , placeholder = Nothing
+                                          , label = Input.labelAbove [Element.moveRight 350] (Element.text "Title")
+                                          })
+        fromContent = (\c -> Input.multiline edit_content_attr { onChange = change_msg Content
+                                                 , text = c
+                                                 , placeholder = Nothing
+                                                 , spellcheck = True
+                                                 , label = Input.labelAbove [Element.moveRight 345] (Element.text "Content")
+                                                 })
+    in view_post header footer fromTitle fromContent post
+
+
 feed : (Post -> msg) -> List Post -> Element msg
 feed on_click posts = posts
             |> view_posts on_click Element.none Element.none
