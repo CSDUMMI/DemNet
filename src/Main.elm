@@ -122,15 +122,11 @@ update msg model =
       in (change_main_page new_main_page model, cmd)
 
     Upload kind post ->
-      let (new_main_page, cmd) = case model.main_page of
-            Writing p ->
-              let new_cmd = case kind of
-                      Publish -> Post.publish Saved post
-                      Save -> Post.save Saved post
-              in (model.main_page,new_cmd)
-            Reading p -> ( Reading p, Cmd.none )
-            Feed ps -> ( Feed ps, Cmd.none )
-      in (change_main_page new_main_page model, cmd)
+      let cmd = case kind of
+            Publish -> Post.publish Saved post
+            Save -> Post.save Saved post
+          new_feed = if kind == Publish then post::model.stored_feed else model.stored_feed
+      in ({ model | stored_feed = new_feed }, cmd)
 
     Saved result ->
       let (new_main_page, cmd) = case model.main_page of
