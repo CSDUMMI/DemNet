@@ -70,7 +70,7 @@ change_main_page : Main_Page -> Model -> Model
 change_main_page mp model = { model | main_page = mp }
 
 init : flags ->  ( Model, Cmd Msg )
-init _ = ( Model { user = { username = ""
+init _ = (        { user = { username = ""
                           , first_name = ""
                           , last_name = ""
                           }
@@ -96,17 +96,17 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     Read post ->
-      let new_main_page = change_main_page << Reading post
+      let new_main_page = change_main_page <| Reading post
       in case model.main_page of
         Writing p ->  ( new_main_page <| cache_writings model [p],  Cmd.none )
         Reading p ->  ( new_main_page <| cache_readings model [p], Cmd.none )
         Feed ps ->    ( new_main_page <| cache_feed model ps, Cmd.none )
     Write post ->
-      let new_main_page = change_main_page << Writing post
+      let new_main_page = change_main_page <| Writing post
       in case model.main_page of
-        Writing p -> ( new_main_page <| cache_writings [p], Cmd.none )
-        Reading p -> ( new_main_page <| cache_readings [p], Cmd.none )
-        Feed ps -> ( new_main_page <| cache_feed ps, Cmd.none )
+        Writing p -> ( new_main_page <| cache_writings model [p], Cmd.none )
+        Reading p -> ( new_main_page <| cache_readings model [p], Cmd.none )
+        Feed ps -> ( new_main_page <| cache_feed model ps, Cmd.none )
 
     Changed element post_element ->
       let (new_main_page, cmd) = case model.main_page of
@@ -125,40 +125,40 @@ update msg model =
               let new_cmd = case kind of
                       Publish -> Post.publish Saved post
                       Save -> Post.save Saved post
-              in (model,new_cmd)
+              in (model.main_page,new_cmd)
             Reading p -> ( Reading p, Cmd.none )
             Feed ps -> ( Feed ps, Cmd.none )
       in (change_main_page new_main_page model, cmd)
 
     Saved result ->
       let (new_main_page, cmd) = case model.main_page of
-        Writing p -> case result of
-          Ok response -> ( Writing { p | saved = ( response == "Posted" ) }, Cmd.none )
-          Err err -> ( Writing { p | saved = False }, Cmd.none )
-        Reading p -> ( Reading p, Cmd.none )
-        Feed ps -> ( Feed ps, Cmd.none )
+            Writing p -> case result of
+              Ok response -> ( Writing { p | saved = ( response == "Posted" ) }, Cmd.none )
+              Err err -> ( Writing { p | saved = False }, Cmd.none )
+            Reading p -> ( Reading p, Cmd.none )
+            Feed ps -> ( Feed ps, Cmd.none )
       in (change_main_page new_main_page model, cmd)
 
     Switch_To_Feed ->
       let (new_main_page, cmd) = case model.main_page of
-        Writing p -> case p.saved of
-          True -> ( Feed [], Post.fetch Recv_Posts )
-          False -> ( Writing p, Post.save Saved p )
-        Reading p -> ( Feed [], Post.fetch Recv_Posts )
-        Feed ps   ->  ( Feed ps, Post.fetch Recv_Posts )
+            Writing p -> case p.saved of
+              True -> ( Feed [], Post.fetch Recv_Posts )
+              False -> ( Writing p, Post.save Saved p )
+            Reading p -> ( Feed [], Post.fetch Recv_Posts )
+            Feed ps   ->  ( Feed ps, Post.fetch Recv_Posts )
       in (change_main_page new_main_page model, cmd)
 
     Recv_Posts posts ->
       let (new_main_page, cmd) = case model.main_page of
-        Writing p -> ( Writing p, Cmd.none )
-        Reading p -> ( Reading p, Cmd.none )
-        Feed ps   ->
-          ( case posts of
-              Ok new_posts -> Feed (new_posts ++ ps)
-              Err error -> Feed ps
-          , Cmd.none
-          )
-      in (change_main_page new_main_page, cmd)
+            Writing p -> ( Writing p, Cmd.none )
+            Reading p -> ( Reading p, Cmd.none )
+            Feed ps   ->
+              ( case posts of
+                  Ok new_posts -> Feed (new_posts ++ ps)
+                  Err error -> Feed ps
+              , Cmd.none
+              )
+      in (change_main_page new_main_page model, cmd)
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
