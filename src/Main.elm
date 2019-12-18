@@ -10,7 +10,6 @@ import Element.Border as Border
 import Json.Decode as D
 
 import Post exposing ( Post )
-import Election exposing ( Election )
 import Views exposing ( Post_Element (..), Upload_Type (..))
 import Cache exposing (Cache)
 
@@ -28,9 +27,7 @@ type Main_Page
   = Reading Post
   | Writing Post
   | Feed (List Post)
-  | Login { username : String, password : String }
-  | Elections (List Election)
-  | Voting Election
+
 
 type alias User = { username : String
                   , first_name : String

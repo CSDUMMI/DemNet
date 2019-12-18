@@ -38,5 +38,5 @@ view_short_election monthToString dayToString zone election
                |> Time.toDay zone election.closes
                |> Debug.toString
                |> (++) "/"
-               |> Time.toYear zone election.closes
+               |> (++) Time.toYear zone election.closes
                |> Debug.toString
