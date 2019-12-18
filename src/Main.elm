@@ -10,7 +10,7 @@ import Json.Decode as D
 
 import Post exposing ( Post )
 import Views exposing ( Post_Element (..), Upload_Type (..))
-import Queue exposing (Queue)
+import Cache exposing (Cache)
 
 -- MAIN
 main : Program () Model Msg
@@ -35,8 +35,14 @@ type Model = Model { user : User
                    , main_page : Main_Page
                    , stored_writings : List Post -- Written posts, that are in waiting (not actually shown)
                    , stored_feed : List Post -- Fetched posts, that are not shown.
-                   , stored_readings : Queue Post -- Post that have been read recently. This queue deletes one for each post added.
+                   , stored_readings : Cache Post -- Post that have been read recently. This queue deletes one for each post added.
                    }
+
+cache : Cache_Type -> Model -> List Post -> Model
+cache ct (Model model) posts = case ct of
+  Feed_Cache -> Model { model | stored_feed = posts ++ model.stored_feed }
+  Writing_Cache -> Model { model | stored_writings = posts ++ model.stored_writings }
+  Reading_Cache -> Model { model | stored_readings = Cache.move posts model.stored_readings }
 
 init : flags ->  ( Model, Cmd Msg )
 init _ = ( Model { user = { username = ""
@@ -46,8 +52,9 @@ init _ = ( Model { user = { username = ""
                   , main_page = Feed [Post.welcome]
                   , stored_writings = []
                   , stored_feed = []
-                  , stored_readings = Queue.empty 50 (Post.empty "") -- The limit may be changed as storage space increases.
-                  } Post.fetch Recv_Posts )
+                  , stored_readings = Cache.empty 50 (Post.empty "") -- The limit may be changed as storage space increases.
+                  }
+                  , Post.fetch Recv_Posts )
 
 
 -- UPDATE
@@ -64,11 +71,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     Read post ->
-      case model of
-        Writing p -> ( Writing p, Cmd.none )
+      case model.main_page of
+        Writing p -> (Model {Writing p, Cmd.none )
         Reading p -> ( Reading post, Cmd.none )
         Feed ps -> ( Reading post, Cmd.none )
-
     Write post ->
       case model of
         Writing p -> ( Writing  p, Cmd.none )
@@ -121,6 +127,7 @@ update msg model =
               Err error -> Feed ps
           , Cmd.none
           )
+
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
