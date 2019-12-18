@@ -31,18 +31,38 @@ type alias User = { username : String
                   , first_name : String
                   , last_name : String
                   }
-type Model = Model { user : User
+
+type alias Model = { user : User
                    , main_page : Main_Page
                    , stored_writings : List Post -- Written posts, that are in waiting (not actually shown)
                    , stored_feed : List Post -- Fetched posts, that are not shown.
                    , stored_readings : Cache Post -- Post that have been read recently. This queue deletes one for each post added.
                    }
 
+type Cache_Type = Feed_Cache | Writing_Cache | Reading_Cache
+
+{-| Cache some posts in the model.
+-}
 cache : Cache_Type -> Model -> List Post -> Model
 cache ct (Model model) posts = case ct of
   Feed_Cache -> Model { model | stored_feed = posts ++ model.stored_feed }
   Writing_Cache -> Model { model | stored_writings = posts ++ model.stored_writings }
-  Reading_Cache -> Model { model | stored_readings = Cache.move posts model.stored_readings }
+  Reading_Cache -> Model { model | stored_readings = Cache.moves posts model.stored_readings }
+
+{-| Cache Feed in the stored_feed cache
+-}
+cache_feed : Model -> List Post -> Model
+cache_feed = cache Feed_Cache
+
+{-| Cache Posts into the stored_writings cache
+-}
+cache_writings : Model -> List Post -> Model
+cache_writings = cache Writing_Cache
+
+{-| Cache Posts in the stored_readings cache
+-}
+cache_readings : Model -> List Post -> Model
+cache_readings = cache Reading_Cache
 
 init : flags ->  ( Model, Cmd Msg )
 init _ = ( Model { user = { username = ""
@@ -71,15 +91,17 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     Read post ->
-      case model.main_page of
-        Writing p -> (Model {Writing p, Cmd.none )
-        Reading p -> ( Reading post, Cmd.none )
-        Feed ps -> ( Reading post, Cmd.none )
+      let new_main_page = Reading post
+      in case model.main_page of
+        Writing p ->  ({ cache_writings model [p] | main_page = new_main_page }, Cmd.none )
+        Reading p ->  ({ cache_readings model [p] | main_page = new_main_page }, Cmd.none )
+        Feed ps ->    ({ cache_feed model ps | main_page = new_main_page }, Cmd.none )
     Write post ->
-      case model of
-        Writing p -> ( Writing  p, Cmd.none )
-        Reading p -> ( Writing post, Cmd.none )
-        Feed ps -> ( Writing post, Cmd.none )
+      let new_main_page = Writing post
+      in case model of
+        Writing p -> ( { cache_writings model [p] | main_page = new_main_page}, Cmd.none )
+        Reading p -> ( { cache_readings model [p] | main_page = new_main_page}, Cmd.none )
+        Feed ps -> ( { cache_feed model ps | main_page = new_main_page }, Cmd.none )
 
     Changed element post_element ->
       case model of
