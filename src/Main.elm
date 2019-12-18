@@ -6,9 +6,11 @@ import Http
 import Html
 import Element as E
 import Element.Events as Events
+import Element.Border as Border
 import Json.Decode as D
 
 import Post exposing ( Post )
+import Election exposing ( Election )
 import Views exposing ( Post_Element (..), Upload_Type (..))
 import Cache exposing (Cache)
 
@@ -26,6 +28,9 @@ type Main_Page
   = Reading Post
   | Writing Post
   | Feed (List Post)
+  | Login { username : String, password : String }
+  | Elections (List Election)
+  | Voting Election
 
 type alias User = { username : String
                   , first_name : String
@@ -70,10 +75,10 @@ change_main_page : Main_Page -> Model -> Model
 change_main_page mp model = { model | main_page = mp }
 
 init : flags ->  ( Model, Cmd Msg )
-init _ = (        { user = { username = ""
-                          , first_name = ""
-                          , last_name = ""
-                          }
+init _ = (        { user =  { username = ""
+                            , first_name = ""
+                            , last_name = ""
+                            }
                   , main_page = Feed [Post.welcome]
                   , stored_writings = []
                   , stored_feed = []
@@ -142,9 +147,9 @@ update msg model =
     Switch_To_Feed ->
       let (new_main_page, cmd) = case model.main_page of
             Writing p -> case p.saved of
-              True -> ( Feed [], Post.fetch Recv_Posts )
+              True -> ( Feed model.stored_feed, Post.fetch Recv_Posts )
               False -> ( Writing p, Post.save Saved p )
-            Reading p -> ( Feed [], Post.fetch Recv_Posts )
+            Reading p -> ( Feed model.stored_feed, Post.fetch Recv_Posts )
             Feed ps   ->  ( Feed ps, Post.fetch Recv_Posts )
       in (change_main_page new_main_page model, cmd)
 
@@ -171,4 +176,9 @@ view model =
         Writing p -> Views.writing Changed p
         Reading p -> Views.reading p
         Feed ps -> Views.feed Read ps
-  in E.layout [] <| E.column [] [ E.wrappedRow [] [(E.el [Events.onClick Switch_To_Feed] << E.text) "Feed", (E.el [Events.onClick <| Write <| Post.empty model.user.username] << E.text) "Write"], element]
+  in E.layout [E.moveRight 600]
+      <| E.column []
+        [ E.wrappedRow [E.spacing 5] [(E.el [Events.onClick Switch_To_Feed ] << E.text) "Feed"
+        , (E.el [Events.onClick <| Write <| Post.empty model.user.username] << E.text) "Write"
+        ]
+        , element]

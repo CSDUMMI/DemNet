@@ -46,7 +46,7 @@ empty = Post True "" ""
 {-| An example post, that also functions as test and welcome message.
 -}
 welcome : Post
-welcome =      { saved = True
+welcome =           { saved = True
                     , title = "Welcome to DemNet"
                     , content = """This is a democratic social network.
 We designed it to be as direct and democratic as possible.

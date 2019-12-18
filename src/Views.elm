@@ -21,9 +21,9 @@ title_attr = []
 
 reading_content_attr = []
 
-edit_title_attr = [ Input.focusedOnLoad ]
+edit_title_attr = [ Input.focusedOnLoad, Element.minimum 200 Element.fill |> Element.width, Element.minimum 50 Element.fill |> Element.height]
 
-edit_content_attr = []
+edit_content_attr = [ Element.minimum 750 Element.fill |> Element.width, Element.minimum 750 Element.fill |> Element.height]
 
 list_attr = []
 -- Datatypes for distinction:
@@ -35,8 +35,12 @@ view_post : Element msg -> Element msg -> (String -> Element msg) -> (String -> 
 view_post header footer fromTitle fromContent post =
   Element.textColumn post_attr
     [ header
+    , Element.text <| case post.saved of
+          True -> "Saved"
+          False -> "Not Saved"
     , fromTitle post.title
     , fromContent post.content
+    , Element.text post.author
     , footer
     ]
 
@@ -64,13 +68,13 @@ writing change_msg
       (\t -> Input.text edit_title_attr { onChange = change_msg Title
                                         , text = t
                                         , placeholder = Nothing
-                                        , label = Input.labelLeft [] (Element.text "Title")
+                                        , label = Input.labelAbove [Element.moveRight 350] (Element.text "Title")
                                         })
       (\c -> Input.multiline edit_content_attr { onChange = change_msg Content
                                                , text = c
                                                , placeholder = Nothing
                                                , spellcheck = True
-                                               , label = Input.labelAbove [] (Element.text "Content")
+                                               , label = Input.labelAbove [Element.moveRight 345] (Element.text "Content")
                                                })
 feed : (Post -> msg) -> List Post -> Element msg
 feed on_click posts = posts
