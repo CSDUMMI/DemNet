@@ -44,10 +44,10 @@ type Cache_Type = Feed_Cache | Writing_Cache | Reading_Cache
 {-| Cache some posts in the model.
 -}
 cache : Cache_Type -> Model -> List Post -> Model
-cache ct (Model model) posts = case ct of
-  Feed_Cache -> Model { model | stored_feed = posts ++ model.stored_feed }
-  Writing_Cache -> Model { model | stored_writings = posts ++ model.stored_writings }
-  Reading_Cache -> Model { model | stored_readings = Cache.moves posts model.stored_readings }
+cache ct model posts = case ct of
+  Feed_Cache -> { model | stored_feed = posts ++ model.stored_feed }
+  Writing_Cache -> { model | stored_writings = posts ++ model.stored_writings }
+  Reading_Cache -> { model | stored_readings = Cache.moves posts model.stored_readings }
 
 {-| Cache Feed in the stored_feed cache
 -}
@@ -63,6 +63,11 @@ cache_writings = cache Writing_Cache
 -}
 cache_readings : Model -> List Post -> Model
 cache_readings = cache Reading_Cache
+
+{-| Update the main_page only
+-}
+change_main_page : Main_Page -> Model -> Model
+change_main_page mp model = { model | main_page = mp }
 
 init : flags ->  ( Model, Cmd Msg )
 init _ = ( Model { user = { username = ""
@@ -91,37 +96,39 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     Read post ->
-      let new_main_page = Reading post
+      let new_main_page = change_main_page << Reading post
       in case model.main_page of
-        Writing p ->  ({ cache_writings model [p] | main_page = new_main_page }, Cmd.none )
-        Reading p ->  ({ cache_readings model [p] | main_page = new_main_page }, Cmd.none )
-        Feed ps ->    ({ cache_feed model ps | main_page = new_main_page }, Cmd.none )
+        Writing p ->  ( new_main_page <| cache_writings model [p],  Cmd.none )
+        Reading p ->  ( new_main_page <| cache_readings model [p], Cmd.none )
+        Feed ps ->    ( new_main_page <| cache_feed model ps, Cmd.none )
     Write post ->
-      let new_main_page = Writing post
-      in case model of
-        Writing p -> ( { cache_writings model [p] | main_page = new_main_page}, Cmd.none )
-        Reading p -> ( { cache_readings model [p] | main_page = new_main_page}, Cmd.none )
-        Feed ps -> ( { cache_feed model ps | main_page = new_main_page }, Cmd.none )
+      let new_main_page = change_main_page << Writing post
+      in case model.main_page of
+        Writing p -> ( new_main_page <| cache_writings [p], Cmd.none )
+        Reading p -> ( new_main_page <| cache_readings [p], Cmd.none )
+        Feed ps -> ( new_main_page <| cache_feed ps, Cmd.none )
 
     Changed element post_element ->
-      case model of
-        Writing p ->
-          let post = case element of
-                Title -> { p | title = post_element, saved = False }
-                Content -> { p | content = post_element, saved = False }
-          in ( Writing post, Cmd.none )
-        Reading p -> ( Reading p, Cmd.none )
-        Feed ps -> ( Feed ps, Cmd.none )
+      let (new_main_page, cmd) = case model.main_page of
+            Writing p ->
+              let post = case element of
+                    Title -> { p | title = post_element, saved = False }
+                    Content -> { p | content = post_element, saved = False }
+              in ( Writing post, Cmd.none )
+            Reading p -> ( Reading p, Cmd.none )
+            Feed ps -> ( Feed ps, Cmd.none )
+      in (change_main_page new_main_page model, cmd)
 
     Upload kind post ->
-      case model of
-        Writing p ->
-          let new_cmd = case kind of
-                  Publish -> Post.publish Saved post
-                  Save -> Post.save Saved post
-          in (model,new_cmd)
-        Reading p -> ( Reading p, Cmd.none )
-        Feed ps -> ( Feed ps, Cmd.none )
+      let (new_main_page, cmd) = case model.main_page of
+            Writing p ->
+              let new_cmd = case kind of
+                      Publish -> Post.publish Saved post
+                      Save -> Post.save Saved post
+              in (model,new_cmd)
+            Reading p -> ( Reading p, Cmd.none )
+            Feed ps -> ( Feed ps, Cmd.none )
+      in (change_main_page new_main_page model, cmd)
 
     Saved result ->
       case model of

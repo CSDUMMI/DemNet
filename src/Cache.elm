@@ -46,7 +46,7 @@ All the elements, that are thrown out, are ignored.
 moves : List a -> Cache a -> Cache a
 moves xs (Cache cs) = case xs of
   [] -> Cache cs
-  x:rest -> moves rest (Tuple.second << move x << Cache <| cs)
+  x::rest -> moves rest (Tuple.second << move x << Cache <| cs)
 
 {-| Reverse of the [`fromList`](#fromList)
 -}
