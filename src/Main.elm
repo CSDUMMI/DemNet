@@ -167,8 +167,8 @@ subscriptions model = Sub.none
 -- VIEW
 view : Model -> Html.Html Msg
 view model =
-  let element = case model of
+  let element = case model.main_page of
         Writing p -> Views.writing Changed p
         Reading p -> Views.reading p
         Feed ps -> Views.feed Read ps
-  in E.layout [] <| E.column [] [ E.wrappedRow [] [(E.el [Events.onClick Switch_To_Feed] << E.text) "Feed", (E.el [Events.onClick <| Write Post.empty] << E.text) "Write"], element]
+  in E.layout [] <| E.column [] [ E.wrappedRow [] [(E.el [Events.onClick Switch_To_Feed] << E.text) "Feed", (E.el [Events.onClick <| Write <| Post.empty model.user.username] << E.text) "Write"], element]
