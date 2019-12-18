@@ -131,23 +131,25 @@ update msg model =
       in (change_main_page new_main_page model, cmd)
 
     Saved result ->
-      case model of
+      let (new_main_page, cmd) = case model.main_page of
         Writing p -> case result of
           Ok response -> ( Writing { p | saved = ( response == "Posted" ) }, Cmd.none )
           Err err -> ( Writing { p | saved = False }, Cmd.none )
         Reading p -> ( Reading p, Cmd.none )
         Feed ps -> ( Feed ps, Cmd.none )
+      in (change_main_page new_main_page model, cmd)
 
     Switch_To_Feed ->
-      case model of
+      let (new_main_page, cmd) = case model.main_page of
         Writing p -> case p.saved of
           True -> ( Feed [], Post.fetch Recv_Posts )
           False -> ( Writing p, Post.save Saved p )
         Reading p -> ( Feed [], Post.fetch Recv_Posts )
         Feed ps   ->  ( Feed ps, Post.fetch Recv_Posts )
+      in (change_main_page new_main_page model, cmd)
 
     Recv_Posts posts ->
-      case model of
+      let (new_main_page, cmd) = case model.main_page of
         Writing p -> ( Writing p, Cmd.none )
         Reading p -> ( Reading p, Cmd.none )
         Feed ps   ->
@@ -156,7 +158,7 @@ update msg model =
               Err error -> Feed ps
           , Cmd.none
           )
-
+      in (change_main_page new_main_page, cmd)
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
