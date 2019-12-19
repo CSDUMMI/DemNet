@@ -11,7 +11,7 @@ import Json.Decode as D
 
 import Post exposing ( Post )
 import Views exposing ( Post_Element (..), Upload_Type (..))
-import Cache exposing (Cache)
+import RemovingCache exposing (RemovingCache)
 
 -- MAIN
 main : Program () Model Msg
@@ -38,30 +38,30 @@ type alias Model = { user : User
                    , main_page : Main_Page
                    , stored_writings : List Post -- Written posts, that are in waiting (not actually shown)
                    , stored_feed : List Post -- Fetched posts, that are not shown.
-                   , stored_readings : Cache Post -- Post that have been read recently. This queue deletes one for each post added.
+                   , stored_readings : RemovingCache Post -- Post that have been read recently. This queue deletes one for each post added.
                    }
 
 type Cache_Type = Feed_Cache | Writing_Cache | Reading_Cache
 
-{-| Cache some posts in the model.
+{-| RemovingCache some posts in the model.
 -}
 cache : Cache_Type -> Model -> List Post -> Model
 cache ct model posts = case ct of
-  Feed_Cache -> { model | stored_feed = posts ++ model.stored_feed }
+  Feed_Cache -> { model | stored_feed = List.foldl (\x acc -> if List.member x acc then acc else x::acc) [] <| posts ++ model.stored_feed }
   Writing_Cache -> { model | stored_writings = posts ++ model.stored_writings }
-  Reading_Cache -> { model | stored_readings = Cache.moves posts model.stored_readings }
+  Reading_Cache -> { model | stored_readings = RemovingCache.moves posts model.stored_readings }
 
-{-| Cache Feed in the stored_feed cache
+{-| RemovingCache Feed in the stored_feed cache
 -}
 cache_feed : Model -> List Post -> Model
 cache_feed = cache Feed_Cache
 
-{-| Cache Posts into the stored_writings cache
+{-| RemovingCache Posts into the stored_writings cache
 -}
 cache_writings : Model -> List Post -> Model
 cache_writings = cache Writing_Cache
 
-{-| Cache Posts in the stored_readings cache
+{-| RemovingCache Posts in the stored_readings cache
 -}
 cache_readings : Model -> List Post -> Model
 cache_readings = cache Reading_Cache
@@ -79,7 +79,7 @@ init _ = (        { user =  { username = ""
                   , main_page = Feed [Post.welcome]
                   , stored_writings = []
                   , stored_feed = []
-                  , stored_readings = Cache.empty 50 (Post.empty "") -- The limit may be changed as storage space increases.
+                  , stored_readings = RemovingCache.empty 50 (Post.empty "") -- The limit may be changed as storage space increases.
                   }
                   , Post.fetch Recv_Posts )
 
@@ -169,7 +169,7 @@ view model =
         Writing p -> Views.writing Changed (Upload ) p
         Reading p -> Views.reading p
         Feed ps -> Views.feed Read ps
-  in E.layout [E.moveRight 600]
+  in E.layout [E.centerX]
       <| E.column []
         [ E.wrappedRow [E.spacing 5] [(E.el [Events.onClick Switch_To_Feed ] << E.text) "Feed"
         , (E.el [Events.onClick <| Write <| Post.empty model.user.username] << E.text) "Write"
