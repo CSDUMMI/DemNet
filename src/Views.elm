@@ -43,10 +43,10 @@ view_post header footer fromTitle fromContent post =
 
 view_posts : (Post -> msg) -> Element msg -> Element msg -> List Post -> Element msg
 view_posts on_click header footer posts =
-  Element.column list_attr
     [ header ]
-    ++ List.foldl (\p acc -> (Element.el [Events.onClick (on_click p)] <| Element.text p.title)::acc) [] posts
-    [ footer ]
+    ++ (List.foldl (\p acc -> (Element.el [Events.onClick (on_click p)] <| Element.text p.title)::acc) [] posts)
+    ++ [ footer ]
+    |> Element.column list_attr
 
 reading : Post -> Element msg
 reading
