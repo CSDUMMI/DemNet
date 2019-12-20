@@ -7,6 +7,7 @@ import Html
 import Element as E
 import Element.Events as Events
 import Element.Border as Border
+import Element.Input as Input
 import Json.Decode as D
 
 import Post exposing ( Post )
@@ -27,6 +28,7 @@ type Main_Page
   = Reading Post
   | Writing Post
   | Feed (List Post)
+  | Login User
 
 
 type alias User = { username : String
@@ -34,7 +36,7 @@ type alias User = { username : String
                   , last_name : String
                   }
 
-type alias Model = { user : User
+type alias Model = { user : Maybe User
                    , main_page : Main_Page
                    , stored_writings : List Post -- Written posts, that are in waiting (not actually shown)
                    , stored_feed : List Post -- Fetched posts, that are not shown.
@@ -85,6 +87,8 @@ init _ = (        { user =  { username = ""
 
 
 -- UPDATE
+type Login_Field = Username | Password
+
 type Msg
   = Read Post -- Switch to Reading with this Post
   | Write Post -- Writing with the Writing with this post
@@ -93,6 +97,7 @@ type Msg
   | Saved ( Result Http.Error String )
   | Switch_To_Feed -- Go to Feed
   | Recv_Posts ( Result Http.Error (List Post) )
+  | Login_Change Login_Field String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -158,6 +163,10 @@ update msg model =
               )
       in (change_main_page new_main_page model, cmd)
 
+    Login_Change field input ->
+      case model.main_page of
+        Writing p -> (change_main_page Login User.empty <| cache_writings model [p], Cmd.none)
+
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
@@ -169,9 +178,18 @@ view model =
         Writing p -> Views.writing Changed (Upload ) p
         Reading p -> Views.reading p
         Feed ps -> Views.feed Read ps
+        content = case model.user of
+          Just user ->
+            [ E.wrappedRow [E.spacing 5]
+              [ (E.el [Events.onClick Switch_To_Feed ] << E.text) "Feed"
+              , (E.el [Events.onClick <| Write <| Post.empty model.user.username] << E.text) "Write"
+              ]
+            , element
+            ]
+          Nothing ->
+            [ Input.username [] { onChange = Login_Change Username, text = "Username", placeholder = Nothing, label = Input.labelLeft [] Element.text "Username:" }
+            , Input.currentPassword [] { onChange = Login_Change Password, text ="Password", placeholder = Nothing, label Input.labelLeft [] Element.text "Password:" }
+            , Input.button [] { onPress = Just Login }
+            ]
   in E.layout [E.centerX]
       <| E.column []
-        [ E.wrappedRow [E.spacing 5] [(E.el [Events.onClick Switch_To_Feed ] << E.text) "Feed"
-        , (E.el [Events.onClick <| Write <| Post.empty model.user.username] << E.text) "Write"
-        ]
-        , element]
