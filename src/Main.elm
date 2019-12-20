@@ -1,7 +1,6 @@
 module Main exposing (..)
 
 import Browser
-import Array
 import Http
 import Html
 import Element as E
@@ -13,7 +12,7 @@ import Json.Decode as D
 import Post exposing ( Post )
 import Views exposing ( Post_Element (..), Upload_Type (..))
 import RemovingCache exposing (RemovingCache)
-
+import User exposing ( User )
 -- MAIN
 main : Program () Model Msg
 main = Browser.element
@@ -31,10 +30,6 @@ type Main_Page
   | Login User
 
 
-type alias User = { username : String
-                  , first_name : String
-                  , last_name : String
-                  }
 
 type alias Model = { user : Maybe User
                    , main_page : Main_Page
@@ -178,18 +173,18 @@ view model =
         Writing p -> Views.writing Changed (Upload ) p
         Reading p -> Views.reading p
         Feed ps -> Views.feed Read ps
-        content = case model.user of
-          Just user ->
-            [ E.wrappedRow [E.spacing 5]
-              [ (E.el [Events.onClick Switch_To_Feed ] << E.text) "Feed"
-              , (E.el [Events.onClick <| Write <| Post.empty model.user.username] << E.text) "Write"
+      content = case model.user of
+            Just user ->
+              [ E.wrappedRow [E.spacing 5]
+                [ (E.el [Events.onClick Switch_To_Feed ] << E.text) "Feed"
+                , (E.el [Events.onClick <| Write <| Post.empty model.user.username] << E.text) "Write"
+                ]
+              , element
               ]
-            , element
-            ]
-          Nothing ->
-            [ Input.username [] { onChange = Login_Change Username, text = "Username", placeholder = Nothing, label = Input.labelLeft [] Element.text "Username:" }
-            , Input.currentPassword [] { onChange = Login_Change Password, text ="Password", placeholder = Nothing, label Input.labelLeft [] Element.text "Password:" }
-            , Input.button [] { onPress = Just Login }
-            ]
+            Nothing ->
+              [ Input.username [] { onChange = Login_Change Username, text = "Username", placeholder = Nothing, label = Input.labelLeft [] Element.text "Username:" }
+              , Input.currentPassword [] { onChange = Login_Change Password, text ="Password", placeholder = Nothing, label Input.labelLeft [] Element.text "Password:" }
+              , Input.button [] { onPress = Just Login }
+              ]
   in E.layout [E.centerX]
       <| E.column []
