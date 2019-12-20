@@ -1,8 +1,0 @@
-A;B;C;D;E
-A;B;C;D;E
-A;B;C;D;E
-A;B;C;D;E
-E;A;B;C;D
-D;E;A;B;C
-C;D;E;A;B
-B;C;D;E;A
