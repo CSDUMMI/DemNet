@@ -1,6 +1,8 @@
 module Post exposing     ( Post
                          , empty
                          , welcome
+                         , view_one
+                         , view_many
                          , save
                          , publish
                          , fetch
@@ -14,6 +16,8 @@ the Post type.
 
 # Definition
 @docs Post, welcome_post
+# Views
+@docs view_one, view_many
 # Networking functions
 @docs save, publish, upload, fetch
 # Conversion
@@ -23,6 +27,12 @@ the Post type.
 import Http
 import Json.Decode as D
 import Json.Encode as E
+import Element exposing ( Element )
+import Element.Events as Events
+
+import User exposing ( User )
+
+-- DEFINITION
 
 {-| Utility type for all response messages (for when packets arive)
 -}
@@ -30,19 +40,19 @@ type alias Expect_Msg result msg = ( Result Http.Error result -> msg )
 
 {-| Post, a simple data type to store a single Post.
 content is special in that it is actually parsed as markdown.
-To convert a Post into HTML [`view_post`](#Views/view_post)
 -}
 type alias Post = { saved : Bool
                   , title : String
                   , content : String
-                  , author : String
+                  , author : User
                   }
 
 {-| An empty post, especially useful for starting to write a new one.
 The only thing left to apply is an author
 -}
-empty : String -> Post
+empty : User -> Post
 empty = Post True "" ""
+
 {-| An example post, that also functions as test and welcome message.
 -}
 welcome : Post
@@ -57,8 +67,33 @@ We use an Alternative Vote System.
 - If you want an easy explaination of the concept [watch this](https://invidio.us/watch?v=3Y3jE3B8HsE)
 - I'll write a long explaination specifically about DemNet's elections soon.
 """
-                    , author = "Joris Gutjahr"
+                    , author = { username = "joris", first_name = "Joris", last_name = "Gutjahr" }
                     }
+-- VIEWS
+{-| Create an Element msg, showing a single post
+-}
+view_one : Element msg -> Element msg -> (String -> Element msg) -> (String -> Element msg) -> Post -> Element msg
+view_one header footer fromTitle fromContent post
+  = Element.textColumn []
+    [ header
+    , fromTitle post.title
+    , fromContent post.content
+    , User.view post.author
+    ]
+
+{-| Create a list of Posts, wich send a message, if clicked upon.
+This is most useful in the Feed.
+-}
+view_many : (Post -> msg) -> Element msg -> Element msg -> List Post -> Element msg
+view_many on_click header footer posts =
+  [ header ]
+  ++ List.foldr (\p acc -> (Element.el [Events.onClick (on_click p)] <| Element.text p.title)::acc) [] posts
+  ++ [ footer ]
+  |> Element.column []
+
+
+-- NETWORKING
+
 {-| Save a Post on the server, but don't publish it.
 If you want to publish a Post use [`publish`](#publish)
 -}
@@ -96,6 +131,8 @@ fetch expect
               , expect = Http.expectJson expect new
               }
 
+-- CONVERSION
+
 {-| Decoder to turn a string into a List of Posts
 -}
 new : D.Decoder (List Post)
@@ -114,14 +151,14 @@ decoder =
   D.map3 (Post True)
     (D.field "title" D.string)
     (D.field "content" D.string)
-    (D.field "author" D.string)
+    (D.field "author" User.decoder)
 
 {-| Encode a Post into a E.Value to transmit to the server.
 Used in the [`save`](#save) and [`publish`](#publish) functions
 underlying [`upload`](#upload) function.
 
-    Post { saved = False, title = "Welcome", content = "To demnet", author = "Joris Gutjahr" }
-    |> encode
+    Post { saved = False, title = "Welcome", content = "To demnet", author = { username = "joris", first_name = "Joris", last_name = "Gutjahr" } }
+    |> encode 0
     |> Http.jsonBody
 
 -}
@@ -130,5 +167,5 @@ encode post =
   E.object
     [ ("title", E.string post.title)
     , ("content", E.string post.content)
-    , ("author", E.string post.author)
+    , ("author", User.encode post.author)
     ]
