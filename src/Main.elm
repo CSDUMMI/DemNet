@@ -69,14 +69,15 @@ change_main_page : Main_Page -> Model -> Model
 change_main_page mp model = { model | main_page = mp }
 
 init : flags ->  ( Model, Cmd Msg )
-init _ = (        { user =  { username = ""
+init _ = (        { user = Just
+                            { username = ""
                             , first_name = ""
                             , last_name = ""
                             }
                   , main_page = Feed [Post.welcome]
                   , stored_writings = []
                   , stored_feed = []
-                  , stored_readings = RemovingCache.empty 50 (Post.empty "") -- The limit may be changed as storage space increases.
+                  , stored_readings = RemovingCache.empty 50 (Post.empty User.empty) -- The limit may be changed as storage space increases.
                   }
                   , Post.fetch Recv_Posts )
 
@@ -93,6 +94,7 @@ type Msg
   | Switch_To_Feed -- Go to Feed
   | Recv_Posts ( Result Http.Error (List Post) )
   | Login_Change Login_Field String
+  | Login_Request
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -160,8 +162,10 @@ update msg model =
 
     Login_Change field input ->
       case model.main_page of
-        Writing p -> (change_main_page Login User.empty <| cache_writings model [p], Cmd.none)
-
+        Writing p -> (change_main_page (Login User.empty) <| cache_writings model [p], Cmd.none)
+    Login_Request ->
+      case model.main_page of
+        
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
@@ -173,18 +177,11 @@ view model =
         Writing p -> Views.writing Changed (Upload) p
         Reading p -> Views.reading p
         Feed ps -> Views.feed Read ps
-      content = case model.user of
-            Just user ->
-              [ E.wrappedRow [E.spacing 5]
-                [ (E.el [Events.onClick Switch_To_Feed ] << E.text) "Feed"
-                , (E.el [Events.onClick <| Write <| Post.empty model.user.username] << E.text) "Write"
+        Login user ->
+              E.column []
+                [ Input.username [] { onChange = Login_Change Username, text = "Username", placeholder = Nothing, label = Input.labelLeft [] <| E.text "Username:" }
+                , Input.currentPassword [] { onChange = Login_Change Password, text ="Password", placeholder = Nothing, label = Input.labelLeft [] <| E.text "Password:", show = False }
+                , Input.button [] { onPress = Just Login_Request, label = E.text "Login" }
                 ]
-              , element
-              ]
-            Nothing ->
-              [ Input.username [] { onChange = Login_Change Username, text = "Username", placeholder = Nothing, label = Input.labelLeft [] E.text "Username:" }
-              , Input.currentPassword [] { onChange = Login_Change Password, text ="Password", placeholder = Nothing, label = Input.labelLeft [] E.text "Password:" }
-              , Input.button [] { onPress = Just Login }
-              ]
   in E.layout [E.centerX]
-      <| E.column []
+      <| E.column [] [element]

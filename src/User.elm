@@ -1,4 +1,4 @@
-module User exposing (User, view, decoder, encode)
+module User exposing (User, empty, view, decoder, encode)
 {-| Data Type and functions to handle users
 # Definition
 @docs User, empty
