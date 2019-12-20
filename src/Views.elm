@@ -31,26 +31,9 @@ type Post_Element = Title | Content
 
 type Upload_Type = Publish | Save
 
-view_post : Element msg -> Element msg -> (String -> Element msg) -> (String -> Element msg) -> Post -> Element msg
-view_post header footer fromTitle fromContent post =
-  Element.textColumn post_attr
-    [ header
-    , fromTitle post.title
-    , fromContent post.content
-    , Element.text post.author
-    , footer
-    ]
-
-view_posts : (Post -> msg) -> Element msg -> Element msg -> List Post -> Element msg
-view_posts on_click header footer posts =
-    [ header ]
-    ++ (List.foldl (\p acc -> (Element.el [Events.onClick (on_click p)] <| Element.text p.title)::acc) [] posts)
-    ++ [ footer ]
-    |> Element.column list_attr
-
 reading : Post -> Element msg
 reading
-  = view_post
+  = Post.view_one
       Element.none
       Element.none
       (Element.el title_attr << Element.text)
@@ -78,9 +61,9 @@ writing change_msg upload post
                                                  , spellcheck = True
                                                  , label = Input.labelAbove [Element.moveRight 345] (Element.text "Content")
                                                  })
-    in view_post header footer fromTitle fromContent post
+    in Post.view_one header footer fromTitle fromContent post
 
 
 feed : (Post -> msg) -> List Post -> Element msg
 feed on_click posts = posts
-            |> view_posts on_click Element.none Element.none
+            |> Post.view_many on_click Element.none Element.none
