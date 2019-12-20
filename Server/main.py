@@ -2,30 +2,65 @@ from flask import Flask, request, session, jsonify
 from election import count_votes
 from Crypto.Hash import SHA256
 import json, os
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 app = Flask(__name__, static_url_path='/static', static_folder='/static')
 app.secret_key = os.environ['SECRET_KEY']
 
-users = json.load(open( 'users.json'))
-elections = json.load( open('elections.json'))
+# MongoDb connection
+client = MongoClient()
+db = client.demnet
+users = db.users
+elections = db.elections
+messages = db.messages
+welcome_msg = messages.find_one({ 'title' : 'Welcome', 'author' : 'devteam' })
+print(welcome_msg)
+print(welcome_msg['_id'])
+"""
+Layout of the users:
+A User Document:
+{
+    'username' : Unique identification string
+    'password' :
+    'firstName' :
+    'lastName' :
+    'email' :
+    'phone' :
+    'messages' : ObjectIds of the Messages in  messages
+}
 
-def save():
-    json.dump(users, open("users.json", "w+") )
-    json.dump(elections, open("elections.json", "w+") )
-
+Layout of the elections:
+An Election Document:
+{
+    'participants' : Array of all usernames of those, who voted already
+    'votes' : Array of all votes, without any association to a user
+    'options' : Array of all the possibilities for a vote
+    'deadline' : UTC Timestamp
+}
+Layout of messages:
+A Message Document:
+{
+    'type' : 'Type of the Message' - Currently only 'text'
+    'content' : 'Content of the Message'
+    'title' : Title
+    'author' : 'Username of the author of the message'
+    'recipient' : Username of the user, to receive the message.
+}
+All messages are public!
+"""
 @app.route('/login')
 def login():
     # Logout automatically
     if request.values.get('username') and request.values.get('password'):
-        hash = SHA256.new( request.values.get('password') ).hexdigest()
+        hash = SHA256.new( request.values.get('password').encode('utf-8') ).hexdigest()
         username = request.values.get('username')
 
+        user = users.find_one({ 'username' : username })
         if hash == users[username]['password']:
             session['username'] = username
             return 'LoggedIn'
-
-    else:
-        return 'NotLoggedIn'
+    return 'NotLoggedIn'
 
 @app.route('/register')
 def register():
@@ -35,25 +70,31 @@ def register():
         and request.values.get('password')
         and request.values.get('email')
         and request.values.get('firstName')
-        and request.values.get('secondName')
-        and not users.get( request.values.get('username'))
+        and request.values.get('lastName')
+        and request.values.get('phone')
+        and users.find_one({ 'username' : request.values.get('username') }) == None
         ):
 
         username = request.values.get('username')
-        firstName = request.values.get('firstName')
-        secondName = request.values.get('secondName')
+        first_name = request.values.get('firstName')
+        last_name = request.values.get('secondName')
         hash = SHA256.new( request.values.get('password').encode('utf-8')).hexdigest()
         email = request.values.get('email')
+        phone = request.values.get('phone')
 
         session['username'] = username # Login automatically
-        users[username] = {
-            "username" : username,
-            "firstName" : firstName,
-            "secondName" : secondName,
-            "email" : email,
-            "password" : hash
+
+        user = {
+         'username'  : username,
+         'password'  : hash,
+         'email'     : email,
+         'first_name': first_name,
+         'last_name' : last_name,
+         'phone'     : phone,
+         'messages'  : [welcome_msg['_id']]
         }
-        save()
+        users.insert_one(user)
+
         return "Registered"
     else:
         return "NotRegistered"
@@ -66,32 +107,43 @@ def vote():
         and session.get('username')
         ):
 
-        vote = request.values.get('vote').split(';')
+        vote = request.values.get('vote')
         election = request.values.get('election')
         username = session.get('username')
 
-        if username in elections[election]['participants']:
+        election_id = ObjectId(election)
+        election = elections.find_one({ '_id' : election })
+        options = election.get('options')
+        deadline = int(election.get('deadline'))
+
+        if username in election.get('participants') or not (vote in options):
             return "AlreadyVoted"
+        elif deadline < time.time():
+            return "BallotClosed"
         else:
-            elections[election]['participants'].append( username )
-            elections[election]['votes'].append( vote )
-            save()
+            elections.update_one({ '_id' : election_id },
+                                 { '$push' :
+                                    {
+                                        'participants' : username,
+                                        'votes': vote
+                                    }
+                                })
             return "Voted"
     else:
         return "NotVoted"
 
 @app.route('/election')
 def election():
-    if( request.values.get('election') and elections.get( request.values.get('election') )):
+    if( request.values.get('election') and elections.find_one({ '_id' : ObjectId(request.values.get('election')) }) ):
 
-        election = request.values.get('election')
+        election_id = ObjectId(request.values.get('election'))
 
-        deadline = elections[election]['deadline']
-        participants = elections[election]['participants']
-        votes = elections[election]['votes']
-        options = elections[election]['options']
-        participant_count = len(participants)
+        election = elections.find_one({ '_id' : ObjectId(election_id) })
 
+        deadline = election.get('deadline')
+        votes = election.get('votes')
+        participants_count = len(election.get('participants'))
+        options = election.get('options')
 
         if int(deadline) > time.time():
             return "BallotNotClosed"
@@ -100,32 +152,41 @@ def election():
     else:
         return 'NotAnElection'
 
-@app.route('/post')
-def post():
+@app.route('/content/<kind>')
+def post(kind):
     if ( request.values.get('posting')
         and request.values.get('type')
         and session.get('username')
         and request.values.get('recipient')
+        and request.values.get('title')
         and users.get('recipient') ):
 
+        title       = request.values['title']
         content     = request.values['posting']
         type        = request.values['type']
         author      = session['username']
         recipient   = request.values['recipient']
 
-        users[recipient]['messages'].append({ "content" : content, "type" : type, "author" : author })
-        if type == "image":
-            img = request.files['uploaded_img']
-            f.save( "/static" + secure_filename(f.filename) )
-
+        message = {
+            'title' : title,
+            'content' : content,
+            'type' : type,
+            'author' : author,
+            'recipient' : recipient,
+            'draft' : kind == 'save'
+        }
+        id = messages.insert_one(message).inserted_id
+        users.update_one({ 'username' : recipient }, { '$push' : { 'messages' : id }})
         return "Posted"
+    else:
+        return "InsufficentArguments"
 
 @app.route('/messages')
 def messages():
     if( session.get('username') ):
-        return jsonify(users[session['username']]['messages'])
+        return jsonify(users.find_one({ 'username' : session.get('username')}).get('messages'))
     else:
         return "NotLoggedIn"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=8600)
