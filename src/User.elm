@@ -1,4 +1,4 @@
-module User exposing (User, show, decoder, encode)
+module User exposing (User, view, decoder, encode)
 {-| Data Type and functions to handle users
 # Definition
 @docs User, empty
@@ -26,10 +26,10 @@ type alias User = { username : String
 empty : User
 empty = { username = "", first_name = "", last_name = "" }
 
-{-| Simple square, to show for example below a post
+{-| Simple square, to view for example below a post
 -}
-show : User -> Element msg
-show user = Element.row
+view : User -> Element msg
+view user = Element.row
   [B.rounded 5,B.solid, B.width 5]
   [ Element.column []
     [ Element.text <| (user.first_name) ++ (user.last_name)
@@ -61,3 +61,4 @@ encode user =
     [ ("username", E.string user.username)
     , ("first_name", E.string user.first_name)
     , ("last_name", E.string user.last_name)
+    ]
