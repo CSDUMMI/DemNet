@@ -170,7 +170,7 @@ subscriptions model = Sub.none
 view : Model -> Html.Html Msg
 view model =
   let element = case model.main_page of
-        Writing p -> Views.writing Changed (Upload ) p
+        Writing p -> Views.writing Changed (Upload) p
         Reading p -> Views.reading p
         Feed ps -> Views.feed Read ps
       content = case model.user of
@@ -182,8 +182,8 @@ view model =
               , element
               ]
             Nothing ->
-              [ Input.username [] { onChange = Login_Change Username, text = "Username", placeholder = Nothing, label = Input.labelLeft [] Element.text "Username:" }
-              , Input.currentPassword [] { onChange = Login_Change Password, text ="Password", placeholder = Nothing, label Input.labelLeft [] Element.text "Password:" }
+              [ Input.username [] { onChange = Login_Change Username, text = "Username", placeholder = Nothing, label = Input.labelLeft [] E.text "Username:" }
+              , Input.currentPassword [] { onChange = Login_Change Password, text ="Password", placeholder = Nothing, label = Input.labelLeft [] E.text "Password:" }
               , Input.button [] { onPress = Just Login }
               ]
   in E.layout [E.centerX]
