@@ -8,11 +8,14 @@ import Element.Events as Events
 import Element.Border as Border
 import Element.Input as Input
 import Json.Decode as D
+import EverySet exposing (EverySet)
+import List.Unique as Unique
 
 import Post exposing ( Post )
 import Views exposing ( Post_Element (..), Upload_Type (..))
 import RemovingCache exposing (RemovingCache)
 import User exposing ( User )
+
 -- MAIN
 main : Program () Model Msg
 main = Browser.element
@@ -23,50 +26,41 @@ main = Browser.element
   }
 
 -- MODEL
-type Main_Page
-  = Reading Post
-  | Writing Post
-  | Feed (List Post)
-  | Login User
-
-
-
-type alias Model = { user : Maybe User
-                   , main_page : Main_Page
-                   , stored_writings : List Post -- Written posts, that are in waiting (not actually shown)
-                   , stored_feed : List Post -- Fetched posts, that are not shown.
-                   , stored_readings : RemovingCache Post -- Post that have been read recently. This queue deletes one for each post added.
-                   }
-
-type Cache_Type = Feed_Cache | Writing_Cache | Reading_Cache
-
-{-| RemovingCache some posts in the model.
+{-| State is only what is, not what might be
 -}
-cache : Cache_Type -> Model -> List Post -> Model
-cache ct model posts = case ct of
-  Feed_Cache -> { model | stored_feed = List.foldl (\x acc -> if List.member x acc then acc else x::acc) [] <| posts ++ model.stored_feed }
-  Writing_Cache -> { model | stored_writings = posts ++ model.stored_writings }
-  Reading_Cache -> { model | stored_readings = RemovingCache.moves posts model.stored_readings }
+type State
+  = Reading Post User
+  | Writing Post User
+  | Feed (List Post) User
+  | Login
 
-{-| RemovingCache Feed in the stored_feed cache
+{-| Storage for multiple possibilities
 -}
-cache_feed : Model -> List Post -> Model
-cache_feed = cache Feed_Cache
+type Storage = Storage { readings : EverySet Post
+                       , writings : EverySet Post
+                       , feed : List Post
 
-{-| RemovingCache Posts into the stored_writings cache
+{-| Reduce the State to it's bare essentialls and store it in Storage
 -}
-cache_writings : Model -> List Post -> Model
-cache_writings = cache Writing_Cache
+reduce : State -> Storage -> Storage
+reduce state (Storage stores)
+  = Storage <| case state of
+      Reading p u -> EverySet.insert p stores.readings
+      Writing p u -> EverySet.insert p stores.writings
+      Feed ps u -> Unique.filterDuplicates (ps ++ stores.feed)
+      Login -> stores
+{-| Model stores for multiple possibilities.
+-}
+type Model
+  = Model State Storage
 
-{-| RemovingCache Posts in the stored_readings cache
+{-| Transform a Model from one to another State saving all the important "might be"s
 -}
-cache_readings : Model -> List Post -> Model
-cache_readings = cache Reading_Cache
-
-{-| Update the main_page only
--}
-change_main_page : Main_Page -> Model -> Model
-change_main_page mp model = { model | main_page = mp }
+transform : (State -> State) -> Model -> Model
+transform transformer (Model old_state old_storage)
+  = let new_state = transformer old_state
+        new_storage = reduce new_state old_storage
+    in Model new_state new_storage
 
 init : flags ->  ( Model, Cmd Msg )
 init _ = (        { user = Just
@@ -161,11 +155,12 @@ update msg model =
       in (change_main_page new_main_page model, cmd)
 
     Login_Change field input ->
-      case model.main_page of
-        Writing p -> (change_main_page (Login User.empty) <| cache_writings model [p], Cmd.none)
-    Login_Request ->
-      case model.main_page of
-        
+      let new_main_page = change_main_page <| Login <| Post.empty <| User.empty
+      in case model.main_page of
+            Writing p -> new_main_page <| cache_writings model [p], Cmd.none)
+            Reading p -> new_main_page <| cache_readings model [p], Cmd.none)
+            Feed ps   -> new_main_page <| cache_feed model ps, Cmd.none)
+
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
