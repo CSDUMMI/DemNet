@@ -2,6 +2,8 @@ module User exposing (User, empty, view, decoder, encode)
 {-| Data Type and functions to handle users
 # Definition
 @docs User, empty
+# Networking
+@docs login
 # Displaying
 @docs show
 # JSON
@@ -26,6 +28,17 @@ type alias User = { username : String
 empty : User
 empty = { username = "", first_name = "", last_name = "" }
 
+{-| Request to login a user with this username or email and password
+-}
+login : String -> String -> String -> (Result Http.Error User -> msg) -> Cmd msg
+login username password email msg =
+  Http.post { url = "/login"
+            , body = Http.multipartBody [ stringPart "username" username
+                                        , stringPart "password" password
+                                        , stringPart "email" email
+                                        ]
+            , expect = Http.expectJson msg decoder
+            }
 {-| Simple square, to view for example below a post
 -}
 view : User -> Element msg
