@@ -1,4 +1,4 @@
-module Main exposing
+module Main exposing (..)
 
 import Browser
 import Http
@@ -94,7 +94,7 @@ type Login_Field = Username | Password | Email
 type Unauthorized_Msg
   = Login
   | Login_Enter Login_Field String
-  | Login_Response (Result Http.Error Bool)
+  | Login_Response (Result Http.Error User)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -126,7 +126,7 @@ update msg model =
         Unauthorized_Msgs unauth_msg ->
           case unauth_msg of
             Login -> let state = unauth_model.state
-                     in (model, User.login state.username state.password state.email)
+                     in (model, User.login state.username state.password state.email Login_Response)
             Login_Enter field value -> let state = unauth_model.state
                                            new_state = case field of
                                              Username -> { state | username = value }
