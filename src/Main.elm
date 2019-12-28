@@ -104,8 +104,8 @@ update msg model =
       case msg of
         Authorized_Msgs auth_msg ->
           case auth_msg of
-            Read p -> (change_state auth_model <| Reading p)
-            Write p -> (change_state auth_model <| Writing p)
+            Read p -> (change_state auth_model <| Reading p, Cmd.none)
+            Write p -> (change_state auth_model <| Writing p, Cmd.none)
             Write_Enter field value ->
               case auth_model.state of
                 Reading p -> (model, Cmd.none)
@@ -113,7 +113,7 @@ update msg model =
                   Views.Title -> (Authorized <| { auth_model | state = Writing { p | title = value }}, Cmd.none)
                   Views.Content -> (Authorized <| { auth_model | state = Writing { p | content = value }}, Cmd.none)
                 Feed ps -> (model, Cmd.none)
-            Switch_To_Feed -> (change_state auth_model <| Feed auth_model.storage.feed, Post.fetch Recv_Posts)
+            Switch_To_Feed -> (change_state auth_model <| Feed auth_model.storage.feed, Post.fetch (Authorized_Msgs << Recv_Posts))
             Recv_Posts response ->
               case response of
                 Ok ps -> (Authorized <| save_in (Feed ps) auth_model, Cmd.none)
@@ -126,7 +126,7 @@ update msg model =
         Unauthorized_Msgs unauth_msg ->
           case unauth_msg of
             Login -> let state = unauth_model.state
-                     in (model, User.login state.username state.password state.email Login_Response)
+                     in (model, User.login state.username state.password state.email (Unauthorized_Msgs << Login_Response))
             Login_Enter field value -> let state = unauth_model.state
                                            new_state = case field of
                                              Username -> { state | username = value }
@@ -174,6 +174,6 @@ view model =
           case auth_model.state of
             Reading p -> Views.reading p
             Writing p -> Views.writing p
-            Feed ps   -> Views.feed ps
+            Feed ps   -> Views.feed (Authorized_Msgs << Read) ps
   in E.layout [E.centerX]
       <| E.column [] page
