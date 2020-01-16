@@ -12,9 +12,10 @@ if [ $1 = "create" ]
 # $3 = Name of the Patcher (all without whitespaces)
 # $4 = Name of the Patch (all without whitespaces)
 then
-  if [ ! [ -e $PATCHES/"$3-$4" ] ]
+  location=$PATCHES/"$3-$4"
+  if [ ! [ -e $location ] ]
   then
-    git clone $2 $PATCHES/"$3-$4"
+    git clone $2 $location
   fi
 # bash patch.sh merge <patcher's name> <patch name>
 elif [ $1 = "merge" ]
