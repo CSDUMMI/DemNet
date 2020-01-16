@@ -7,7 +7,7 @@
 #
 
 # bash patch.sh create <origin_repo --bare> <patcher's name> <patch name>
-if [ $1 = "create" ]
+if [ $1 = "create"  ]
 # $2 = Path of Origin Repository
 # $3 = Name of the Patcher (all without whitespaces)
 # $4 = Name of the Patch (all without whitespaces)
