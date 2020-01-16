@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import Patches
 from election import count_votes
 from pymongo import MongoClient
@@ -17,8 +18,7 @@ Law. But they have to be handled differently on this level.
 """
 def create(type,options):
     if type == "human-readable":
-
     elif type == "executable":
 
     else:
-        print("Error: Invalid type in Election")
+        print("Error: Invalid type in Election", file=sys.stderr)
