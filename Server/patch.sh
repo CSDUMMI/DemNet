@@ -9,4 +9,14 @@ if [$1 = "create"]
 # $3 = Name of the Patcher (all without whitespaces)
 # $4 = Name of the Patch (all without whitespaces)
 then
-  git clone $2
+  git clone $2 $PATCHES/"$3-$4"
+elif [$1 = "merge"]
+# $2 = Path of the Origin Repository
+# $3 = Name of the Patcher (without whitespaces)
+# $4 = Name of the Patch
+then
+  current_pwd=pwd
+  cd $PATCHES/"$3-$4"
+  git push
+else
+  echo "Please provide a command"
