@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Whenever a Patcher creates a Patch formula, this Script is called.
+# It creates a clone of the origin repository (which needs to be bare).
+# After the patcher has developed successfully and won the election for their patch,
+# this script is called again and merged with the origin repository.
+#
+
 if [ $1 = "create" ]
 # $2 = Path of Origin Repository
 # $3 = Name of the Patcher (all without whitespaces)
