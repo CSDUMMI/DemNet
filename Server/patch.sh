@@ -7,12 +7,15 @@
 #
 
 # bash patch.sh create <origin_repo --bare> <patcher's name> <patch name>
-if [ $1 = "create"  ]
+if [ $1 = "create" ]
 # $2 = Path of Origin Repository
 # $3 = Name of the Patcher (all without whitespaces)
 # $4 = Name of the Patch (all without whitespaces)
 then
-  git clone $2 $PATCHES/"$3-$4"
+  if [ ! [ -e $PATCHES/"$3-$4" ] ]
+  then
+    git clone $2 $PATCHES/"$3-$4"
+  fi
 # bash patch.sh merge <patcher's name> <patch name>
 elif [ $1 = "merge" ]
 # $2 = Name of the Patcher (without whitespaces)
