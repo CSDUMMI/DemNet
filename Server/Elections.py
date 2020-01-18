@@ -90,3 +90,22 @@ def create(simple_description, long_description, human_readable_changes, executa
         election['hash'] = SHA256.new(election).hexdigest()
         elections.insert_one(election)
         return election['hash']
+
+"""
+a vote is a list of all options ranked by
+how much a voter wants them to win. (see alternative vote).
+**This function call cannot leave any trace of the association between
+username and vote.**
+"""
+def vote(election_hash,vote,username):
+    client = MongoClient()
+    db = client.demnet
+    elections = db.elections
+    election = elections.find_one({ "hash" : election_hash })
+
+    if username in election.participants:
+        return False
+    else:
+        elections.update_one({ "hash" : election_hash }, { "$push" : { "participants" : username }})
+        elections.update_one({ "hash" : election_hash }, { "$push" : { "votes" : vote }})
+        return True
