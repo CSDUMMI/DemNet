@@ -1,93 +1,84 @@
 #!/usr/bin/env python3
 
-import sys
+import sys, time, sched, subprocess, json
 import Patches
 from election import count_votes
 from pymongo import MongoClient
 from Crypto.Hash import SHA256
 
+
+"""
+Utility function to get the MongoClient.demnet[<collection>]
+"""
+def collection(collection_name):
+    client = MongoClient()
+    db = client.demnet
+    return db[collection_name]
+
+"""
+Scheduler for all Elections close call on deadline
+"""
+scheduler = sched.scheduler(time.time,time.sleep)
+
 """
 To create, count and handle victory conditions.
 
-There are two kinds of elections,
-as there are two kinds of laws:
-Executable and Human Readable.
+# An Election
+On all elections there are at least two options:
+1. Proposal 1
+2. None of the Other options
+There can be more Proposals, but if None of the other Options
+wins, nothing happens.
+Each Election has this field filled:
+- deadline, unix timestamp of the end of voting
 
-Executable Law is Source Code,
-that must be just as approved as Textual, Human Readable to be more percise,
-Law. But they have to be handled differently on this level.
+All Proposals in an Election can either be:
+1. Human Readable
+2. Executable
 
-Human-readable laws are:
-- Changes to right/wrong questions (laws in the juristical sense)
-- Proposal for a Patch (pre-election)
+A Human Readable Proposal is:
+{ "removals" : [<law hashes>]
+, "new" : [{ "title" : <title>, "paragraphs" : [<§1>,<§2>,...] }]
+, "ammendments" : [{ "law" : <hash of existing law>, "paragraphs" : [<§1 ammended>, <§2 ammended> ...] }]
+, "description" : <markdown description of the Proposal in simple terms>
+}
+Removals are all the Human Readable Laws, that  should be
+removed by the Proposal.
+"new" Laws are totally new Laws, that should apply
+if the Proposal is approved.
+Ammendments are Paragraphs, that are added to an existing law at the end.
 
-Executable laws are:
-- Fully developed patches, that must be voted on.
-
-# All changes, in general
-All changes change laws and depending on
-whether those laws are executable or human-readable
-they have to differ somewhat.
-These fields they have in general though:
-- simple_description, simple, brief language
-to get an overview of the changes
-- long_description, conclusive, may even complex, description.
-A bad long_description is one that is written with the intent
-to promote the change.
-
-# Human-Readable Changes
-Human Readable Laws consist of paragraphs.
-If the Changes have human-readable laws the argument
-is filled with an array of Law elements:
-This can be of three kinds:
-- { "type" : "Remove", "id" : <law_hash> }
-- { "type" : "New",
-    "law" : { "title" : <title>
-            , "paragraphs" : [<§1>,<§2>]
-            }
-  }
-- { "type" : "Ammend"
-  , "to" : <law_hash>
-  , "ammendment" : [<§1 ammended>, <§2 ammended> ]
-  }
-
-A "Remove" Change removes a law with the hash.
-A "New" Change is a totally new law with the given paragraphs.
-An "Ammend" Change ammends the given paragraphs to an existing law.
-
-# Executable Changes
-If a patcher has done their duty,
-they propose the final election.
-Then the patch folder locked, they
-won't be able to edit it anymore.
-Thus if a Executable change is proposed,
-the executable_changes must be filled with
-[
-    { "patcher" : <patcher's name>
-    , "patch" : <patch name>
-    , "conclusion" : <description to describe the final patch>
-    }
-]
-You can't combine two patches and make a vote on the
-two together, but you can propose two alternatives,
-which are then put into this list.
+An Executable Proposal is
+a reference to a path of the Git Repo relative to $PATCHES/
+If a proposal is created for a Patch, then the Git Repo cannot
+be modified. (chmod a-w <path/to/repo>)
+Thus a Proposal would look like this:
+{ path : <$PATCHES/path/to/repo>
+, description : <brief and simple description of the Proposal>
+}
 """
-def create(simple_description, long_description, human_readable_changes, executable_changes):
-    client = MongoClient()
-    db = client.demnet
-    elections = db.elections
+def create(type,deadline,proposals):
+    election = { "proposals" : proposals
+               , "deadline" : deadline
+               , "closed" : False
+               , "winner" : None
+               }
+    if type == "executable":
+        for proposal in proposals:
+            absolute_path = os.environ["PATCHES"] + "/" + proposal.path
+            subprocess.run("chmod a-w", absolute_path) # Block any writing to the repository
 
-    if human_readable_changes == [] and executable_changes == []:
-        return None
+    elections = collection("elections")
+    election['hash'] = SHA256.new(json.dumps(election).encode('utf-8')).hexdigest()
+    if elections.find_one({ 'hash' : election['hash'] }):
+        # If the same Election was proposed already,
+        # reject the election.
+        # Be aware, this doesn't prevent proposing an
+        # election later with a different deadline.
+        # But it prevents spamming elections.
+        return False
     else:
-        election =  { "long_description" : long_description
-                    , "simple_description" : simple_description
-                    , "human_readable_changes" : human_readable_changes
-                    , "executable_changes" : executable_changes
-                    , "participants" : []
-                    , "votes" : []
-                    }
-        election['hash'] = SHA256.new(election).hexdigest()
+        scheduler.enterabs(deadline,0, close, argument=(election['hash']))
         elections.insert_one(election)
         return election['hash']
 
@@ -98,14 +89,33 @@ how much a voter wants them to win. (see alternative vote).
 username and vote.**
 """
 def vote(election_hash,vote,username):
-    client = MongoClient()
-    db = client.demnet
-    elections = db.elections
+    elections = collection("elections")
     election = elections.find_one({ "hash" : election_hash })
 
-    if username in election.participants:
+    if username in election["participants"] and time.time() >= election["deadline"]:
         return False
     else:
         elections.update_one({ "hash" : election_hash }, { "$push" : { "participants" : username }})
         elections.update_one({ "hash" : election_hash }, { "$push" : { "votes" : vote }})
         return True
+
+
+"""
+Closing an election means:
+Calculating the results and publishing
+them.
+Publishing the votes, to make the independent control
+possible.
+"""
+def close(election_hash):
+    elections = collection('elections')
+    election = elections.find_one({ "hash" : election_hash })
+
+    if election:
+        if election.get('deadline') <= time.time():
+            winner = count_votes(election.votes, len(election.participants), range(0,len(election.proposals)+1))["ballot"]
+            winner = election.proposals[winner]
+            elections.update_one({ "hash" : election_hash }, { "$set" : { "winner" : winner, "closed" : True } })
+            return True
+    else:
+        return False
