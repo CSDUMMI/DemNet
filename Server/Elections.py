@@ -90,5 +90,3 @@ def create(simple_description, long_description, human_readable_changes, executa
         election['hash'] = SHA256.new(election).hexdigest()
         elections.insert_one(election)
         return election['hash']
-
-def vote()

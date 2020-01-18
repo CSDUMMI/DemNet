@@ -4,9 +4,10 @@ from Crypto.Hash import SHA256
 from pymongo import MongoClient
 
 """
-The $PATCHES Environment Variable
-must be set to the Folder with all the
-patch Repositories.
+Env Variables:
+$PATCHES : Folder with the Git Repositories of the Patches (format: patcher-patch/)
+$ORIGIN_REPOSITORY : Location of the Original Git Repository, from which patches are cloned from
+and to whom patches are pushed after being approved.
 
 create a patch:
 - clone the origin_repository, as stored in the $ORIGIN_REPOSITORY envvar.
@@ -66,25 +67,40 @@ def create(patcher,patch_name, options):
             , "technical_description" : options['technical_description']
             , "hold_pre_election" : options['hold_pre_election'] == "true"
             , "references" : options['references']
+            , "closed" : False
             }
-    patch['sha256'] = SHA256.new(data=json.dumps(patch).encode('utf-8'))
+    patch['hash'] = SHA256.new(data=json.dumps(patch).encode('utf-8')).hexdigest()
     patch_id = patches.insert_one(patch).inserted_id
 
     subprocess.run(['bash', 'patch.sh', 'create', os.environ["ORIGIN_REPOSITORY"], patcher, patch_name])
 
-    return patch['sha256']
+    return patch['hash']
 
 def merge(patcher, patch_name):
     subprocess.run(['bash', 'patch.sh', 'merge', patcher, patch_name])
 
-def close(patcher, patch_name, id):
+"""
+Closing a patch means:
+Deleting the Git Repo.
+Setting the "closed" flag to True.
+"""
+def close(patcher, patch_name, id, merge=False):
     client = MongoClient()
     db = client.demnet
     patches = db.patches
-    patch = patches.find_one( { "patcher" : patcher
-                              , "name" : patch_name
-                              , "sha256" : id
-                              , "closed" : False
+    patch = patches.find_one( { "patcher"   : patcher
+                              , "name"      : patch_name
+                              , "hash"      : id
+                              , "closed"    : False
                               } )
 
-    if not (patch == None):
+    if (not (patch == None)) and os.path.isdir(os.environ['PATCHES'] + "/" + patcher + "-" + patch_name):
+        if merge:
+            merge(patcher, patch_name)
+
+        subprocess.run(["rm", os.environ['PATCHES'] + "/" + patcher + "-" + patch_name])
+
+        patches.update_one({ "hash" : id }, { "$set" : { "closed" : True } })
+        return True
+    else:
+        return False
