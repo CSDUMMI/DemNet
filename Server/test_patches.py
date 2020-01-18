@@ -1,5 +1,5 @@
 import Patches
-import random, os, string
+import random, os, string, subprocess
 from pymongo import MongoClient
 
 def random_string():
@@ -20,7 +20,7 @@ def generate_random_patch():
 def test_patch():
     os.environ['PATCHES'] = "/tmp/demnet_test"
     os.environ['ORIGIN_REPOSITORY'] = "/tmp/demnet_origin"
-    
+
     (patcher, patch, options) = generate_random_patch()
 
     patch_hash = Patches.create(patcher, patch, options)
@@ -47,3 +47,9 @@ def test_patch():
     patch_2_hash = Patches.create(patcher, patch, options)
 
     # Close Patches without merging
+    assert close(patcher_2, patch_2, patch_2_hash) == True
+    assert not os.path.isdir(os.environ['PATCHES'] + "/" + patcher_2 + "-" + patch_2)
+
+    # Create a Commit a Change to Patch
+    subprocess.run([ "echo \"Hello, World\"", ">", f"{os.environ['PATCHES']}/{patcher}-{patch}/README")
+    
