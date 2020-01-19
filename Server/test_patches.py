@@ -21,6 +21,11 @@ def test_patch():
     os.environ['PATCHES'] = "/tmp/demnet_test"
     os.environ['ORIGIN_REPOSITORY'] = "/tmp/demnet_origin"
 
+    # Setup ORIGIN_REPOSITORY
+    subprocess.run([ "bash setup-mock-origin-repo.sh create" ], shell=True)
+
+
+
     (patcher, patch, options) = generate_random_patch()
 
     patch_hash = Patches.create(patcher, patch, options)
@@ -47,9 +52,20 @@ def test_patch():
     patch_2_hash = Patches.create(patcher, patch, options)
 
     # Close Patches without merging
-    assert close(patcher_2, patch_2, patch_2_hash) == True
+    assert Patches.close(patcher_2, patch_2, patch_2_hash) == True
     assert not os.path.isdir(os.environ['PATCHES'] + "/" + patcher_2 + "-" + patch_2)
 
-    # Create a Commit a Change to Patch
-    subprocess.run([ "echo \"Hello, World\"", ">", f"{os.environ['PATCHES']}/{patcher}-{patch}/README")
-    
+    # Create a Commit and Change to Patch
+    pwd = os.environ['PWD']
+    subprocess.run([ f"cd { os.environ['PATCHES'] }/{patcher}-{patch}" ])
+    subprocess.run([ f"echo \"Hello, World\" > README" ])
+    subprocess.run([ f"git commit -m \"Test Commit\"" ])
+    subprocess.run([ "cd ", pwd ])
+    assert Patches.close(patcher, patch, patch_hash, merge=True) == True
+    assert not os.isdir(f"{os.environ['PATCHES']}/{patcher}-{patch}")
+
+    subprocess.run([ "cd ", os.environ["ORIGIN_REPOSITORY"] ])
+    log_res = subprocess.run([ "git log | grep \"Test Commit\"" ], capture_output=True, text=True)
+    assert log_res.stdout == "Test Commit"
+
+    subprocess.run([ "bash setup-mock-origin-repo.sh" ], shell=True)
