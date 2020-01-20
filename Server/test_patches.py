@@ -6,24 +6,20 @@ def random_string():
     return ''.join(random.choice(string.ascii_letters) for i in range(random.randint(0,125)))
 
 def generate_random_patch():
-    patcher = random_string()
-    patch   = random_string()
+    patcher = random.choice(['joris', 'abbashan', 'martin', 'brummel'])
+    patch   = random.choice(['www-x','user-support', 'generate-random', 'postings'])
 
     options =   { "is_user"                 : random.choice([True, False])
                 , "simple_description"      : random_string()
                 , "technical_description"   : random_string()
                 , "hold_pre_election"       : random.choice([True, False])
-                , "references"              : [ random_string() for i in range(random.randint(0,5000)) ]
+                , "references"              : [ random_string() for i in range(random.randint(0,5)) ]
                 }
     return (patcher, patch, options)
 
 def test_patch():
     os.environ['PATCHES'] = "/tmp/demnet_test"
     os.environ['ORIGIN_REPOSITORY'] = "/tmp/demnet_origin"
-
-    # Setup ORIGIN_REPOSITORY
-    subprocess.run([ "bash setup-mock-origin-repo.sh create" ], shell=True)
-
 
 
     (patcher, patch, options) = generate_random_patch()
@@ -49,23 +45,22 @@ def test_patch():
 
     (patcher_2, patch_2, options_2) = generate_random_patch()
 
-    patch_2_hash = Patches.create(patcher, patch, options)
+    patch_2_hash = Patches.create(patcher_2, patch_2, options_2)
 
     # Close Patches without merging
     assert Patches.close(patcher_2, patch_2, patch_2_hash) == True
-    assert not os.path.isdir(os.environ['PATCHES'] + "/" + patcher_2 + "-" + patch_2)
+    print(f"Patcher:\t{patcher_2}\nPatch:\t{patch_2}")
+    assert not os.path.isdir(f"{ os.environ['PATCHES'] }/{patcher_2}-{patch_2}")
 
     # Create a Commit and Change to Patch
     pwd = os.environ['PWD']
-    subprocess.run([ f"cd { os.environ['PATCHES'] }/{patcher}-{patch}" ])
-    subprocess.run([ f"echo \"Hello, World\" > README" ])
-    subprocess.run([ f"git commit -m \"Test Commit\"" ])
-    subprocess.run([ "cd ", pwd ])
+    subprocess.run([ f"cd { os.environ['PATCHES'] }/{patcher}-{patch}" ], shell=True)
+    subprocess.run([ f"echo \"Hello, World\" > README" ], shell=True)
+    subprocess.run([ f"git commit -m \"Test Commit\" && cd {pwd}" ], shell=True)
+    subprocess.run([ "cd ", pwd ], shell=True)
     assert Patches.close(patcher, patch, patch_hash, merge=True) == True
     assert not os.isdir(f"{os.environ['PATCHES']}/{patcher}-{patch}")
 
     subprocess.run([ "cd ", os.environ["ORIGIN_REPOSITORY"] ])
     log_res = subprocess.run([ "git log | grep \"Test Commit\"" ], capture_output=True, text=True)
     assert log_res.stdout == "Test Commit"
-
-    subprocess.run([ "bash setup-mock-origin-repo.sh remove" ], shell=True)

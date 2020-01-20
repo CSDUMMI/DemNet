@@ -94,11 +94,12 @@ def close(patcher, patch_name, id, merge=False):
                               , "closed"    : False
                               } )
 
-    if (not (patch == None)) and os.path.isdir(os.environ['PATCHES'] + "/" + patcher + "-" + patch_name):
+    repo_path = f"{os.environ['PATCHES']}/{patcher}-{patch_name}"
+    if patch and os.path.isdir(repo_path):
         if merge:
             merge(patcher, patch_name)
 
-        subprocess.run(["rm", os.environ['PATCHES'] + "/" + patcher + "-" + patch_name])
+        print(subprocess.run([f"rm -rf { repo_path }"], shell=True))
 
         patches.update_one({ "hash" : id }, { "$set" : { "closed" : True } })
         return True
