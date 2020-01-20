@@ -61,11 +61,11 @@ def create(patcher,patch_name, options):
     db = client.demnet
     patches = db.patches
     patch = { "patcher" : patcher
-            , "is_user" : options['is_user'] == True
+            , "is_user" : options['is_user']
             , "name" : patch_name
             , "simple_description" : options['simple_description']
             , "technical_description" : options['technical_description']
-            , "hold_pre_election" : options['hold_pre_election'] == True
+            , "hold_pre_election" : options['hold_pre_election']
             , "references" : options['references']
             , "closed" : False
             }
