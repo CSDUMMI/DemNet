@@ -10,6 +10,7 @@ then
   git add .
   git commit -m "INITIAL COMMIT"
   cd $current_loc
-else
+elif [ $1 = "remove" ]
+then
   rm /tmp/demnet_origin -rf
 fi

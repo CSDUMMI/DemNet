@@ -3,7 +3,7 @@ import random, os, string, subprocess
 from pymongo import MongoClient
 
 def random_string():
-    return ''.join(random.choice(string.ascii_letters) for i in range(random.randint(0,250)))
+    return ''.join(random.choice(string.ascii_letters) for i in range(random.randint(0,125)))
 
 def generate_random_patch():
     patcher = random_string()
@@ -68,4 +68,4 @@ def test_patch():
     log_res = subprocess.run([ "git log | grep \"Test Commit\"" ], capture_output=True, text=True)
     assert log_res.stdout == "Test Commit"
 
-    subprocess.run([ "bash setup-mock-origin-repo.sh" ], shell=True)
+    subprocess.run([ "bash setup-mock-origin-repo.sh remove" ], shell=True)
