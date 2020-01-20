@@ -16,11 +16,11 @@ of messages addressed to everybody and signed with only the public key of the au
 # elections
 A sample Election Document looks like this:
 ```json
-             { "proposals" : [<proposals>]
-             , "deadline" : [<deadline>]
-             , "closed" : <Bool: is Closed?>
-             , "winner" : <Winner Proposal>
-             }
+{ "proposals" : [<proposals>]
+, "deadline" : [<deadline>]
+, "closed" : <Bool: is Closed?>
+, "winner" : <Winner Proposal>
+}
 ```
 There can be two kinds of proposals:
 Human and Machine Executable Proposals.
@@ -40,13 +40,37 @@ All proposals in the `proposals` list are alternatives to each other.
 ## Human Executable Proposals
 These kinds of laws are stored in the `laws` collection.
 There they are subdivided into distinct groups called "books".
-A proposal can only affect a single 
+A proposal can only amend, remove and add to a single book
+and an election about human executable laws can only
+have proposals for the same books.
 ```json
-``
+{ "book" : <book_id>
+, "title" : <unique_title>
+, "ammendments" : [ { "law" : <law_title>
+                    , "paragraphs" : [ <§1 ammended>, <§2 ammended>, …]
+                    }
+                  ]
+, "additions" : [ { "title" : <unique title in the book>
+                  , "paragraphs" : [ <§1>, <§2>, …]
+                  }
+                ]
+, "removals" : [ <law title> ]
+}
+```
 
 # patches
+A Patch is all the metadata about a patch,
+that has been or is still in process of being developed.
 
 # laws
+Laws are subdivided into books of the same responsibility.
+A Law Document looks like this:
+```json
+{ "book" : <book_id>
+, "title" : <unique title in the book>
+, "paragraphs" : [ <§1>, <§2>, …]
+}
+```
 
 # users
 
