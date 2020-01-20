@@ -33,22 +33,22 @@ Each Election has this field filled:
 - deadline, unix timestamp of the end of voting
 
 All Proposals in an Election can either be:
-1. Human Readable
-2. Executable
+1. Human Executable
+2. Machine Executable
 
-A Human Readable Proposal is:
+A Human Executable Proposal is:
 { "removals" : [<law hashes>]
-, "new" : [{ "title" : <title>, "paragraphs" : [<§1>,<§2>,...] }]
+, "new" : [{ "title" : <title>, "paragraphs" : [<§1>,<§2>,…] }]
 , "ammendments" : [{ "law" : <hash of existing law>, "paragraphs" : [<§1 ammended>, <§2 ammended> ...] }]
 , "description" : <markdown description of the Proposal in simple terms>
 }
-Removals are all the Human Readable Laws, that  should be
+Removals are all the Human Executable Laws, that  should be
 removed by the Proposal.
 "new" Laws are totally new Laws, that should apply
 if the Proposal is approved.
 Ammendments are Paragraphs, that are added to an existing law at the end.
 
-An Executable Proposal is
+An Machine Executable Proposal is
 a reference to a path of the Git Repo relative to $PATCHES/
 If a proposal is created for a Patch, then the Git Repo cannot
 be modified. (chmod a-w <path/to/repo>)
@@ -56,6 +56,9 @@ Thus a Proposal would look like this:
 { path : <$PATCHES/path/to/repo>
 , description : <brief and simple description of the Proposal>
 }
+
+# The Law Database
+A approved Law in the Database demnet.laws
 """
 def create(type,deadline,proposals):
     election = { "proposals" : proposals
@@ -78,7 +81,7 @@ def create(type,deadline,proposals):
         # But it prevents spamming elections.
         return False
     else:
-        scheduler.enterabs(deadline,0, close, argument=(election['hash']))
+        scheduler.enter(deadline-time.time(),0, close, argument=(election['hash']))
         elections.insert_one(election)
         return election['hash']
 
@@ -92,7 +95,7 @@ def vote(election_hash,vote,username):
     elections = collection("elections")
     election = elections.find_one({ "hash" : election_hash })
 
-    if username in election["participants"] and time.time() >= election["deadline"]:
+    if username in election["participants"] and not election['closed']:
         return False
     else:
         elections.update_one({ "hash" : election_hash }, { "$push" : { "participants" : username }})

@@ -6,6 +6,13 @@
 # this script is called again and merged with the origin repository.
 #
 
+# Wie erstellt man einen Patch?
+# 1. Man füllt ein Formula auf der Webseite aus
+# 2. Patcher schreibt seinen Patch, kann auf das Repo zugreifen durch: https://dev.demnet.org/joris/direct-messages.git
+# 3. Wenn Patch fertig, erstelle Wahl
+#  - Wird das Patch Repo Readonly
+# Wenn die Wahl gewonnen wird nach einer Deadline
+
 # bash patch.sh create <origin_repo --bare> <patcher's name> <patch name>
 if [ $1 = "create" ]
 # $2 = Path of Origin Repository
