@@ -41,7 +41,7 @@ All patches have to pass an election eventually, but if the patcher wants to,
 they can hold an election before starting to develop, just to see if there
 is any interest. If the election is lost, the patcher will either have to delete
 the patch or modify it substantially. If they want to hold such an election,
-"hold_pre_election" must be set to "true".
+"hold_pre_election" must be set to True.
 
 - After the Patch has been closed and the Patch Repository deleted, the
 patch entry gets two additional fields, called "closed" = True
@@ -61,11 +61,11 @@ def create(patcher,patch_name, options):
     db = client.demnet
     patches = db.patches
     patch = { "patcher" : patcher
-            , "is_user" : options['is_user'] == "true"
+            , "is_user" : options['is_user'] == True
             , "name" : patch_name
             , "simple_description" : options['simple_description']
             , "technical_description" : options['technical_description']
-            , "hold_pre_election" : options['hold_pre_election'] == "true"
+            , "hold_pre_election" : options['hold_pre_election'] == True
             , "references" : options['references']
             , "closed" : False
             }

@@ -13,8 +13,9 @@ if [ $1 = "create" ]
 # $4 = Name of the Patch (all without whitespaces)
 then
   location="$PATCHES/$3-$4"
-  if [ ! [ -e $location ] ]
+  if [[ ! -e $location ]]
   then
+    echo "git clone $2 $location"
     git clone $2 $location
   fi
 # bash patch.sh merge <patcher's name> <patch name>
@@ -24,7 +25,7 @@ elif [ $1 = "merge" ]
 then
   current_pwd=pwd
   location=$PATCHES/"$2-$3"
-  if [ -e $location ]
+  if [[ ! -e $location ]]
     then
       cd $location
       git push

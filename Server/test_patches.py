@@ -3,7 +3,7 @@ import random, os, string, subprocess
 from pymongo import MongoClient
 
 def random_string():
-    return ''.join(random.choice(string.printable) for i in range(random.randint(0,500)))
+    return ''.join(random.choice(string.ascii_letters) for i in range(random.randint(0,250)))
 
 def generate_random_patch():
     patcher = random_string()
