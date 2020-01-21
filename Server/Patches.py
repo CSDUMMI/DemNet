@@ -44,12 +44,8 @@ the patch or modify it substantially. If they want to hold such an election,
 "hold_pre_election" must be set to True.
 
 - After the Patch has been closed and the Patch Repository deleted, the
-patch entry gets two additional fields, called "closed" = True
+patch entry "closed" = True
 
-- And "refs", which are all the git-commit ids, that this patch created.
-This is, so you can easily see what changes have been made in this patch
-and generate a Diff. (This could be done with git-blame too, maybe.)
-Returns:
 After creating the patch,
 a SHA256 of all the data is created and
 returned as the reference to the patch.

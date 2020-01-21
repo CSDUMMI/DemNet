@@ -61,7 +61,18 @@ have proposals for the same books.
 # patches
 A Patch is all the metadata about a patch,
 that has been or is still in process of being developed.
-
+```json
+{ "patcher" : <patcher>
+, "is_user" : <True if patcher is user of demnet>
+, "name" : <name of the patch>
+, "simple_description" : <simple description using simple language>
+, "technical_description" : <detailed description of the patch>
+, "hold_pre_election" : <True if the patcher wants to hold an election, before starting development>
+, "references" : <Links relevant to the patch>
+, "closed" : <True if the patch has been closed>
+}
+```
+This Collection is soley managed by `Patches.py`
 # laws
 Laws are subdivided into books of the same responsibility.
 A Law Document looks like this:
