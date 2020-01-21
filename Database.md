@@ -44,10 +44,13 @@ A proposal can only amend, remove and add to a single book
 and an election about human executable laws can only
 have proposals for the same books.
 ```json
-{ "book" : <book_id>
-, "title" : <unique_title>
-, "ammendments" : [ { "law" : <law_title>
-                    , "paragraphs" : [ <§1 ammended>, <§2 ammended>, …]
+{ "book" : "<book_id>"
+, "title" : "<unique_title>"
+, "ammendments" : [ { "law" : "<law_title>"
+                    , "paragraphs" :
+                      [ "<§1 ammended>"
+                      , "<§2 ammended>",
+                      "<…>"]
                     }
                   ]
 , "additions" : [ { "title" : <unique title in the book>
@@ -84,5 +87,32 @@ A Law Document looks like this:
 ```
 
 # users
+For every Registered user there is a
+Public and Private PGP Key (GnuPG):
+```json
+{ "public_key" : "<PGP Public Key>"
+, "private_key" : "<Encrypted PGP Private Key>"
+, "username" : "<unique username>"
+, "first_name" : "<first real name>"
+, "last_name" : "<last real name>"
+, "expiration" : "<date of expiration of key pair>"
+}
+```
 
 # messages
+Anybody can send end-to-end encypted messages to anyone.
+A message, that is addressed to `all` is a post.
+The process of encrypting and decrypting a message
+from Alice to Bob is like this:
+
+    Alice's Message -> Alice's Private Key -> Bob's Public Key -> Send -> Bob's Private Key -> Alice's Public Key
+
+A post is just signed by the author
+
+    Alice's Message -> Alice's Private Key -> Published
+
+```json
+{ "from" : "<username of the author>"
+, "to" : [ "<username's of the recipients or 'all', when the message is a post>" ]
+, "body" : "<encrypted message>"
+}
