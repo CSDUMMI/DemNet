@@ -1,8 +1,10 @@
 # ROADMAP for the next half  a year (the pre-alpha phase)
 TODO:
-1. Version Control and Deployment System
-2. Voting Service (return winner of an election, given only the votes)
-3. Basic HTTP Server as basis for the project's continued development
+1. HTTPS Server
+2. Election.py implemented with: create(); close(); vote();
+3. Patches.py implemented with: create(); close(); request_election()
+4. Users.py implemented with: login(); register();
+5. Laws.py implemented with: create(); request_election();
 
 # After three weeks:
 
