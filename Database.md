@@ -90,8 +90,8 @@ A Law Document looks like this:
 For every Registered user there is a
 Public and Private PGP Key (GnuPG):
 ```json
-{ "public_key" : "<PGP Public Key>"
-, "private_key" : "<Encrypted PGP Private Key>"
+{ "public_key" : "<RSA Public Key>"
+, "private_key" : "<Encrypted RSA Private Key>"
 , "username" : "<unique username>"
 , "first_name" : "<first real name>"
 , "last_name" : "<last real name>"
