@@ -96,6 +96,7 @@ Public and Private PGP Key (GnuPG):
 , "first_name" : "<first real name>"
 , "last_name" : "<last real name>"
 , "expiration" : "<date of expiration of key pair>"
+, "feed" : ["<hash of message where this user is either in the to or from part>"]
 , "old_keys" : [{ "expiration" : "<unix timestamp of their expiration>"
                 , "public_key" :"<old public key until the expiration>"
                 , "private_key" : "<old, encrypted private key>"
