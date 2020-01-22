@@ -118,5 +118,12 @@ A post is just signed by the author
 ```json
 { "from" : "<username of the author>"
 , "to" : [ "<username's of the recipients or 'all', when the message is a post>" ]
-, "body" : "<encrypted message>"
+, "body" : [{ "recipient_name" : "<username of the recipient>"
+  , "ciphertext" : "<encrypted text of the message, D(D(body, recipient_private_key), author_public_key) == message>"
+  }]
 }
+```
+If in "to" there is `"all"` then the body isn't encrypted
+and everybody can read it, but only those
+users who are also in `"to"` get notification or something
+of the sort.
