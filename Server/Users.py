@@ -163,6 +163,10 @@ If recipient = "all" then the last encryption step is skipped.
 Parameters:
 - message (dict) a full message document as defined in Database.md
 - password, the passphrase to decrypt the author's (message['to']) private key
+Returns:
+Either `False` or a list of dictionaries of the kind:
+{ "recipient_name" : recipient_username, "ciphertext" : ciphertext }
+
 """
 def encrypt(message,password):
     users = users_collection()
