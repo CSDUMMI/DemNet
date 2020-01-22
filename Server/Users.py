@@ -9,45 +9,17 @@ This Module makes it possible to:
 - Verify the signature of a user, is_author_of()
 """
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
-
+from Crypto.Hash import SHA256
 from pymongo import MongoClient
-import datetime, sys
+import datetime, sys, json
 
-def users_collection():
+def collection(col):
     client = MongoClient()
     db = client.demnet
-    return db.users
-
-def login(username, password):
-    users = users_collection()
-    user = users.find_one({ 'username' : username })
-
-    try:
-        keys = RSA.import_key(user["private_key"], passphrase=password)
-
-        if keys.publickey().export_key(format="PEM") != user["public_key"]:
-            users.update_one({ "username" : username }, { "$set" : { "public_key"  : keys.publickey().export_key(format="PEM") } } )
-
-        if datetime.datetime.strptime(user["expiration"], "%m/%d/%Y") > datetime.datetime.now():
-"""
-Use Cryptodome.PublicKey.RSA
-to generate random key pairs and store them in
-MongoDB for the user.
-This Key Pair is used for authenticating
-messages and requests by the user.
-This Module makes it possible to:
-- Fetch the private key providing a password and username, login()
-- Verify the signature of a user, is_author_of()
-"""
-from Crypto.PublicKey import RSA
-from pymongo import MongoClient
-import datetime, sys
+    return db[col]
 
 def users_collection():
-    client = MongoClient()
-    db = client.demnet
-    return db.users
+    return collection('users')
 
 def login(username, password):
     users = users_collection()
@@ -156,15 +128,6 @@ def is_author_of(body,username,starts_with="FROM: "):
 
 
 """
-Publishing a message works in these steps:
-1. Encrypt/Sign the message
-2. Publish it in demnet.messages
-3. Add a notification to the recipient's feed.
-"""
-def publish(message, password):
-
-
-"""
 Encrypt a message or post before it is being send.
 message is a real message document.
 Encryption of a message:
@@ -204,3 +167,26 @@ def encrypt(message,password):
             return ciphertexts
         except Exception as e:
             return False
+
+"""
+Publishing a message works in these steps:
+1. Encrypt/Sign the message
+2. Publish it in demnet.messages
+3. Add a notification to the recipient's feed.
+Parameters:
+- *message* message document with unencrypted body
+- *password* password to encrypt the author's private key
+"""
+def publish(message, password):
+    # 1. Encrypt/Sign the message
+    body = encrypt(message, password)
+    if body != False:
+        # 2. Publish it in demnet.messages
+        message['body'] = body
+        message['hash'] = SHA256.new(json.dumps(body).encode('utf-8')).hexdigest()
+        messages = collection("messages")
+        messages.insert_one(message)
+
+        # 3. Add a notification to the recipient's feed
+        users  = users_collection()
+        for recipient_name in message['to']:

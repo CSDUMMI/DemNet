@@ -122,6 +122,7 @@ A post is just signed by the author
 , "body" : [{ "recipient_name" : "<username of the recipient>"
   , "ciphertext" : "<encrypted text of the message, D(D(body, recipient_private_key), author_public_key) == message>"
   }]
+, "hash" : "<SHA256 of a dict of all the other fields in the message, used as unique and secure identifier>"
 }
 ```
 If in "to" there is `"all"` then the body isn't encrypted
