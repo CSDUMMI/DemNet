@@ -153,3 +153,40 @@ def is_author_of(body,username,starts_with="FROM: "):
         return (plain_text.startswith(starts_with), plain_text)
     else:
         return False
+
+"""
+Encrypt a message or post before it is being send.
+message is a real message document.
+Encryption of a message:
+Ciphertext = E(E(message,private_key_author), public_key_recipient)
+If recipient = "all" then the last encryption step is skipped.
+Parameters:
+- message (dict) a full message document as defined in Database.md
+- password, the passphrase to decrypt the author's (message['to']) private key
+"""
+def encrypt(message,password):
+    users = users_collection()
+    user = users.find_one({ "username" : message["from"] })
+
+    if user:
+        try:
+            keys = RSA.import_key(user['private_key'],passphrase=password)
+            if "all" in user['to']:
+                # Skip encryption if only one of the recipients is "all".
+                ciphertexts = [{ "all" : message['body'] }]
+            else:
+                plain_text = json.dumps(message['body']).encode('utf-8') # Make the body into a string
+                cipher = PKCS1_OAEP.new(keys)
+                ciphertext = cipher.encrypt(plain_text)
+                ciphertexts = []
+                for recipient_name in message['to']:
+                    recipient = users.find_one({ "username" : recipient_name })
+                    if recipient:
+                        recipient_public_key = RSA.import_key(recipient['public_key'])
+                        recipient_cipher = PKCS1_OAEP.new(recipient_public_key)
+
+                        ciphertexts.append({ "recipient" : recipient_name, "ciphertext" : recipient_cipher.encrypt(ciphertext) })
+
+            return ciphertexts
+        except Exception as e:
+            return False
