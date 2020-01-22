@@ -154,6 +154,16 @@ def is_author_of(body,username,starts_with="FROM: "):
     else:
         return False
 
+
+"""
+Publishing a message works in these steps:
+1. Encrypt/Sign the message
+2. Publish it in demnet.messages
+3. Add a notification to the recipient's feed.
+"""
+def publish(message, password):
+
+
 """
 Encrypt a message or post before it is being send.
 message is a real message document.
