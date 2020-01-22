@@ -176,6 +176,9 @@ Publishing a message works in these steps:
 Parameters:
 - *message* message document with unencrypted body
 - *password* password to encrypt the author's private key
+Returns:
+True if successfull
+False if not
 """
 def publish(message, password):
     # 1. Encrypt/Sign the message
@@ -190,3 +193,8 @@ def publish(message, password):
         # 3. Add a notification to the recipient's feed
         users  = users_collection()
         for recipient_name in message['to']:
+            users.update_one({ "username" : recipient_name }
+                             , { "$push" : { "feed" : message["hash"] } }
+                            )
+        return True
+    return False
