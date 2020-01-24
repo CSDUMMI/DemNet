@@ -65,14 +65,24 @@ def create(type,deadline,proposals):
                , "deadline" : deadline
                , "closed" : False
                , "winner" : None
+               , "type" : type
                }
-    if type == "executable":
+    if type == "machine":
+        patches = collection("patches")
         for proposal in proposals:
-            absolute_path = os.environ["PATCHES"] + "/" + proposal.path
-            subprocess.run("chmod a-w", absolute_path) # Block any writing to the repository
-
+            patch = patches.find_one({ "hash" : proposal['patch_id'] })
+            if patch:
+                absolute_path = f"{os.environ['PATCHES']}/{patch['patcher']}-{patch['name']}"""
+                subprocess.run("chmod a-w", absolute_path) # Block any writing to the repository
+            else:
+                # Remove proposals, that don't exist
+                election['proposals'].remove(proposal)
+    elif type == "human":
+        # Requiements for a human executable law
+        # **All referenced laws and the book have to exist**
+        laws = collection("laws")
     elections = collection("elections")
-    election['hash'] = SHA256.new(json.dumps(election).encode('utf-8')).hexdigest()
+    election['hash'] = SHA256.new(data=json.dumps(election).encode('utf-8')).hexdigest()
     if elections.find_one({ 'hash' : election['hash'] }):
         # If the same Election was proposed already,
         # reject the election.
@@ -119,6 +129,8 @@ def close(election_hash):
             winner = count_votes(election.votes, len(election.participants), range(0,len(election.proposals)+1))["ballot"]
             winner = election.proposals[winner]
             elections.update_one({ "hash" : election_hash }, { "$set" : { "winner" : winner, "closed" : True } })
+            if election['type'] == "machine":
+
             return True
     else:
         return False

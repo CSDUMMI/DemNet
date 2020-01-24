@@ -20,6 +20,7 @@ A sample Election Document looks like this:
 , "deadline" : [<deadline>]
 , "closed" : <Bool: is Closed?>
 , "winner" : <Winner Proposal>
+, "type" : "<either machine or human>"
 }
 ```
 There can be two kinds of proposals:
@@ -45,7 +46,7 @@ and an election about human executable laws can only
 have proposals for the same books.
 ```json
 { "book" : "<book_id>"
-, "title" : "<unique_title>"
+, "title" : "<title>"
 , "ammendments" : [ { "law" : "<law_title>"
                     , "paragraphs" :
                       [ "<§1 ammended>"
@@ -61,6 +62,14 @@ have proposals for the same books.
 }
 ```
 
+## machine executbale proposals
+These are simpler in structure,
+because most of the data is present
+on disk in a Repository.
+```json
+{ "patch_id" : "<hash field of the patch in demnet.patches" }
+```
+
 # patches
 A Patch is all the metadata about a patch,
 that has been or is still in process of being developed.
@@ -73,6 +82,7 @@ that has been or is still in process of being developed.
 , "hold_pre_election" : <True if the patcher wants to hold an election, before starting development>
 , "references" : <Links relevant to the patch>
 , "closed" : <True if the patch has been closed>
+, "hash" : "<SHA256 of all the other fields>"
 }
 ```
 This Collection is soley managed by `Patches.py`
