@@ -53,9 +53,7 @@ a reference to a path of the Git Repo relative to $PATCHES/
 If a proposal is created for a Patch, then the Git Repo cannot
 be modified. (chmod a-w <path/to/repo>)
 Thus a Proposal would look like this:
-{ path : <$PATCHES/path/to/repo>
-, description : <brief and simple description of the Proposal>
-}
+{ "patch_id" :  "<hash field of the patch in demnet.patches" }
 
 # The Law Database
 A approved Law in the Database demnet.laws
@@ -129,7 +127,17 @@ def close(election_hash):
             winner = count_votes(election.votes, len(election.participants), range(0,len(election.proposals)+1))["ballot"]
             winner = election.proposals[winner]
             elections.update_one({ "hash" : election_hash }, { "$set" : { "winner" : winner, "closed" : True } })
+
             if election['type'] == "machine":
+                patches = collection('patches')
+                patch = patches.find_one({ "hash" : winner['patch_id'] })
+                Patches.close(patch['name'], patch['name'], patch['hash'], merge=True)
+            elif election['type'] == "human":
+                laws = collection("laws")
+                # Append ammendments to laws
+                for ammendment in winner["ammendment"]:
+                    law = laws.update_one({ "book" : winner["book"], "law" ammendment["law"] }
+                                         , { })
 
             return True
     else:
