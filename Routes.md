@@ -1,2 +1,12 @@
 # All the Routes of the HTTP Server
-The service requires some 
+There are two kinds of people,
+that will use the Server:
+- Contributors
+Anyone changing the site in any way
+- Users
+Anyone registered on the network
+
+Thus any route can be allocated to one
+of those groups.
+
+## Contributors 
