@@ -137,7 +137,18 @@ def close(election_hash):
                 # Append ammendments to laws
                 for ammendment in winner["ammendment"]:
                     law = laws.update_one({ "book" : winner["book"], "law" ammendment["law"] }
-                                         , { })
+                                         , { "$push" : { "paragraphs" : ammendment["paragraphs"] } }
+                                         , upsert=True)
+
+                # Add additions as new laws
+                for addition in winner["additions"]:
+                    addition["book"] = winner["book"]
+                    laws.insert_one(addition)
+
+                # Remove removals from laws
+                for removal in removals:
+                    laws.remove_one({ "title" : removal })
+
 
             return True
     else:
