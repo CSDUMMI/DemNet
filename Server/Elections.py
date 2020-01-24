@@ -136,7 +136,7 @@ def close(election_hash):
                 laws = collection("laws")
                 # Append ammendments to laws
                 for ammendment in winner["ammendment"]:
-                    law = laws.update_one({ "book" : winner["book"], "law" ammendment["law"] }
+                    law = laws.update_one({ "book" : winner["book"], "law" : ammendment["law"] }
                                          , { "$push" : { "paragraphs" : ammendment["paragraphs"] } }
                                          , upsert=True)
 

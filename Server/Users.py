@@ -60,8 +60,7 @@ def login(username, password):
                                                                 , "private_key" : user['private_key']
                                                                 }
                                               }
-                                  }
-                                }
+                                 }
                             )
 
             keys = new_keys
@@ -71,41 +70,7 @@ def login(username, password):
     except Exception as e:
         print("Invalid Login information", file=sys.stderr)
         return False
-            new_keys = RSA.generate(2048)
-            new_expiration = datetime.timedelta (weeks=104
-                                                ,days=0
-                                                ,hours=0
-                                                ,minutes=0
-                                                ,seconds=0
-                                                ,milliseconds=0
-                                                ,microseconds=0
-                                                ) + datetime.datetime.now()
-
-            private_key = new_keys.export_key(format="PEM", passphrase=password)
-            public_key  = new_keys.publickey().export_key(format="PEM")
-
-
-            users.update_one(   { "username" : username }
-                                , { "$set" : { "public_key"     : public_key
-                                             , "private_key"    : private_key
-                                             , "expiration"     : new_expiration
-                                             }
-                                  , "$push" : { "old_keys" :    { "expiration"  : user['expiration']
-                                                                , "public_key"  : keys.publickey().export_key(format="PEM")
-                                                                , "private_key" : user['private_key']
-                                                                }
-                                              }
-                                  }
-                                }
-                            )
-
-            keys = new_keys
-
-        return keys
-
-    except Exception as e:
-        print("Invalid Login information", file=sys.stderr)
-        return False
+            
 
 """
 Verify that a string
