@@ -36,3 +36,68 @@ of the user in either session or client.
 
 # Routes
 ## Contributor Routes
+All Contributors Routes are prefixed
+with `/contrib/` route.
+
+### `/contrib/patch`
+To create a patch.
+A new patch is forked from the current `master` and created as a separate
+Git Repo, that can be access on `dev.domain/<patcher>/<patch>` with the patcher's
+password and user information as admin.
+A new patch needs the following POST parameters:
+```
+patcher : <patcher's name>
+is_user : <True if the patcher is user of the network, if they are, the patcher field is a network username
+name    : <name of the patch, good title>
+simple_description : <simple description using simple language
+technical_description : <detailed description>
+hold_pre_election : <True if the patcher wants to hold an election, before starting development>
+references : <Links relevant to the patch>
+if not is_user:
+  temporary_password : <The Patcher's temporary password to access the patch and git repo>
+```
+
+### `/contrib/submit`
+To close a patch.
+Requires logged in patcher, either on the network or using their temporary password.
+```
+name : <Name of the patch, that is administrated by the patcher>
+```
+
+Most other adminstrations and communications, etc. are managed on `dev.domain`.
+
+## User Routes
+These have to prefixs.
+
+### `/login`
+Login a verified registered user
+This sets the `passphrase` field in the `session`.
+```
+username : <username of the user, unique in all of the network>
+password : <password of the user, used to encrypt passphrase, which is stored in session>
+```
+This results in fetching the encrypted passphrase and stores it in `session["passphrase"]`,
+this is used to sign messages.
+
+### `/vote`
+Vote on an election.
+**On this Route logging and any other kind of documentation must
+be stopped.**
+```
+election : <election hash>
+vote : [<choice1>,<choice2>,<choice3>,…]
+```
+This requires logged in users.
+
+### `/message`
+Send a message to some recipients.
+```
+to : [<list of recipient's usernames>
+body : message text
+```
+The body will be encrypted with the private key of the author
+and the public key of all the recipients, unless one of the
+recipients is `"all"`, in which case the message is a
+post and public and only signed by the author for authentication
+purposes.
+
