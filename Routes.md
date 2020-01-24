@@ -10,3 +10,5 @@ Thus any route can be allocated to one
 of those groups.
 
 ## Contributors 
+This Group can be separated again, which can be seen in
+this Venn diagram:
