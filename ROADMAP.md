@@ -4,7 +4,6 @@ TODO:
 2. Election.py implemented with: create(); close(); vote();
 3. Patches.py implemented with: create(); close(); request_election()
 4. Users.py implemented with: login(); register();
-5. Laws.py implemented with: create(); request_election();
 
 # After three weeks:
 
