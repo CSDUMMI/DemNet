@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import sys, time, sched, subprocess, json
-import Patches
-from election import count_votes
+import Server.Patches as Patches
+from Server.election import count_votes
 from pymongo import MongoClient
 from Crypto.Hash import SHA256
 
