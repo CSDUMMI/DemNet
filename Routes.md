@@ -71,7 +71,15 @@ These have to prefixs.
 
 ### `/login`
 Login a verified registered user
-This sets the `passphrase` field in the `session`.
+This sets the `SHA3-256_passphrase` and `keys` field in the `session`.
+While the keys object in `keys` is still encrypted, it can be
+decrypted using the `SHA3-256_passphrase`, which is the SHA3-256
+Hash of the Password.
+This is only stored in session and **never** written to disk.
+We encrypt and decrypt using a Hash of the password instead
+of the actual password to minimize the harm, that anyone
+could do, that would read the sessions, because they'll
+be unable to guess at the password's plain text form. 
 ```
 username : <username of the user, unique in all of the network>
 password : <password of the user, used to encrypt passphrase, which is stored in session>
