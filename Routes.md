@@ -35,6 +35,7 @@ of the user in either session or client.
 
 
 # Routes
+All these Routes are **POST**
 ## Contributor Routes
 All Contributors Routes are prefixed
 with `/contrib/` route.
@@ -79,13 +80,13 @@ This is only stored in session and **never** written to disk.
 We encrypt and decrypt using a Hash of the password instead
 of the actual password to minimize the harm, that anyone
 could do, that would read the sessions, because they'll
-be unable to guess at the password's plain text form. 
+be unable to guess at the password's plain text form.
 ```
 username : <username of the user, unique in all of the network>
-password : <password of the user, used to encrypt passphrase, which is stored in session>
+password : <password of the user>
 ```
-This results in fetching the encrypted passphrase and stores it in `session["passphrase"]`,
-this is used to sign messages.
+This going to write the SHA3-256 to `SHA3-256_passphrase`
+and encrypted `keys`, which are encrypted using `SHA3-256_passphrase`.
 
 ### `/vote`
 Vote on an election.

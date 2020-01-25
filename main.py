@@ -26,3 +26,16 @@ def login():
             return 0
     else:
         return 2
+
+@app.route("/vote", method=["POST"])
+def vote():
+    # Stop Logging Temporarily to anything but errors
+    app.logger.setLevel(100) # Higher then **CRITICAL** logs must be send, for them to be logged
+
+    election = request.values.get('election')
+    vote    = request.values.get('vote')
+
+    Elections.vote(election, vote, username) # After this function is called, nobody has any knowledge of the association between user and vote.
+
+    app.logger.setLevel(0) # The crucial unnoticable part has past.
+    return 0
