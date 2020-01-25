@@ -9,7 +9,7 @@ Anyone registered on the network
 Thus any route can be allocated to one
 of those groups.
 
-## Contributors 
+## Contributors
 This Group can be separated again, which can be seen in
 this Venn diagram:
 
@@ -27,7 +27,7 @@ developers, currently working on their own Patch.
 This is important and to gurantee it, we don't have
 a public register function **yet**.
 All Users receive a RSA key pair,
-which are used to encrypt their messages when stored on the 
+which are used to encrypt their messages when stored on the
 server.
 The private key is encrypted using a random string encrypted again by the password of the user.
 This is done to provide security, for example preventing the storage of the plain text password
@@ -101,3 +101,12 @@ recipients is `"all"`, in which case the message is a
 post and public and only signed by the author for authentication
 purposes.
 
+
+# Error Codes
+If a route returns one of these codes, there has been an error:
+| Code | Meaning             |
+|:----:|:-------------------:|
+| 0    | No Error            |
+| 1    | InvalidData         |
+| 2    | InsufficientData    |
+| 3    | Unable to do that Action in this context |
