@@ -104,9 +104,8 @@ purposes.
 
 # Error Codes
 If a route returns one of these codes, there has been an error:
-| Code | Meaning             |
-|:----:|:-------------------:|
-| 0    | No Error            |
-| 1    | InvalidData         |
-| 2    | InsufficientData    |
-| 3    | Unable to do that Action in this context |
+| Codes | Meaning                                   |
+|-------|-------------------------------------------|
+| 0     | OK                                        |
+| 1     |  Invalid Data                             |
+| 2     | Unable to do that Action in given context |
