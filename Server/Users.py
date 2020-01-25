@@ -5,31 +5,28 @@ MongoDB for the user.
 This Key Pair is used for authenticating
 messages and requests by the user.
 This Module makes it possible to:
-- Fetch the private key providing a password and username, login()
+- Fetch the private key providing a passphrase and username, login()
 - Verify the signature of a user, is_author_of()
 """
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
+from Crypto.Cipher import AES
 from pymongo import MongoClient
 import datetime, sys, json
 
-def collection(col):
-    client = MongoClient()
-    db = client.demnet
-    return db[col]
+client = MongoClient()
+db = client.demnet
+users = db.users
 
-def users_collection():
-    return collection('users')
 
-def login(username, password):
-    users = users_collection()
+def login(username, passphrase):
     user = users.find_one({ 'username' : username })
 
     if not user:
         return False
 
     try:
-        keys = RSA.import_key(user["private_key"], passphrase=password)
+        keys = RSA.import_key(user["private_key"], passphrase=passphrase)
 
         if keys.publickey().export_key(format="PEM") != user["public_key"]:
             users.update_one({ "username" : username }, { "$set" : { "public_key"  : keys.publickey().export_key(format="PEM") } } )
@@ -46,7 +43,7 @@ def login(username, password):
                                                 ,microseconds=0
                                                 ) + datetime.datetime.now()
 
-            private_key = new_keys.export_key(format="PEM", passphrase=password)
+            private_key = new_keys.export_key(format="PEM", passphrase=passphrase)
             public_key  = new_keys.publickey().export_key(format="PEM")
 
 
@@ -70,7 +67,7 @@ def login(username, password):
     except Exception as e:
         print("Invalid Login information", file=sys.stderr)
         return False
-            
+
 
 """
 Verify that a string
@@ -80,7 +77,6 @@ body : bytes
 username : string
 """
 def is_author_of(body,username,starts_with="FROM: "):
-    users = users_collection()
     user = users.find_one({ "username" : username })
 
     if user:
@@ -100,19 +96,18 @@ Ciphertext = E(E(message,private_key_author), public_key_recipient)
 If recipient = "all" then the last encryption step is skipped.
 Parameters:
 - message (dict) a full message document as defined in Database.md
-- password, the passphrase to decrypt the author's (message['to']) private key
+- passphrase, the passphrase to decrypt the author's (message['to']) private key
 Returns:
 Either `False` or a list of dictionaries of the kind:
 { "recipient_name" : recipient_username, "ciphertext" : ciphertext }
 
 """
-def encrypt(message,password):
-    users = users_collection()
+def encrypt(message,passphrase):
     user = users.find_one({ "username" : message["from"] })
 
     if user:
         try:
-            keys = RSA.import_key(user['private_key'],passphrase=password)
+            keys = RSA.import_key(user['private_key'],passphrase=passphrase)
             if "all" in user['to']:
                 # Skip encryption if only one of the recipients is "all".
                 ciphertexts = [{ "all" : message['body'] }]
@@ -140,23 +135,22 @@ Publishing a message works in these steps:
 3. Add a notification to the recipient's feed.
 Parameters:
 - *message* message document with unencrypted body
-- *password* password to encrypt the author's private key
+- *passphrase* passphrase to encrypt the author's private key
 Returns:
 True if successfull
 False if not
 """
-def publish(message, password):
+def publish(message, passphrase):
     # 1. Encrypt/Sign the message
-    body = encrypt(message, password)
+    body = encrypt(message, passphrase)
     if body != False:
         # 2. Publish it in demnet.messages
         message['body'] = body
         message['hash'] = SHA256.new(json.dumps(body).encode('utf-8')).hexdigest()
-        messages = collection("messages")
+        messages = db.messages
         messages.insert_one(message)
 
         # 3. Add a notification to the recipient's feed
-        users  = users_collection()
         for recipient_name in message['to']:
             users.update_one({ "username" : recipient_name }
                              , { "$push" : { "feed" : message["hash"] } }

@@ -15,8 +15,9 @@ def login():
     if not session.get("passphrase") and username and password:
         passphrase = Users.login(username,password)
         if not passphrase:
-            return "InvalidLoginInformation"
+            return 1
         else:
             session["passphrase"] = passphrase
+            return 0
     else:
-        return "AlreadyLoggedIn"
+        return 2
