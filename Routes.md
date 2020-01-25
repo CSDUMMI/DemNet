@@ -104,6 +104,7 @@ purposes.
 
 # Error Codes
 If a route returns one of these codes, there has been an error:
+
 | Codes | Meaning                                   |
 |-------|-------------------------------------------|
 | 0     | OK                                        |
