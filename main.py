@@ -23,6 +23,7 @@ def login():
         else:
             session["keys"] = keys
             session["SHA3-256_passphrase"] = passphrase
+            session["username"] = username
             return 0
     else:
         return 2
@@ -32,10 +33,13 @@ def vote():
     # Stop Logging Temporarily to anything but errors
     app.logger.setLevel(100) # Higher then **CRITICAL** logs must be send, for them to be logged
 
+    username = session.get("username")
     election = request.values.get('election')
-    vote    = request.values.get('vote')
+    vote     = request.values.get('vote')
 
-    Elections.vote(election, vote, username) # After this function is called, nobody has any knowledge of the association between user and vote.
+    if username and election and vote:
+        Elections.vote(election, vote, username) # After this function is called, nobody has any knowledge of the association between user and vote.
 
     app.logger.setLevel(0) # The crucial unnoticable part has past.
+    # Not even the client is notified, if there was anything wrong, except if they get a timeout.
     return 0
