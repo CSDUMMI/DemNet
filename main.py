@@ -28,6 +28,10 @@ def login():
     else:
         return 2
 
+###################################################################
+############################ CRITICAL #############################
+###################################################################
+
 @app.route("/vote", method=["POST"])
 def vote():
     # Stop Logging Temporarily to anything but errors
@@ -43,3 +47,10 @@ def vote():
     app.logger.setLevel(0) # The crucial unnoticable part has past.
     # Not even the client is notified, if there was anything wrong, except if they get a timeout.
     return 0
+
+###################################################################
+############################ CRITICAL OVER ########################
+###################################################################
+
+@app.route("/message")
+def message():
