@@ -101,7 +101,7 @@ This requires logged in users.
 ### `/message`
 Send a message to some recipients.
 ```
-to : [<list of recipient's usernames>
+to : <list of recipient's usernames, as JSON List>
 body : message text
 ```
 The body will be encrypted with the private key of the author

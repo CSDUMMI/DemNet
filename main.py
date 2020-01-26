@@ -2,7 +2,7 @@
 
 from Server import Elections, Patches, Users
 from flask import Flask, request
-from typing import List
+import json
 from Crypto.Hash import SHA3_256
 
 app = Flask(__name__, static_url_path="/static", static_folder="/static")
@@ -54,3 +54,16 @@ def vote():
 
 @app.route("/message")
 def message():
+    author      = session.get("username")
+    recipients  = json.loads(request.values.get('to'))
+    body        = request.values.get('body')
+    keys        = session.get("keys")
+    passphrase  = session.get("passphrase")
+
+    if author and recipients and body and keys:
+        message =   { "body"    : body
+                    , "to"      : recipients
+                    , "from"    : author
+                    }
+
+        

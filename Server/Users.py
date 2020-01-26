@@ -96,18 +96,17 @@ Ciphertext = E(E(message,private_key_author), public_key_recipient)
 If recipient = "all" then the last encryption step is skipped.
 Parameters:
 - message (dict) a full message document as defined in Database.md
-- passphrase, the passphrase to decrypt the author's (message['to']) private key
+- keys, the RSA Keys of the author
 Returns:
 Either `False` or a list of dictionaries of the kind:
 { "recipient_name" : recipient_username, "ciphertext" : ciphertext }
 
 """
-def encrypt(message,passphrase):
+def encrypt(message,keys):
     user = users.find_one({ "username" : message["from"] })
 
     if user:
         try:
-            keys = RSA.import_key(user['private_key'],passphrase=passphrase)
             if "all" in user['to']:
                 # Skip encryption if only one of the recipients is "all".
                 ciphertexts = [{ "all" : message['body'] }]
