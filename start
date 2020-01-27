@@ -2,5 +2,14 @@
 # Install pip3 Packages
 pip3 install -r requirements.txt
 
+# BUILD=Variable denoting current build string:
+BUILD=`date -u +"%D-%T"`
+BUILD="$BUILD-$BUILDER"
+
+echo $BUILD >> BUILD.txt
+
+# Build Elm frontend
+elm make --output=output/index.html --optimize src/Main.elm
+
 # Start Server
 gunicorn main:app
