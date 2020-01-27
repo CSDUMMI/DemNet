@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from Server import Elections, Patches, Users
-from flask import Flask, request
+from flask import Flask, request, render_template
 import json, os
 from Crypto.Hash import SHA3_256
 
@@ -12,6 +12,10 @@ app.secret_key = os.environ["SECRET_KEY"]
 ok = 0
 invalidData = 1
 invalidContext = 2
+
+@app.route("/", methods=["GET"])
+def index():
+    return render_template("output/index.html")
 
 @app.route("/login",methods=["POST"])
 def login():
