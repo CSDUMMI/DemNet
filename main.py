@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from Server import Elections, Patches, Users
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_file
 import json, os
 from Crypto.Hash import SHA3_256
 
@@ -15,7 +15,7 @@ invalidContext = 2
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("output/index.html")
+    return send_file("output/index.html")
 
 @app.route("/login",methods=["POST"])
 def login():
