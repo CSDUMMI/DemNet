@@ -2,7 +2,7 @@
 
 from Server import Elections, Patches, Users
 from flask import Flask, request
-import json
+import json, os
 from Crypto.Hash import SHA3_256
 
 app = Flask(__name__, static_url_path="/static", static_folder="/static")
