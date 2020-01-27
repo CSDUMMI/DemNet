@@ -37,7 +37,7 @@ def login():
 ############################ CRITICAL #############################
 ###################################################################
 
-@app.route("/vote", method=["POST"])
+@app.route("/vote", methods=["POST"])
 def vote():
     # Stop Logging Temporarily to anything but errors
     app.logger.setLevel(100) # Higher then **CRITICAL** logs must be send, for them to be logged
@@ -57,7 +57,7 @@ def vote():
 ############################ CRITICAL OVER ########################
 ###################################################################
 
-@app.route("/message", method=["POST"])
+@app.route("/message", methods=["POST"])
 def message():
     author      = session.get("username")
     recipients  = json.loads(request.values.get('to'))

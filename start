@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-
 # Install pip3 Packages
 pip3 install -r requirements.txt
 
 # Start Server
-python3 main.py
+gunicorn main:app

@@ -1,4 +1,4 @@
 .env
 node_modules
-*/__pycache__
+Server/__pycache__
 __pycache__
