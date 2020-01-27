@@ -8,6 +8,11 @@ from Crypto.Hash import SHA3_256
 app = Flask(__name__, static_url_path="/static", static_folder="/static")
 app.secret_key = os.environ["SECRET_KEY"]
 
+# Errors
+ok = 0
+invalidData = 1
+invalidContext = 2
+
 @app.route("/login",methods=["POST"])
 def login():
     username = request.values.get("username")
@@ -19,14 +24,14 @@ def login():
         passphrase = sha3_256.hexdigest()
         keys = Users.login(username,passphrase)
         if not keys:
-            return 1
+            return invalidData
         else:
             session["keys"] = keys
             session["SHA3-256_passphrase"] = passphrase
             session["username"] = username
-            return 0
+            return ok
     else:
-        return 2
+        return invalidContext
 
 ###################################################################
 ############################ CRITICAL #############################
@@ -46,7 +51,7 @@ def vote():
 
     app.logger.setLevel(0) # The crucial unnoticable part has past.
     # Not even the client is notified, if there was anything wrong, except if they get a timeout.
-    return 0
+    return ok
 
 ###################################################################
 ############################ CRITICAL OVER ########################
@@ -65,4 +70,8 @@ def message():
                     , "to"      : recipients
                     , "from"    : author
                     }
-        Users.publish
+        Users.publish( message, keys )
+
+        return ok
+    else:
+        return invalidData
