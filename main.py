@@ -52,7 +52,7 @@ def vote():
 ############################ CRITICAL OVER ########################
 ###################################################################
 
-@app.route("/message")
+@app.route("/message", method=["POST"])
 def message():
     author      = session.get("username")
     recipients  = json.loads(request.values.get('to'))
@@ -65,5 +65,3 @@ def message():
                     , "to"      : recipients
                     , "from"    : author
                     }
-
-        
