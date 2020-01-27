@@ -134,14 +134,14 @@ Publishing a message works in these steps:
 3. Add a notification to the recipient's feed.
 Parameters:
 - *message* message document with unencrypted body
-- *passphrase* passphrase to encrypt the author's private key
+- *keys* private and public keys of the author
 Returns:
 True if successfull
 False if not
 """
-def publish(message, passphrase):
+def publish(message, keys):
     # 1. Encrypt/Sign the message
-    body = encrypt(message, passphrase)
+    body = encrypt(message, keys)
     if body != False:
         # 2. Publish it in demnet.messages
         message['body'] = body

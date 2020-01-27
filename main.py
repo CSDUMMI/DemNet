@@ -65,3 +65,4 @@ def message():
                     , "to"      : recipients
                     , "from"    : author
                     }
+        Users.publish
