@@ -38,6 +38,9 @@ type alias Model =  { user      : User
                     , notices   : List String -- Short Messages for the user.
                     }
 
+save_page : Model -> Model
+save_page model =
+  case model.page of
 init : flags -> ( Model, Cmd Msg)
 init _ = ( { user = Nothing
            , readings = []
@@ -65,16 +68,21 @@ type Field
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model
-  = case model.page of
-    Writing message ->
-      case msg of
-        Writes writing_msg ->
-          case writing_msg of
-            Change field new ->
-              let new_message = case field of
-                Title -> { message | title = new }
-                Content -> { message | content = new }
-                To -> { message | to = new }
-              in ({ model | page = Writing new_message }, Cmd.none)
-            Publish -> (model, publish message <| Published message)
-        To_Feed -> ( { model | page = Feed model.feed, writings = remove_duplicates <| model.writings ++ message }, save message (Saved message))
+  = case msg of
+      Writes writing_msg ->
+        case model.page of
+          Writing message ->
+            case writing_msg of
+              Change field new ->
+                  let new_message = case field of
+                        Title -> { message | title = new }
+                        Content -> { message | content = new }
+                        To -> { message | to = new }
+                  in ({ (save_page model) | page = Writing new_message }, Cmd.none)
+              Publish -> (model, publish message <| Published message)
+          _ -> ( model, Cmd.none )
+      To_Feed             -> ( { (save_page  model) | page = Feed model.feed }, save model.message (Saved model.message))
+      Read other_message  -> ( { (save_page model) | page = Reading other_message }, save message (Saved model.message))
+      Write other_message -> ( { (save_page model) | page = Writing other_message }, save message (Saved message))
+      Saved message       -> ( { model | notices = ("Saved: " ++ message.title)::model.notices }, Cmd.none)
+      Published message   -> ( { model | notices = ("Saved: " ++ message.title)::model.notices }, Cmd.none)
