@@ -35,12 +35,17 @@ type alias Model =  { user      : User
                     , readings  : List Message
                     , writings  : List Message
                     , feed      : List Message
+                    , elections : List Election
                     , notices   : List String -- Short Messages for the user.
                     }
 
 save_page : Model -> Model
 save_page model =
   case model.page of
+    Reading message -> { model | readings = add_if_not_member message model.readings }
+    Writing message -> { model | writings = add_if_not_member message model.writings }
+    Feed messages   -> { model | feed =  remove_duplicates <| messages ++ model.feed }
+    Vote election   -> { model | elections = add_if_not_member election}
 init : flags -> ( Model, Cmd Msg)
 init _ = ( { user = Nothing
            , readings = []
