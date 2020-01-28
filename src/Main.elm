@@ -28,6 +28,7 @@ type Page
   = Reading Message
   | Writing Message
   | Feed (List Message)
+  | Vote Election
 
 type alias Model =  { user      : Maybe User
                     , page      : Page
