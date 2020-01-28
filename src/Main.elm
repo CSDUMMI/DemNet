@@ -39,6 +39,15 @@ type alias Model =  { user      : User
                     , notices   : List String -- Short Messages for the user.
                     }
 
+add_if_not_member : a -> List a -> List a
+add_if_not_member element list
+  = if List.member element list
+    then list
+    else element:list
+
+remove_duplicates : List a -> List a
+remove_duplicates list = List.foldl add_if_not_member [] list
+
 save_page : Model -> Model
 save_page model =
   case model.page of
