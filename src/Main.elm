@@ -17,13 +17,6 @@ type alias User = { username : String
                   , last_name : String
                   }
 
-type alias Message
-  = { from : User
-    , to : User
-    , title : String
-    , content : String
-    }
-
 type alias Election = { options : List String }
 
 type Page
