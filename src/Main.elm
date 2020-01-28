@@ -5,7 +5,7 @@ import Browser
 import Element exposing (Element)
 import Http
 
-main = Browser.document { init = init
+main = Browser.element  { init = init
                         , view = view
                         , update = update
                         , subscription = subscription
@@ -30,7 +30,7 @@ type Page
   | Feed (List Message)
   | Vote Election
 
-type alias Model =  { user      : Maybe User
+type alias Model =  { user      : User
                     , page      : Page
                     , readings  : List Message
                     , writings  : List Message
@@ -46,17 +46,32 @@ init _ = ( { user = Nothing
 
 -- UPDATE
 type Msg
-  = Read Message
+  = Writes Writing_Msg
+  | To_Feed
+  | Read Message
   | Write Message
-  | Feed
-  | Write_Change_Title String
-  | Write_Change_Content String
-  | Login_Username_Change String
-  | Login_Password_Change String
+
+type Writing_Msg
+  = Change Field String
+  | Publish
+
+type Field
+  = Title
+  | Content
+  | To
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model
-  = case model.user of
-      Just user -> case msg of
-        Read msg ->
-      Nothing   ->
+  = case model.page of
+    Writing message ->
+      case msg of
+        Writes writing_msg ->
+          case writing_msg of
+            Change field new ->
+              let new_message = case field of
+                Title -> { message | title = new }
+                Content -> { message | content = new }
+                To -> { message | to = new }
+              in ({ model | page = Writing new_message }, Cmd.none)
+            Publish -> (model, publish message)
+        To_Feed -> ( { model | page = Feed model.feed })
