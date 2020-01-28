@@ -24,6 +24,8 @@ type alias Message
     , content : String
     }
 
+type alias Election = { options : List String }
+
 type Page
   = Reading Message
   | Writing Message
@@ -94,7 +96,7 @@ update msg model
                         Title -> { message | title = new }
                         Content -> { message | content = new }
                         To -> { message | to = new }
-                  in ({ (save_page saved_model) | page = Writing new_message }, Cmd.none)
+                  in ({ saved_model | page = Writing new_message }, Cmd.none)
               Publish -> (model, publish message <| Published message)
           _ -> ( saved_model, Cmd.none )
       To_Feed             -> ( { saved_model | page = Feed saved_model.feed }, Cmd.none)
