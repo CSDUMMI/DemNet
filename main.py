@@ -5,7 +5,7 @@ from flask import Flask, request, render_template, send_file
 import json, os
 from Crypto.Hash import SHA3_256
 
-app = Flask(__name__, static_url_path="/static", static_folder="/static")
+app = Flask(__name__, static_url_path="/static", static_folder="/output")
 app.secret_key = os.environ["SECRET_KEY"]
 
 # Errors
