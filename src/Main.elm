@@ -35,6 +35,7 @@ type alias Model =  { user      : User
                     , readings  : List Message
                     , writings  : List Message
                     , feed      : List Message
+                    , notices   : List String -- Short Messages for the user.
                     }
 
 init : flags -> ( Model, Cmd Msg)
@@ -50,6 +51,8 @@ type Msg
   | To_Feed
   | Read Message
   | Write Message
+  | Saved Message
+  | Published Message
 
 type Writing_Msg
   = Change Field String
@@ -73,5 +76,5 @@ update msg model
                 Content -> { message | content = new }
                 To -> { message | to = new }
               in ({ model | page = Writing new_message }, Cmd.none)
-            Publish -> (model, publish message)
-        To_Feed -> ( { model | page = Feed model.feed })
+            Publish -> (model, publish message <| Published message)
+        To_Feed -> ( { model | page = Feed model.feed, writings = remove_duplicates <| model.writings ++ message }, save message (Saved message))
