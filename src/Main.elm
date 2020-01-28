@@ -43,7 +43,7 @@ add_if_not_member : a -> List a -> List a
 add_if_not_member element list
   = if List.member element list
     then list
-    else element:list
+    else element::list
 
 remove_duplicates : List a -> List a
 remove_duplicates list = List.foldl add_if_not_member [] list
@@ -54,7 +54,8 @@ save_page model =
     Reading message -> { model | readings = add_if_not_member message model.readings }
     Writing message -> { model | writings = add_if_not_member message model.writings }
     Feed messages   -> { model | feed =  remove_duplicates <| messages ++ model.feed }
-    Vote election   -> { model | elections = add_if_not_member election}
+    Vote election   -> { model | elections = add_if_not_member election }
+
 init : flags -> ( Model, Cmd Msg)
 init _ = ( { user = Nothing
            , readings = []
@@ -82,9 +83,10 @@ type Field
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model
-  = case msg of
+  = let saved_model = save_page model
+    in case msg of
       Writes writing_msg ->
-        case model.page of
+        case saved_model.page of
           Writing message ->
             case writing_msg of
               Change field new ->
@@ -92,11 +94,11 @@ update msg model
                         Title -> { message | title = new }
                         Content -> { message | content = new }
                         To -> { message | to = new }
-                  in ({ (save_page model) | page = Writing new_message }, Cmd.none)
+                  in ({ (save_page saved_model) | page = Writing new_message }, Cmd.none)
               Publish -> (model, publish message <| Published message)
-          _ -> ( model, Cmd.none )
-      To_Feed             -> ( { (save_page  model) | page = Feed model.feed }, save model.message (Saved model.message))
-      Read other_message  -> ( { (save_page model) | page = Reading other_message }, save message (Saved model.message))
-      Write other_message -> ( { (save_page model) | page = Writing other_message }, save message (Saved message))
+          _ -> ( saved_model, Cmd.none )
+      To_Feed             -> ( { saved_model | page = Feed saved_model.feed }, Cmd.none)
+      Read other_message  -> ( { saved_model | page = Reading other_message }, Cmd.none)
+      Write other_message -> ( { saved_model | page = Writing other_message }, Cmd.none)
       Saved message       -> ( { model | notices = ("Saved: " ++ message.title)::model.notices }, Cmd.none)
       Published message   -> ( { model | notices = ("Saved: " ++ message.title)::model.notices }, Cmd.none)
