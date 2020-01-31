@@ -1,10 +1,10 @@
-module Messages exposing ( message_decoder
-                        , message_encoder
-                        , publish
-                        , save
-                        , request_message
-                        , request_messages
-                        )
+module Messages exposing  ( decoder
+                          , encoder
+                          , publish
+                          , save
+                          , request_one
+                          , request_many
+                          )
 
 import Json.Decode as D
 import Json.Encode as E
@@ -24,3 +24,7 @@ decoder =
     (D.field "to"  <| D.list D.string)
     (D.at ["body", "title"] D.string)
     (D.at ["body", "content"] D.string)
+
+encode : Message -> E.Value
+encode message =
+  E.object []
