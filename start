@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+# Add Location of gunicorn installation to PATH
+PATH=$HOME/.local/bin:$PATH
+
 # Install pip3 Packages
 pip3 install -r requirements.txt
 
