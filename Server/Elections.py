@@ -5,6 +5,8 @@ import Server.Patches as Patches
 from Server.election import count_votes
 from pymongo import MongoClient
 from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
 from typing import List, Tuple, Mapping
 
 """
@@ -94,14 +96,30 @@ def create(type,deadline,proposals):
         return election['hash']
 
 
-Encrypted_Vote = str
-def vote(election_hash : str, username : str, vote : Encrypted_Vote ):
+"""Stores a vote byte string, that is encrypted like this:
+Given Keys:
+- Private Key of the User (private_key_of_user)
+- Public Key of the Election Authority (public_key_of_ea)
+Encryption of the vote as string:
+vote_e = E(private_key_of_user, E(public_key_of_ea, vote))
+If you only have the public key of the user you can only
+tell, that a user has voted but not how.
+And only the EA can read the vote, with their private key.
+If you don't trust the EA or the EA has been compromised,
+the election is invalid to you, but this could easily
+be decentralised.
+"""
+def vote(election_hash : str, username : str, vote : List[str], private_key_of_user : RSA.RsaKey, public_key_of_ea : RSA.RsaKey) -> bool:
     elections = collection("elections")
     election = elections.find_one({ "hash" : election_hash })
+
+    cipher_ea = PKCS1_OAEP.new(public_key_of_ea)
+    cipher_user = PKCS1_OAEP.new(private_key_of_user)
 
     if username in election["participants"]:
         return False
     else:
+        vote = cipher_user(cipher_ea.encrypt(json.dumps(vote).encode('utf-8')))
         elections.update_one({ "hash" : election_hash }, { "$push" : { "participants" : username }})
         elections.update_one({ "hash" : election_hash }, { "$push" : { "votes" : vote }})
         return True
