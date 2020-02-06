@@ -10,7 +10,7 @@ This Module makes it possible to:
 """
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
-from Crypto.Cipher import AES
+from Crypto.Cipher import PKCS1_OAEP
 from pymongo import MongoClient
 import datetime, sys, json
 

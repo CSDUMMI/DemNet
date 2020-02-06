@@ -5,7 +5,7 @@ import Server.Patches as Patches
 from Server.election import count_votes
 from pymongo import MongoClient
 from Crypto.Hash import SHA256
-
+from typing import List, Tuple, Mapping
 
 """
 Utility function to get the MongoClient.demnet[<collection>]
@@ -93,17 +93,13 @@ def create(type,deadline,proposals):
         elections.insert_one(election)
         return election['hash']
 
-"""
-a vote is a list of all options ranked by
-how much a voter wants them to win. (see alternative vote).
-**This function call cannot leave any trace of the association between
-username and vote.**
-"""
-def vote(election_hash,vote,username):
+
+Encrypted_Vote = str
+def vote(election_hash : str, username : str, vote : Encrypted_Vote ):
     elections = collection("elections")
     election = elections.find_one({ "hash" : election_hash })
 
-    if username in election["participants"] and not election['closed']:
+    if username in election["participants"]:
         return False
     else:
         elections.update_one({ "hash" : election_hash }, { "$push" : { "participants" : username }})
@@ -124,7 +120,7 @@ def close(election_hash):
 
     if election:
         if election.get('deadline') <= time.time():
-            winner = count_votes(election.votes, len(election.participants), range(0,len(election.proposals)+1))["ballot"]
+            winner = count_votes(election["votes"], len(election.participants), range(0,len(election.proposals)+1))["ballot"]
             winner = election.proposals[winner]
             elections.update_one({ "hash" : election_hash }, { "$set" : { "winner" : winner, "closed" : True } })
 
