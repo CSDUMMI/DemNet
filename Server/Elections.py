@@ -120,8 +120,7 @@ def vote(election_hash : str, username : str, vote : List[str], private_key_of_u
         return False
     else:
         vote = cipher_user(cipher_ea.encrypt(json.dumps(vote).encode('utf-8')))
-        elections.update_one({ "hash" : election_hash }, { "$push" : { "participants" : username }})
-        elections.update_one({ "hash" : election_hash }, { "$push" : { "votes" : vote }})
+        elections.update_one({ "hash" : election_hash }, { "$push" : { "votes" : { "username" : username, "vote" : vote_e }}}
         return True
 
 
@@ -132,12 +131,13 @@ them.
 Publishing the votes, to make the independent control
 possible.
 """
-def close(election_hash):
+def close(election_hash : str, private_key_ea : RSA.RsaKey):
     elections = collection('elections')
     election = elections.find_one({ "hash" : election_hash })
 
     if election:
         if election.get('deadline') <= time.time():
+            votes = encrypt_votes(election["votes"], private_key_ea)
             winner = count_votes(election["votes"], len(election.participants), range(0,len(election.proposals)+1))["ballot"]
             winner = election.proposals[winner]
             elections.update_one({ "hash" : election_hash }, { "$set" : { "winner" : winner, "closed" : True } })
@@ -146,7 +146,7 @@ def close(election_hash):
                 patches = collection('patches')
                 patch = patches.find_one({ "hash" : winner['patch_id'] })
                 Patches.close(patch['name'], patch['name'], patch['hash'], merge=True)
-            elif election['type'] == "human":
+            else:
                 laws = collection("laws")
                 # Append ammendments to laws
                 for ammendment in winner["ammendment"]:
@@ -164,6 +164,18 @@ def close(election_hash):
                     laws.remove_one({ "title" : removal })
 
 
-            return True
+        return True
     else:
         return False
+
+def encrypt_votes(votes : List[bytes], private_key_ea : RSA.RsaKey) -> List[List[str]]:
+    users   = collection("users")
+    cipher_ea = PKCS1_OAEP.new(private_key_ea)
+    for vote in votes:
+        user    = users.find_one({ "username" : vote["username"] })
+        public_key_of_user = RSA.import_key(user['public_key'])
+        cipher_user = PKCS1_OAEP.new(public_key_of_user)
+        try:
+            vote = cipher_ea.decrypt(cipher_user.decrypt(user["vote"]))
+        except Exception as e:
+            raise
