@@ -18,7 +18,7 @@ def generate_elections( options, participants ):
         votes.append( generate_random_vote(options) )
         participants -= 1
 
-    winner = count_votes( votes, len(votes), options )
+    winner = count_votes( len(votes), votes, options )
 
     winners = []
     for i in range(len(options)):

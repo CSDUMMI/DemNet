@@ -4,21 +4,47 @@ from typing import List, Tuple
 Vote = List[str]
 Option = str
 
-def count_votes( votes : List[Vote], participant_count : int, options : List[Option]) -> Tuple[Option, List[Vote]]:
-    turn = map(lambda v: v[-1], votes)
-    for i in range(1,len(votes))
-        # If one option > 50 % support, it wins
-        maximum_option = max([(turn.count(o), o) for o in options])
-        if maximum_option[0] > len(votes)/2:
-            return (maximum_option[1],filter(lambda v: v[-i] == max(turn)[-i]))# Winner
-        else:
-            # If no option receives > 50 % support, delete the  least popular ones.
-            least_popular_indicies = find_least_popular(turn)
-            turn.pop(least_popular_indicies)
-            for least_popular_index in least_popular_indicies:
-                turn.append(votes[least_popular_index][-i-1])
+"""
+Turn class,
+a class to collect the current state of the counting.
+First it sorts all votes into the options.
+If an option is deleted, the votes removed from it
+are resorted into the new options.
+"""
+class Turn():
+    def __init__(self,participants : int, votes : List[Vote], options : List[Option]):
+        self.__options__ = { key : [] for key in options }
+        self.__resort(votes)
+        self.participants = participants
 
 
-def find_least_popular( turn : List[Option] ):
-    # If the least popular is a singular, just return that:
-    turn.index(min(turn))
+    def __resort(self,votes : List[Vote]):
+        for vote in votes:
+            vote_old = vote
+            print(f"Changed from {vote.pop()} to {vote[-1]} in {vote_old}")
+
+            self.__options__[vote[-1]].append(vote)
+
+    def count(self):
+        winner = None
+        while winner == None:
+            least = []
+            for option in self.__options__:
+                option = (option,len(self.__options__[option]))
+                if option[1] > self.participants/2:
+                    winner = option
+                elif option[1] < sum([s[1] for s in least]):
+                    least = option
+                elif option[1] == sum([s[1] for s in least]):
+                    least.append(option)
+
+            for s in least:
+                self.__resort(self.__options__[s[0]])
+                print(s[0])
+                del self.__options__[s[0]]
+
+        return winner
+
+def count_votes(participants : int, votes : List[Vote], options : List[Option]) -> Tuple[Option, int]:
+    turn = Turn(participants,votes,options)
+    return turn.count()
