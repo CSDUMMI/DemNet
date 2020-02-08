@@ -79,7 +79,7 @@ class Turn():
                 self.__resort(self.__options__[s[0]])
                 self.__options__.pop(s[0],None)
 
-        print(f"Winner:\n{winner[0]}, {winner[1]}", file=self.result_file)
+        print(f"Winner:\n{winner}", file=self.result_file)
         return winner
 
 def count_votes(participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None, threshold : float = 0.5) -> Tuple[Option, int]:
