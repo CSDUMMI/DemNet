@@ -63,4 +63,9 @@ class Turn():
 
 def count_votes(participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None ) -> Tuple[Option, int]:
     turn = Turn(participants,votes,options, fs)
-    return turn.count()
+    result = turn.count()
+
+    if fs != None:
+        fs.close()
+
+    return result

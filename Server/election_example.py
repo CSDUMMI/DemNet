@@ -14,7 +14,7 @@ def load_sample_votes():
 
 def generate_election( options, participants ):
     votes = []
-    result_file = open("sample_election.el","r+")
+    result_file = open("sample_election.el","w")
     while( participants > 0 ):
         votes.append( generate_random_vote(options) )
         participants -= 1
@@ -27,5 +27,5 @@ def generate_election( options, participants ):
 if __name__ == '__main__':
     i = 10
     while(i > 0):
-        generate_elections(['A','B','C','D', 'E', 'F', 'G', 'H', 'I'],random.randint(10**2,10**3))
+        generate_election(['A','B','C','D', 'E', 'F', 'G', 'H', 'I'],random.randint(10**2,10**3))
         i -= 1
