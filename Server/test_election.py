@@ -18,6 +18,7 @@ def generate_ballot():
     return (votes,participants,options)
 
 def test_count_votes():
+    # Random ballot test cases
     for i in range(1000):
         ballot = generate_ballot()
         test_file = open("test_election.el","w")
@@ -38,3 +39,13 @@ def test_count_votes():
 
         assert ballot[0] == votes
         assert winner == str(result)
+
+    # Testing on one special ballot
+    options = ["A","B","C"]
+    votes = [["A","B","C"],["A","C","B"],["A","C","B"]]
+    participants = len(votes)
+
+    assert ("B", 2) == election.count_votes(votes,participants,options)
+
+    participants = 10
+    assert ("NoneOfTheOtherOptions", 8) == election.count_votes(votes,participants,options)
