@@ -48,10 +48,14 @@ class Turn():
                 option = (option,len(self.__options__[option]))
                 if option[1] > self.participants/2:
                     winner = option
+                elif len(self.__options__) == 2: # another election must be called.
+                    keys = list(self.__options__)
+                    winner = [(key,self.__options__[key]) for key in keys]
                 elif option[1] < sum([s[1] for s in least]):
                     least = option
                 elif option[1] == sum([s[1] for s in least]):
                     least.append(option)
+
 
             for s in least:
                 print(f"{s[0]}",file=self.result_file)
