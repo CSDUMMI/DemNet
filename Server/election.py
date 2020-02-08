@@ -40,15 +40,24 @@ class Turn():
             else:
                 self.__options__[vote[-1]].append(vote)
 
-    def count(self):
+    """count all votes in self.__options__.
+    To win the election an option has to have more than limit*100 % support.
+    Parameters:
+    - limit : float = 0.5 := Percentages necessary to win for an election
+    Returns:
+    Either
+    - (winner_name,support) : Tuple[str,List[Vote] - If one option has won
+    - [(one_winner,support),(other_winner,support)] : List[Tuple[str,List[Vote]]] - If no side could unite the necessary support
+    """
+    def count(self, limit : float =0.5):
         winner = None
         while winner == None:
             least = []
             for option in self.__options__:
                 option = (option,len(self.__options__[option]))
-                if option[1] > self.participants/2:
+                if option[1] > self.participants*limit:
                     winner = option
-                elif len(self.__options__) == 2: # another election must be called.
+                elif len(self.__options__) == (1/limit): # another election must be called.
                     keys = list(self.__options__)
                     winner = [(key,self.__options__[key]) for key in keys]
                 elif option[1] < sum([s[1] for s in least]):
