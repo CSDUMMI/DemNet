@@ -1,5 +1,5 @@
 from typing import List, Tuple, TextIO
-import sys
+import sys, json
 
 Vote = List[str]
 Option = str
@@ -12,7 +12,7 @@ If an option is deleted, the votes removed from it
 are resorted into the new options.
 """
 class Turn():
-    def __init__(self,participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None):
+    def __init__(self, votes : List[Vote], participants : int, options : List[Option], fs : TextIO = None):
         if len(votes) < participants:
             votes.extend([["NoneOfTheOtherOptions"] for x in range(participants-len(votes))])
 
@@ -24,7 +24,7 @@ class Turn():
         else:
             self.result_file = sys.stdout
 
-        print(f"Votes:\n {votes}\nThrown:", file=self.result_file)
+        print(f"Votes:\n {json.dumps(votes)}\nThrown:", file=self.result_file)
 
 
         self.participants = participants

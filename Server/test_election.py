@@ -12,9 +12,9 @@ def generate_ballot():
                 , k=random.randint(1,len(options_population))
                 )
 
-    votes = [random.sample(options,random.randint(1,len(options))) for i in range(random.randint(100,1000))]
+    votes = [random.sample(options,random.randint(1,len(options))) for i in range(random.randint(10,100))]
 
-    participants = random.randint(len(votes), len(votes)+1000)
+    participants = random.randint(len(votes), len(votes)+10)
     return (votes,participants,options)
 
 def test_count_votes():
