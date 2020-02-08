@@ -12,7 +12,7 @@ def load_sample_votes():
     sample_votes = list(map( lambda v: v.split(';'), sample_votes ))
     return sample_votes
 
-def generate_elections( options, participants ):
+def generate_election( options, participants ):
     votes = []
     while( participants > 0 ):
         votes.append( generate_random_vote(options) )
@@ -35,5 +35,5 @@ def generate_elections( options, participants ):
 if __name__ == '__main__':
     i = 10
     while(i > 0):
-        generate_elections(['A','B','C','D', 'E', 'F', 'G', 'H', 'I'],random.randint(10**2,10**3))
+        generate_election(['A','B','C','D', 'E', 'F', 'G', 'H', 'I'],random.randint(10**2,10**3))
         i -= 1
