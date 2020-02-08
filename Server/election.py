@@ -43,19 +43,19 @@ class Turn():
     """count all votes in self.__options__.
     To win the election an option has to have more than limit*100 % support.
     Parameters:
-    - limit : float = 0.5 := Percentages necessary to win for an election
+    - threshold : float = 0.5 := Percentages necessary to win for an election
     Returns:
     Either
     - (winner_name,support) : Tuple[str,List[Vote] - If one option has won
     - [(one_winner,support),(other_winner,support)] : List[Tuple[str,List[Vote]]] - If no side could unite the necessary support
     """
-    def count(self, limit : float =0.5):
+    def count(self, threshold : float =0.5):
         winner = None
         while winner == None:
             least = []
             for option in self.__options__:
                 option = (option,len(self.__options__[option]))
-                if option[1] > self.participants*limit:
+                if option[1] > self.participants*threshold:
                     winner = option
                 elif len(self.__options__) == (1/limit): # another election must be called.
                     keys = list(self.__options__)
@@ -74,9 +74,9 @@ class Turn():
         print(f"Winner:\n{winner[0]}, {winner[1]}", file=self.result_file)
         return winner
 
-def count_votes(participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None ) -> Tuple[Option, int]:
+def count_votes(participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None, threshold : float = 0.5) -> Tuple[Option, int]:
     turn = Turn(participants,votes,options, fs)
-    result = turn.count()
+    result = turn.count(threshold=threshold)
 
     if fs != None:
         fs.close()
