@@ -16,7 +16,7 @@ class Turn():
         if len(votes) < participants:
             votes.extend([["NoneOfTheOtherOptions"] for x in range(participants-len(votes))])
 
-
+        self.threshold = 0.5
         self.__options__ = { key : list(filter(lambda v:v[-1] == key, votes)) for key in options }
 
         if fs != None:
@@ -52,43 +52,39 @@ class Turn():
     Once an option reached a threshold of support, the counting is over.
 
     To win the election an option has to have more than limit*100 % support.
-    Parameters:
-    - threshold : float = 0.5 := Percentages necessary to win for an election
     Returns:
     Either
     - (winner_name,support) : Tuple[str,List[Vote] - If one option has won
     - [(one_winner,support),(other_winner,support)] : List[Tuple[str,List[Vote]]] - If no side could unite the necessary support
     - False - If Error has occured and invalid data been provided.
     """
-    def count(self, threshold : float =0.5):
-        # If threshold were less than 50%, there could be multiple
-        # winners, which is impossible under this setup.
-        if threshold < 0.5 or threshold > 1:
-            return False
+    def count(self):
+        threshold = 0.5
         winner = None
         is_infinite_loop = 0
         while winner == None:
-            winners = filter(lambda o: (o/self.participants > threshold),self.__options__)
+            winners = list(filter(lambda o: (len(self.__options__[o])/self.participants > threshold),self.__options__))
             if len(winners) == 1:
                 winner = winners[0]
-                
-            least = self.least()
-
-            for s in least:
-                print(f"{s[0]}",file=self.result_file)
-                self.__resort(self.__options__[s[0]])
-                self.__options__.pop(s[0],None)
+            elif len(winners) == 2:
+                winner = winners
+            else:
+                least = self.least()
+                for s in least:
+                    print(f"{s[0]}",file=self.result_file)
+                    self.__resort(self.__options__[s[0]])
+                    self.__options__.pop(s[0],None)
 
 
         print(f"Winner:\n{winner}", file=self.result_file)
-        return winner
+        return (winner, len(self.__options__[winner])/self.participants)
 
     def least(self):
-        least = []
         options = list(self.__options__)
-        for o in options:
-            sub_support_of_o_from_least_support = (len(self.__options__[o])/self.participants) - (sum([len(self.__options__[least_option]) for least_option in least]))
-
+        least = [options[0]]
+        for o in options[1:]:
+            sub_support_of_o_from_least_support = (len(self.__options__[o])/self.participants) - sum([len(self.__options__[least_option]) for least_option in least])
+            print(sub_support_of_o_from_least_support)
             if (sub_support_of_o_from_least_support > 0) or (o == "NoneOfTheOtherOptions"):
                 # Ignore this option
                 continue
@@ -99,9 +95,9 @@ class Turn():
 
         return least
 
-def count_votes(participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None, threshold : float = 0.5) -> Tuple[Option, int]:
+def count_votes(participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None) -> Tuple[Option, int]:
     turn = Turn(participants,votes,options, fs)
-    result = turn.count(threshold=threshold)
+    result = turn.count()
 
     if fs != None:
         fs.close()
