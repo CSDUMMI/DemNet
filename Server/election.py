@@ -18,7 +18,8 @@ class Turn():
 
         self.threshold = 0.5
         self.__options__ = { key : list(filter(lambda v:v[-1] == key, votes)) for key in options }
-
+        if "NoneOfTheOtherOptions" not in list(self.__options__):
+            self.__options__["NoneOfTheOtherOptions"] = []
         if fs != None:
             self.result_file = fs
         else:
