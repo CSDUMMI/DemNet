@@ -74,18 +74,24 @@ class Turn():
                 for s in least:
                     print(f"{s[0]}",file=self.result_file)
                     self.__resort(self.__options__[s[0]])
+
+                    # If not all instances of this option are removed, KeyErrors
+                    # would be thrown once count() meet them again.
+                    for option in self.__options__:
+                        self.__options__[option] = [[alternative for alternative in v if alternative != s] for v in self.__options__[option]]
                     self.__options__.pop(s[0],None)
 
+        if type(winner) == type(""):
+            winner = (winner, len(self.__options__[winner])/self.participants)
 
         print(f"Winner:\n{winner}", file=self.result_file)
-        return (winner, len(self.__options__[winner])/self.participants)
+        return winner
 
     def least(self):
         options = list(self.__options__)
         least = [options[0]]
         for o in options[1:]:
             sub_support_of_o_from_least_support = (len(self.__options__[o])/self.participants) - sum([len(self.__options__[least_option]) for least_option in least])
-            print(sub_support_of_o_from_least_support)
             if (sub_support_of_o_from_least_support > 0) or (o == "NoneOfTheOtherOptions"):
                 # Ignore this option
                 continue

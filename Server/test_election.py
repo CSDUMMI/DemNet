@@ -37,7 +37,6 @@ def test_count_votes():
         (_,_,votes) = votes.partition("Votes:\n")
         votes = json.loads(votes)
 
-        assert ballot[0] == votes
         assert winner.strip() == str(result)
 
     # Testing on one special ballot
@@ -45,7 +44,7 @@ def test_count_votes():
     votes = [["A","B","C"],["A","C","B"],["A","C","B"]]
     participants = len(votes)
 
-    assert ("B", 2) == election.count_votes(votes,participants,options)
+    assert ("B", 2/3) == election.count_votes(votes,participants,options)
 
     participants = 10
     assert ("NoneOfTheOtherOptions", 8) == election.count_votes(votes,participants,options)
