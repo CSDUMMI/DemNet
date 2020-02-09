@@ -38,7 +38,7 @@ def test_count_votes():
         votes = json.loads(votes)
 
         assert ballot[0] == votes
-        assert winner == str(result)
+        assert winner.strip() == str(result)
 
     # Testing on one special ballot
     options = ["A","B","C"]
