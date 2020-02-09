@@ -69,17 +69,23 @@ class Turn():
                 winner = winners[0]
             elif len(winners) == 2:
                 winner = winners
+            elif is_infinite_loop >= 10**7:
+                winner = self.__options__
+                break
             else:
                 least = self.least()
                 for s in least:
+                    print(s)
                     print(f"{s[0]}",file=self.result_file)
                     self.__resort(self.__options__[s[0]])
 
                     # If not all instances of this option are removed, KeyErrors
-                    # would be thrown once count() meet them again.
+                    # would be thrown once count() met them again.
                     for option in self.__options__:
-                        self.__options__[option] = [[alternative for alternative in v if alternative != s] for v in self.__options__[option]]
-                    self.__options__.pop(s[0],None)
+                        self.__options__[option] = [list(filter(lambda a:a != s,vote)) for vote in self.__options__[option]]
+
+                    self.__options__.pop(s,None)
+
 
         if type(winner) == type(""):
             winner = (winner, len(self.__options__[winner])/self.participants)
@@ -100,6 +106,8 @@ class Turn():
             elif sub_support_of_o_from_least_support < 0:
                 least = [o]
 
+        # Never make "NoneOfTheOtherOptions" not an option.
+        print(least)
         return least
 
 def count_votes(participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None) -> Tuple[Option, int]:

@@ -19,7 +19,7 @@ def generate_ballot():
 
 def test_count_votes():
     # Random ballot test cases
-    for i in range(1000):
+    for i in range(100):
         ballot = generate_ballot()
         test_file = open("test_election.el","w")
         result = election.count_votes(ballot[0],ballot[1],ballot[2],fs=test_file)
@@ -36,15 +36,14 @@ def test_count_votes():
         (thrown,_,winner) = election_log.partition("\nWinner:\n")
         (_,_,votes) = votes.partition("Votes:\n")
         votes = json.loads(votes)
-
         assert winner.strip() == str(result)
 
     # Testing on one special ballot
     options = ["A","B","C"]
     votes = [["A","B","C"],["A","C","B"],["A","C","B"]]
     participants = len(votes)
-
     assert ("B", 2/3) == election.count_votes(votes,participants,options)
+
 
     participants = 10
     assert ("NoneOfTheOtherOptions", 8) == election.count_votes(votes,participants,options)

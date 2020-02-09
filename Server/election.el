@@ -2,4 +2,4 @@ Votes:
  [["A", "B", "C"], ["C", "A", "B"], ["A", "B", "C"]]
 Thrown:
 Winner:
-C
+('C', 1.0)
