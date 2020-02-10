@@ -64,6 +64,8 @@ class Turn():
                 winner = winners[0]
             elif len(winners) == 2:
                 winner = winners
+            elif self.__options__ == {}:
+                return {}
             else:
                 least = self.least()
                 for s in least:
