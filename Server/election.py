@@ -35,13 +35,12 @@ class Turn():
     def __resort(self,votes : List[Vote]):
         for vote in votes:
 
-            old = vote[-1]
-            if old == "NoneOfTheOtherOptions":
-                continue
-            elif len(vote) == 1:
+            vote.pop()
+            # The silent majority doen't support anybody, when they don't vote
+            # for them.
+            if vote == []:
                 self.__options__["NoneOfTheOtherOptions"].append(["NoneOfTheOtherOptions"])
             else:
-                vote.pop()
                 self.__options__[vote[-1]].append(vote)
 
     """count all votes in self.__options__.
@@ -62,29 +61,30 @@ class Turn():
     def count(self):
         threshold = 0.5
         winner = None
-        is_infinite_loop = 0
         while winner == None:
             winners = list(filter(lambda o: (len(self.__options__[o])/self.participants > threshold),self.__options__))
             if len(winners) == 1:
                 winner = winners[0]
             elif len(winners) == 2:
                 winner = winners
-            elif is_infinite_loop >= 10**7:
-                winner = self.__options__
-                break
             else:
                 least = self.least()
                 for s in least:
                     print(s)
-                    print(f"{s[0]}",file=self.result_file)
-                    self.__resort(self.__options__[s[0]])
+                    print(f"{s}",file=self.result_file)
+                    self.__resort(self.__options__[s)
 
                     # If not all instances of this option are removed, KeyErrors
                     # would be thrown once count() met them again.
-                    for option in self.__options__:
-                        self.__options__[option] = [list(filter(lambda a:a != s,vote)) for vote in self.__options__[option]]
+                    # Only remove those NoneOfTheOtherOptions, that are currently in the minority
+                    # in the first rank.
+                    # This is, so one can always choose NoneOfTheOtherOptions as an Option,
+                    # even if it is the 100. alternative
+                    if s != "NoneOfTheOtherOptions":
+                        for option in self.__options__:
+                            self.__options__[option] = [list(filter(lambda a:a != s,vote)) for vote in self.__options__[option]]
 
-                    self.__options__.pop(s,None)
+                            self.__options__.pop(s,None)
 
 
         if type(winner) == type(""):
