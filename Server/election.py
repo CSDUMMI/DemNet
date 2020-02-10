@@ -18,8 +18,7 @@ class Turn():
 
         self.threshold = 0.5
         self.__options__ = { key : list(filter(lambda v:v[-1] == key, votes)) for key in options }
-        if "NoneOfTheOtherOptions" not in list(self.__options__):
-            self.__options__["NoneOfTheOtherOptions"] = []
+
         if fs != None:
             self.result_file = fs
         else:
@@ -38,9 +37,7 @@ class Turn():
             vote.pop()
             # The silent majority doen't support anybody, when they don't vote
             # for them.
-            if vote == []:
-                self.__options__["NoneOfTheOtherOptions"].append(["NoneOfTheOtherOptions"])
-            else:
+            if vote != []:
                 self.__options__[vote[-1]].append(vote)
 
     """count all votes in self.__options__.
@@ -72,19 +69,16 @@ class Turn():
                 for s in least:
                     print(s)
                     print(f"{s}",file=self.result_file)
-                    self.__resort(self.__options__[s)
+                    self.__resort(self.__options__[s])
 
                     # If not all instances of this option are removed, KeyErrors
-                    # would be thrown once count() met them again.
-                    # Only remove those NoneOfTheOtherOptions, that are currently in the minority
-                    # in the first rank.
-                    # This is, so one can always choose NoneOfTheOtherOptions as an Option,
-                    # even if it is the 100. alternative
-                    if s != "NoneOfTheOtherOptions":
-                        for option in self.__options__:
-                            self.__options__[option] = [list(filter(lambda a:a != s,vote)) for vote in self.__options__[option]]
+                    # would be thrown once self.count() met them again.
 
-                            self.__options__.pop(s,None)
+                    for option in self.__options__:
+                        self.__options__[option] = [list(filter(lambda a:a != s,vote)) for vote in self.__options__[option]]
+
+
+                    self.__options__.pop(s,None)
 
 
         if type(winner) == type(""):
