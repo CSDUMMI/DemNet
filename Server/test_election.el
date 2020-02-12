@@ -1,15 +1,4 @@
 Votes:
- [["U", "W", "T", "B", "T", "Q"], ["B", "S", "R", "T", "W", "D", "J"], ["G", "T", "Q", "R"], ["G", "R", "T", "E", "T", "T", "D", "B", "J", "W", "U", "S"], ["D", "B", "E", "J", "T"], ["F", "T", "U", "R", "D", "E", "T", "Q"], ["W", "S", "Q", "E"], ["F", "B", "G", "U", "Q", "E", "W", "T", "R", "T", "J", "T"], ["D", "T", "R", "J", "T", "B", "F", "E", "W"], ["T", "Q", "B", "D", "T", "S", "U", "T", "E", "G", "J", "W"], ["T", "T", "T", "G", "W", "B"], ["NoneOfTheOtherOptions"], ["NoneOfTheOtherOptions"], ["NoneOfTheOtherOptions"], ["NoneOfTheOtherOptions"], ["NoneOfTheOtherOptions"]]
+ [["R"], ["E", "U", "I", "T"], ["E", "E", "R", "I", "U", "D", "T"], ["I", "E", "D", "R", "T", "E", "R", "U"], ["E", "R", "E", "D"], ["E", "D", "R", "U", "T", "R", "E"], ["U", "E", "T"], ["R"], ["E", "R", "D", "I", "T", "U"], ["E", "U", "T", "R", "D", "I"], ["T", "D", "E", "E", "R", "U", "I", "R"], ["I", "U", "T", "E"], ["R"], ["U", "D", "T", "R"], ["T", "I", "R", "R", "D"], ["R", "R", "U", "I", "E", "D"], ["R", "E", "I", "E", "U", "D"], ["E", "R"], ["T"], ["E"], ["I", "D", "T", "E", "R"], ["R", "D", "I", "R", "T", "U", "E"], ["U"], ["U", "R", "D", "T"], ["R", "U", "E"], ["R", "E", "E", "T", "R", "D"], ["NoneOfTheOtherOptions"], ["NoneOfTheOtherOptions"]]
 Thrown:
-G
-D
-U
-F
-B
-R
-W
-E
-S
-Q
-T
-J
+NoneOfTheOtherOptions

@@ -16,6 +16,7 @@ class Turn():
         if len(votes) < participants:
             votes.extend([["NoneOfTheOtherOptions"] for x in range(participants-len(votes))])
 
+        options.append("NoneOfTheOtherOptions")
         self.threshold = 0.5
         self.__options__ = { key : list(filter(lambda v:v[-1] == key, votes)) for key in options }
 
@@ -39,6 +40,8 @@ class Turn():
             # for them.
             if vote != []:
                 self.__options__[vote[-1]].append(vote)
+            else:
+                self.__options__["NoneOfTheOtherOptions"].append(["NoneOfTheOtherOptions"])
 
     """count all votes in self.__options__.
     It follows the following principle:
@@ -60,28 +63,27 @@ class Turn():
         winner = None
         while winner == None:
             winners = list(filter(lambda o: (len(self.__options__[o])/self.participants > threshold),self.__options__))
+            least = self.least()
+
             if len(winners) == 1:
+                # This case is the most obvious, but also leat likely
                 winner = winners[0]
-            elif len(winners) == 2:
-                winner = winners
-            elif self.__options__ == {}:
-                return {}
+            elif least == list(self.__options__):
+                # If all the least are all the options,
+                # then there are only two left.
+                # And both of them have 50% support.
+                # This is equivalent to len(winners) == 2
+                winner = least
             else:
-                least = self.least()
-                for s in least:
-                    print(s)
-                    print(f"{s}",file=self.result_file)
-                    self.__resort(self.__options__[s])
-
-                    # If not all instances of this option are removed, KeyErrors
-                    # would be thrown once self.count() met them again.
-
-                    for option in self.__options__:
-                        self.__options__[option] = [list(filter(lambda a:a != s,vote)) for vote in self.__options__[option]]
-
-
-                    self.__options__.pop(s,None)
-
+                # Neither case, we have to remove the least and try again.
+                for l in least:
+                    self.__resort(self.__options__[l])
+                    # Only those, that aren't NoneOfTheOtherOptions are removed permanently from the race.
+                    if l != "NoneOfTheOtherOptions":
+                        self.__options__(l, None)
+                        for o in list(self.__options__):
+                            self.__options__[o] = list(filter(lambda a: a != l, self.__options__[o]))
+                            
 
         if type(winner) == type(""):
             winner = (winner, len(self.__options__[winner])/self.participants)
@@ -94,7 +96,7 @@ class Turn():
         least = [options[0]]
         for o in options[1:]:
             sub_support_of_o_from_least_support = (len(self.__options__[o])/self.participants) - sum([len(self.__options__[least_option]) for least_option in least])
-            if (sub_support_of_o_from_least_support > 0) or (o == "NoneOfTheOtherOptions"):
+            if (sub_support_of_o_from_least_support > 0):
                 # Ignore this option
                 continue
             elif sub_support_of_o_from_least_support == 0:
@@ -102,8 +104,6 @@ class Turn():
             elif sub_support_of_o_from_least_support < 0:
                 least = [o]
 
-        # Never make "NoneOfTheOtherOptions" not an option.
-        print(least)
         return least
 
 def count_votes(participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None) -> Tuple[Option, int]:
