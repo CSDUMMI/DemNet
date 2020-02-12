@@ -1,5 +1,5 @@
 from typing import List, Tuple, TextIO, Any
-import sys, json
+import sys, json, functools
 
 Vote = List[str]
 Option = str
@@ -13,35 +13,20 @@ are resorted into the new options.
 """
 class Turn():
     def __init__(self, votes : List[Vote], participants : int, options : List[Option], fs : TextIO = None):
-        if len(votes) < participants:
-            votes.extend([["NoneOfTheOtherOptions"] for x in range(participants-len(votes))])
-
-        options.append("NoneOfTheOtherOptions")
-        self.threshold = 0.5
-        self.__options__ = { key : list(filter(lambda v:v[-1] == key, votes)) for key in options }
-
-        if fs != None:
-            self.result_file = fs
-        else:
-            self.result_file = sys.stdout
-
-        print(f"Votes:\n {json.dumps(votes)}\nThrown:", file=self.result_file)
-
-
         self.participants = participants
+        self.__options__ = { key : list(filter(lambda v: v[-1] == key)) for key in options }
 
 
+    def order(self,reverse=False):
+        return sorted(list(self.__options__), key = lambda k: len(self.__options__[k]), reverse=reverse)
 
     def __resort(self,votes : List[Vote]):
         for vote in votes:
-
             vote.pop()
-            # The silent majority doen't support anybody, when they don't vote
-            # for them.
             if vote != []:
                 self.__options__[vote[-1]].append(vote)
             else:
-                self.__options__["NoneOfTheOtherOptions"].append(["NoneOfTheOtherOptions"])
+                self.potential_voters += 1
 
     """count all votes in self.__options__.
     It follows the following principle:
@@ -60,51 +45,38 @@ class Turn():
     """
     def count(self):
         threshold = 0.5
-        winner = None
-        while winner == None:
-            winners = list(filter(lambda o: (len(self.__options__[o])/self.participants > threshold),self.__options__))
-            least = self.least()
-
-            if len(winners) == 1:
-                # This case is the most obvious, but also leat likely
-                winner = winners[0]
-            elif least == list(self.__options__):
-                # If all the least are all the options,
-                # then there are only two left.
-                # And both of them have 50% support.
-                # This is equivalent to len(winners) == 2
-                winner = least
+        winner = False
+        while type(winner) != "" or winner != None:
+            ordered = self.order(reverse=True)
+            if len(self.__options__[ordered[0]]) > (participants*threshold):
+                winner = ordered[0]
+            elif len(self.__options__[ordered[o]]) == (participants*threshold) and len(self.__options__[ordered[1]]) == (participants*threshold):
+                winner = None
+            elif self.potential_voters/self.participants > threshold:
+                winner = None
             else:
-                # Neither case, we have to remove the least and try again.
+                least = self.least()
                 for l in least:
                     self.__resort(self.__options__[l])
-                    # Only those, that aren't NoneOfTheOtherOptions are removed permanently from the race.
-                    if l != "NoneOfTheOtherOptions":
-                        self.__options__(l, None)
-                        for o in list(self.__options__):
-                            self.__options__[o] = list(filter(lambda a: a != l, self.__options__[o]))
-                            
-
-        if type(winner) == type(""):
-            winner = (winner, len(self.__options__[winner])/self.participants)
-
-        print(f"Winner:\n{winner}", file=self.result_file)
-        return winner
+                    self.__options__.pop(l)
 
     def least(self):
-        options = list(self.__options__)
-        least = [options[0]]
-        for o in options[1:]:
-            sub_support_of_o_from_least_support = (len(self.__options__[o])/self.participants) - sum([len(self.__options__[least_option]) for least_option in least])
-            if (sub_support_of_o_from_least_support > 0):
-                # Ignore this option
-                continue
-            elif sub_support_of_o_from_least_support == 0:
-                least.append(o)
-            elif sub_support_of_o_from_least_support < 0:
-                least = [o]
+        ordered = self.order()
+        least = ([ordered[0]], len(self.__options__[ordered[0]]))
 
-        return least
+        for o in ordered:
+            support_for_o = len(self.__options__[o])
+            if support_for_o < least[1]:
+                least = (o,support_for_o)
+            elif support_for_o == least[1]:
+                least[0].append(o)
+                least[1] += support_for_o
+            elif support_for_o > least[1]:
+                continue
+
+        return least[0]
+
+
 
 def count_votes(participants : int, votes : List[Vote], options : List[Option], fs : TextIO = None) -> Tuple[Option, int]:
     turn = Turn(participants,votes,options, fs)
