@@ -14,6 +14,7 @@ are resorted into the new options.
 class Turn():
     def __init__(self, votes : List[Vote], participants : int, options : List[Option], fs : TextIO = None):
         self.participants = participants
+        self.potential_voters = participants - len(votes)
         self.__options__ = { key : list(filter(lambda v: v[-1] == key)) for key in options }
 
 
