@@ -15,7 +15,7 @@ class Turn():
     def __init__(self, votes : List[Vote], participants : int, options : List[Option], fs : TextIO = None):
         self.participants = participants
         self.potential_voters = participants - len(votes)
-        self.__options__ = { key : list(filter(lambda v: v[-1] == key)) for key in options }
+        self.__options__ = { key : list(filter(lambda v: v[-1] == key, votes)) for key in options }
 
 
     def order(self,reverse=False):
@@ -49,9 +49,9 @@ class Turn():
         winner = False
         while type(winner) != "" or winner != None:
             ordered = self.order(reverse=True)
-            if len(self.__options__[ordered[0]]) > (participants*threshold):
+            if len(self.__options__[ordered[0]]) > (self.participants*threshold):
                 winner = ordered[0]
-            elif len(self.__options__[ordered[o]]) == (participants*threshold) and len(self.__options__[ordered[1]]) == (participants*threshold):
+            elif len(self.__options__[ordered[0]]) == (self.participants*threshold) and len(self.__options__[ordered[1]]) == (participants*threshold):
                 winner = None
             elif self.potential_voters/self.participants > threshold:
                 winner = None
@@ -60,18 +60,21 @@ class Turn():
                 for l in least:
                     self.__resort(self.__options__[l])
                     self.__options__.pop(l)
+                    for o in list(self.__options__):
+                        self.__options__[o] = [list(filter(lambda a: a != l, v)) for v in self.__options__[o]]
+
 
     def least(self):
         ordered = self.order()
         least = ([ordered[0]], len(self.__options__[ordered[0]]))
 
-        for o in ordered:
+        for o in ordered[1:]:
             support_for_o = len(self.__options__[o])
             if support_for_o < least[1]:
                 least = (o,support_for_o)
             elif support_for_o == least[1]:
                 least[0].append(o)
-                least[1] += support_for_o
+                least = (least[0],least[1]+support_for_o)
             elif support_for_o > least[1]:
                 continue
 
