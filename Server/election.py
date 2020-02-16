@@ -1,8 +1,7 @@
-import random, pyrankvote, pprint
+import random, pprint
 from typing import List, Dict
-from pyrankvote import Candidate, Ballot
 
-def vote(votes : List[List[str]], options : List[str]):
+def count(votes : List[List[str]], options : List[str]):
     options = { key : list(filter(lambda v: v[-1] == key, votes)) for key in list(options) }
     votes = len(votes)
     all_participants = votes
