@@ -46,7 +46,7 @@ def test(n, repeat_for=10**3,seed="A"):
     for i in range(repeat_for):
         options = ["A","B","C","D"]
         votes = [random.sample(options,k=random.randint(1,len(options))) for i in range(n)]
-        result = vote(votes,options)
+        result = count(votes,options)
         print(f"""{result["winner"]}
 Options : {options}
 Votes: {votes}
