@@ -12,12 +12,10 @@ def test_count(n=50, repeat_for=10**7,seed=None):
         # thus after len(options) rounds, AV has to stop.
         assert len(result["rounds"]) <= len(options)
         assert len(result["rounds"]) > 0
-        
+
         assert result["thrown_out"] >= 0
 
         if result["winner"] != "NoneOfTheOtherOptions":
-            assert result["thrown_out"]/len(votes) >= 0.5
+            assert result["thrown_out"]/len(votes) < 0.5
         else:
-            assert result["thrown_out"] >= 0.5*len(votes)
-
-        
+            assert result["thrown_out"] > 0.5*len(votes)
