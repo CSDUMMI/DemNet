@@ -2,7 +2,7 @@ import random, pprint
 from typing import List, Dict
 
 def count(votes : List[List[str]], options : List[str]):
-    options = { key : list(filter(lambda v: v[-1] == key, votes)) for key in list(options) }
+    options  : Dict[str, List[List[str]]] = { key : list(filter(lambda v: v[-1] == key, votes)) for key in list(options) }
     votes = len(votes)
     all_participants = votes
     thrown_out = 0
@@ -41,14 +41,5 @@ def count(votes : List[List[str]], options : List[str]):
     result["winner"] = "NoneOfTheOtherOptions" if (result["thrown_out"]/all_participants) > 0.5 else result["winner"]
     return result
 
-def test(n, repeat_for=10**3,seed="A"):
-    random.seed("A")
-    for i in range(repeat_for):
-        options = ["A","B","C","D"]
-        votes = [random.sample(options,k=random.randint(1,len(options))) for i in range(n)]
-        result = count(votes,options)
-        print(f"""{result["winner"]}
-Options : {options}
-Votes: {votes}
-Thrown out: {(result["thrown_out"]/len(votes))*100}%
-        """)
+        
+            
