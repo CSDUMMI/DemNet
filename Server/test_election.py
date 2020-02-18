@@ -1,7 +1,7 @@
 from election import count
 import random,os
 
-def test_count(n=50, repeat_for=10**7,seed=None):
+def test_count(n=50, repeat_for=10**5,seed=None):
     random.seed("A" if seed != None else os.environ["SEED"])
     for i in range(repeat_for):
         options = [str(i) for i in range(random.randint(4,20))]
