@@ -3,10 +3,10 @@ import sys, subprocess, os
 
 
 if sys.argv[1] == "test":
-    subprocess.run("pytest")
+    exit(subprocess.run("pytest").returncode)
 elif sys.argv[1] == "run":
     os.environ["BUILDER"] = sys.argv[2]
-    subprocess.run("./start")
+    exit(subprocess.run("./start").returncode)
 else:
     print("""Please provide a command:
 test : To run the tests
