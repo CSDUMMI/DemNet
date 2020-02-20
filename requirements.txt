@@ -7,8 +7,11 @@ itsdangerous==1.1.0
 Jinja2==2.10.3
 MarkupSafe==1.1.1
 more-itertools==8.2.0
+<<<<<<< HEAD
 mypy==0.761
 mypy-extensions==0.4.3
+=======
+>>>>>>> ContinousIntegration
 packaging==20.1
 pluggy==0.13.1
 py==1.8.1
@@ -17,8 +20,14 @@ pymongo==3.10.1
 pyparsing==2.4.6
 pytest==5.3.5
 six==1.14.0
+<<<<<<< HEAD
 typed-ast==1.4.1
 typing-extensions==3.7.4.1
 wcwidth==0.1.8
 Werkzeug==0.16.0
 zipp==2.2.0
+=======
+wcwidth==0.1.8
+Werkzeug==0.16.0
+zipp==3.0.0
+>>>>>>> ContinousIntegration
