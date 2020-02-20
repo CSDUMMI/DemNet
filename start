@@ -9,15 +9,12 @@ BUILD="$BUILD-$BUILDER"
 
 echo $BUILD >> BUILD.txt
 
-<<<<<<< HEAD
 # Test if the static analyses pases
 if ! mypy main.py Server/*.py --ignore-issing-imports;
 then exit 1
 
 # Build Elm frontend
 elm make --output=output/main.js --optimize src/Main.elm
-=======
->>>>>>> ContinousIntegration
 
 # Start Server
 gunicorn main:app
