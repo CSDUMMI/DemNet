@@ -8,8 +8,6 @@ BUILD="$BUILD-$BUILDER"
 
 echo $BUILD >> BUILD.txt
 
-# Build Elm frontend
-elm make --output=output/main.js --optimize src/Main.elm
 
 # Start Server
 gunicorn main:app
