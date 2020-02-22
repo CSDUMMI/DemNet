@@ -4,7 +4,7 @@ pip3 install -r requirements.txt
 
 # BUILD=Variable denoting current build string:
 BUILD=`date -u +"%D-%T"`
-BUILD="$BUILD-$BUILDER"
+BUILD="$BUILD-`whoami`"
 
 echo $BUILD >> BUILD.txt
 
