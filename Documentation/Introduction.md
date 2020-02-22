@@ -26,4 +26,20 @@ After this the Server is listening on `http://127.0.0.1:8000`
 ## The Directory structure.
 There are Three important folders in the repository
 and 2-3 important files in the root directory.
+
 ### The `main.py` file.
+Here the Flask Server and Routes are implemeneted, that are documented [here](Routes.md).
+It is depending on the `Server/` folder and is executed by `gunicorn main:app`.
+If you want to understand this program, you should start here for anything the
+Server does, goes through this file.
+### The `Server/` folder
+Here all the Python Modules that are used in `main.py`.
+This changes a lot, but the one that will stay constant is the `Server/election.py`
+which implements the `count` function that computes the election results.
+### The `output/` folder
+Here all the static HTML files are kept, like `login.html` or `index.html`.
+These may be human written or compiled from the Elm files in the `src/` folder.
+Eventually we want to use Elm more as a way of developing interactive single file
+Web Applications. But this is Abbashan's work to do.
+
+
