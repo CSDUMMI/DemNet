@@ -8,6 +8,35 @@
 name: Labeler
 on: [pull_request]
 
+critical:
+  - output/login.html
+  - output/vote.html
+  - main.py
+  - Server/election.py
+  - Server/Elections.py
+  - Server/test_election.py
+  - Server/Crypto/*
+  
+patches:
+  - Server/Patches.py
+  - Server/patch.sh
+
+elections:
+  - output/vote.html
+  - Server/election.py
+  - Server/Elections.py
+  - Server/test_election.py
+
+crypto:
+  - Server/Crypto/*
+
+users:
+  - Server/Users.py
+
+running-building:
+  - start
+
+
 jobs:
   label:
 
