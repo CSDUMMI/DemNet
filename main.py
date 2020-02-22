@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 
 from Server import Elections, Patches, Users
-from flask import Flask, request, render_template, send_file
+from Server.Crypto import Storage
+from flask import Flask, request, render_template
+import pymongo
+from pymongo import MongoClient
 import json, os
 from Crypto.Hash import SHA3_256
 
-app = Flask(__name__, static_url_path="/static", static_folder="output")
+app = Flask( __name__
+           , static_url_path="/static"
+           , static_folder="output/static"
+           , template_folder="output")
 app.secret_key = os.environ["SECRET_KEY"]
 
 # Errors
@@ -15,7 +21,31 @@ invalidContext = 2
 
 @app.route("/", methods=["GET"])
 def index():
-    return send_file("output/index.html")
+    if session.get("username"):
+        return render_template("index.html")
+    else:
+        return render_template("login.html")
+
+@app.route("/login", methods=["GET"])
+def login():
+    return render_template("login.html")
+
+@app.route("/readings", methods=["GET"])
+def readings():
+    if session.get("username"):
+        client      = MongoClient()
+        db          = client.demnet
+        messages    = db.messages
+        users       = db.users
+        readings    = users.find_one({ "username" : session["username" ] })["readings"]
+        readings    = [messages.find_one({ "hash" : reading }) for reading in readings]
+        readings    = [{ key : reading[key] if key != "body" else Storage.encrypt(reading["body"]) for key in reading } for reading in readings]
+
+        return render_template("readings-index.html", readings=readings)
+
+
+
+
 
 @app.route("/login",methods=["POST"])
 def login():

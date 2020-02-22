@@ -107,6 +107,8 @@ Public and Private PGP Key (GnuPG):
 , "last_name" : "<last real name>"
 , "expiration" : "<date of expiration of key pair>"
 , "feed" : ["<hash of message where this user is either in the to or from part>"]
+, "readings" : ["<hash of messages, that the user is reading>"]
+, "writings" : ["<hash of messages, that the user is writing>"]
 , "old_keys" : [{ "expiration" : "<unix timestamp of their expiration>"
                 , "public_key" :"<old public key until the expiration>"
                 , "private_key" : "<old, encrypted private key>"
@@ -133,6 +135,7 @@ A post is just signed by the author
   , "ciphertext" : "<encrypted text of the message, D(D(body, recipient_private_key), author_public_key) == message>"
   }]
 , "hash" : "<SHA256 of a dict of all the other fields in the message, used as unique and secure identifier>"
+, "draft" : <true if message is a draft and not yet ready to be send.>
 }
 ```
 If in "to" there is `"all"` then the body isn't encrypted
