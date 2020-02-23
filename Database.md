@@ -117,23 +117,16 @@ Public and Private PGP Key (GnuPG):
 ```
 
 # messages
-Anybody can send end-to-end encypted messages to anyone.
-A message, that is addressed to `all` is a post.
-The process of encrypting and decrypting a message
-from Alice to Bob is like this:
-
-    Alice's Message -> Alice's Private Key -> Bob's Public Key -> Send -> Bob's Private Key -> Alice's Public Key
-
-A post is just signed by the author
-
-    Alice's Message -> Alice's Private Key -> Published
-
+For now, there can be only one kind of messages:
+Public posts.
+These messages can be read and are addressed to anyone.
 ```json
 { "from" : "<username of the author>"
-, "to" : [ "<username's of the recipients or 'all', when the message is a post>" ]
-, "body" : [{ "recipient_name" : "<username of the recipient>"
-  , "ciphertext" : "<encrypted text of the message, D(D(body, recipient_private_key), author_public_key) == message>"
-  }]
+, "to" : "all"
+, "body" : { "title" : "<title of the post"
+           , "content" : "<markdown content of the post."
+         }
+}
 , "hash" : "<SHA256 of a dict of all the other fields in the message, used as unique and secure identifier>"
 , "draft" : <true if message is a draft and not yet ready to be send.>
 }
