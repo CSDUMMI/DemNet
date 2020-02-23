@@ -15,9 +15,10 @@ app = Flask( __name__
 app.secret_key = os.environ["SECRET_KEY"]
 
 # Errors
-ok = 0
-invalidData = 1
-invalidContext = 2
+ok                  = 0
+invalidData         = 1
+invalidContext      = 2
+notLoggedIn         = 3
 
 @app.route("/", methods=["GET"])
 def index():
@@ -30,21 +31,40 @@ def index():
 def login():
     return render_template("login.html")
 
+"""
+Returns the readings-index.html template
+with template argument:
+    readings : List[Tuple[title,hash of reading]]
+
+"""
 @app.route("/readings", methods=["GET"])
 def readings():
     if session.get("username"):
         client      = MongoClient()
         db          = client.demnet
         messages    = db.messages
-        users       = db.users
         readings    = users.find_one({ "username" : session["username" ] })["readings"]
         readings    = [messages.find_one({ "hash" : reading }) for reading in readings]
-        readings    = [{ key : reading[key] if key != "body" else Storage.encrypt(reading["body"]) for key in reading } for reading in readings]
+        readings    = [(reading["body"]["title"], reading["hash"]) for reading in readings]
 
         return render_template("readings-index.html", readings=readings)
-
-
-
+    else:
+        return notLoggedIn
+"""
+Returns the reading.html template
+with argument:
+    reading, the full message.
+"""
+@app.route("/read/<reading_hash>", methods=["GET"])
+def read(reading_hash):
+    if session.get("username"):
+        client      = MongoClient()
+        db          = client.demnet
+        messages    = db.messages
+        reading     = messages.find_one({ "hash" : reading_hash })
+        return render_template("reading.html", reading=reading)
+    else:
+        return notLoggedIn
 
 
 @app.route("/login",methods=["POST"])

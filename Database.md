@@ -126,7 +126,6 @@ These messages can be read and are addressed to anyone.
 , "body" : { "title" : "<title of the post"
            , "content" : "<markdown content of the post."
          }
-}
 , "hash" : "<SHA256 of a dict of all the other fields in the message, used as unique and secure identifier>"
 , "draft" : <true if message is a draft and not yet ready to be send.>
 }
