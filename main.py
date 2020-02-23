@@ -20,10 +20,26 @@ invalidData         = 1
 invalidContext      = 2
 notLoggedIn         = 3
 
+"""
+Returns either the login.html
+or feed.
+If the user is logged in, returns feed
+sorted by most recent uploads as
+dict of "title" and "hash".
+So you can use /read/<hash> to get to reading that upload.
+"""
 @app.route("/", methods=["GET"])
 def index():
     if session.get("username"):
-        return render_template("index.html")
+        client      = MongoClient()
+        db          = client.demnet
+        messages    = db.messages
+        messages    = messages.find().sort('upload_time', pymongo.DESCENDING)
+        messages_   = []
+        for message in messages:
+            messages_.append({ "title" : message["title"], "hash" : message["hash"] } } )
+
+        return render_template("index.html", messages=messages_)
     else:
         return render_template("login.html")
 
