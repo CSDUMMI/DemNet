@@ -14,10 +14,10 @@ app = Flask( __name__
 app.secret_key = os.environ["SECRET_KEY"]
 
 # Errors
-ok                  = 0
-invalidData         = 1
-invalidContext      = 2
-notLoggedIn         = 3
+ok                  = "0"
+invalidData         = "1"
+invalidContext      = "2"
+notLoggedIn         = "3"
 
 """
 Returns either the login.html
