@@ -129,9 +129,7 @@ def encrypt(message,keys):
 
 """
 Publishing a message works in these steps:
-1. Encrypt/Sign the message
-2. Publish it in demnet.messages
-3. Add a notification to the recipient's feed.
+1. Publish it in demnet.messages
 Parameters:
 - *message* message document with unencrypted body
 - *keys* private and public keys of the author
@@ -140,13 +138,12 @@ True if successfull
 False if not
 """
 def publish(message, keys):
-    # 1. Encrypt/Sign the message
-    body = encrypt(message, keys)
     if body != False:
         # 2. Publish it in demnet.messages
+        messages = db.messages
         message['body'] = body
         message['hash'] = SHA256.new(json.dumps(body).encode('utf-8')).hexdigest()
-        messages = db.messages
+        message['upload_time'] = messages.find().sort("upload_time", pymongo.DESCENDING).limit(1)[0] + 1 # Some inconsistent (race condition) is possible, but not critical.
         messages.insert_one(message)
 
         # 3. Add a notification to the recipient's feed

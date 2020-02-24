@@ -130,8 +130,8 @@ def vote():
 @app.route("/message", methods=["POST"])
 def message():
     author      = session.get("username")
-    recipients  = json.loads(request.values.get('to'))
-    body        = request.values.get('body')
+    recipients  = "all"
+    body        = json.loads(request.values.get('body'))
     keys        = session.get("keys")
     passphrase  = session.get("passphrase")
 
