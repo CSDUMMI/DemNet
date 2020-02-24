@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from Server import Elections, Patches, Users
-from Server.Crypto import Storage
 from flask import Flask, request, render_template
 import pymongo
 from pymongo import MongoClient
@@ -37,15 +36,34 @@ def index():
         messages    = messages.find().sort('upload_time', pymongo.DESCENDING)
         messages_   = []
         for message in messages:
-            messages_.append({ "title" : message["title"], "hash" : message["hash"] } } )
+            messages_.append({ "title" : message["title"], "hash" : message["hash"] })
 
         return render_template("index.html", messages=messages_)
     else:
-        return render_template("login.html")
+        return redirect("/login")
 
-@app.route("/login", methods=["GET"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    return render_template("login.html")
+    if request.method == "GET":
+        return render_template("login.html")
+    elif request.method == "POST":
+        username = request.values.get("username")
+        password = request.values.get("password")
+
+        if not session.get("keys") and username and password:
+            sha3_256 = SHA3_256.new()
+            sha3_256.update(password.encode('utf-8'))
+            passphrase = sha3_256.hexdigest()
+            keys = Users.login(username,passphrase)
+            if not keys:
+                return invalidData
+            else:
+                session["keys"] = keys
+                session["SHA3-256_passphrase"] = passphrase
+                session["username"] = username
+                return ok
+        else:
+            return invalidContext
 
 """
 Returns the readings-index.html template
@@ -85,23 +103,7 @@ def read(reading_hash):
 
 @app.route("/login",methods=["POST"])
 def login():
-    username = request.values.get("username")
-    password = request.values.get("password")
 
-    if not session.get("keys") and username and password:
-        sha3_256 = SHA3_256.new()
-        sha3_256.update(password.encode('utf-8'))
-        passphrase = sha3_256.hexdigest()
-        keys = Users.login(username,passphrase)
-        if not keys:
-            return invalidData
-        else:
-            session["keys"] = keys
-            session["SHA3-256_passphrase"] = passphrase
-            session["username"] = username
-            return ok
-    else:
-        return invalidContext
 
 ###################################################################
 ############################ CRITICAL #############################
