@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from Server import Elections, Patches, Users
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, session
 import pymongo
 from pymongo import MongoClient
 import json, os
