@@ -63,7 +63,7 @@ def login():
                 session["username"] = username
                 return ok
         else:
-            return invalidContext
+            return redirect("/login")
 
 """
 Returns the readings-index.html template
