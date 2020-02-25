@@ -14,12 +14,17 @@ app = Flask( __name__
 app.secret_key = os.environ["SECRET_KEY"]
 
 # Errors
-ok                          = "0"
-error_for_unknown_reason    = "1"
-error_but_not               = "2"
-invalid_data                = "3"
-invalid_context             = "4"
-not_logged_in               = "5"
+debug                       = os.environ.get("DEBUG")
+errors = { "OK"                         : "0"
+         , "error_for_unknown_reason"   : "1"
+         , "error_but_not"              : "2"
+         , "invalid_data"               : "3"
+         , "invalid_context"            : "4"
+         , "not_logged_in"              : "5"
+         }
+
+errors = { key : errors[key] if not debug else key for key in errors }
+
 
 """
 Returns either the login.html
@@ -36,12 +41,14 @@ def index():
         db          = client.demnet
         messages    = db.messages
         messages    = messages.find().sort('upload_time', pymongo.DESCENDING)
-        messages_   = []
-        for message in messages:
-            messages_.append({ "title" : message["title"], "hash" : message["hash"] })
+        messages    = list(map( lambda m:    { "title" : m["title"]
+                                            , "hash" : m["hash"] }
+                                , list(messages)
+                            )
+                        )
 
         response =  render_template ( "index.html"
-                                    , messages  = messages_
+                                    , messages  = messages
                                     , logged_in = session.get("username") != None
                                     )
 
