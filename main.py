@@ -53,7 +53,7 @@ def index():
                                     )
 
     except:
-        return error_for_unknown_reason
+        return errors["error_for_unknown_reason"]
     else:
         return response
 
@@ -76,9 +76,9 @@ def login():
             response            = redirect("/")
 
     except KeyError:
-        return invalid_data
+        return errors["invalid_data"]
     except:
-        return error_for_unknown_reason
+        return errors["error_for_unknown_reason"]
     else:
         return response
 
@@ -99,9 +99,9 @@ def readings():
         readings    = [(reading["body"]["title"], reading["hash"]) for reading in readings]
         response    = render_template("readings-index.html", readings=readings)
     except KeyError:
-        return not_logged_in
+        return errors["not_logged_in"]
     except:
-        return error_but_not + not_logged_in
+        return errors["error_but_not"] + errors["not_logged_in"]
     else:
         return response
 
@@ -112,11 +112,16 @@ with argument:
 """
 @app.route("/read/<reading_hash>", methods=["GET"])
 def read(reading_hash):
-    client      = MongoClient()
-    db          = client.demnet
-    messages    = db.messages
-    reading     = messages.find_one({ "hash" : reading_hash })
-    return render_template("reading.html", reading=reading)
+    try:
+        client      = MongoClient()
+        db          = client.demnet
+        messages    = db.messages
+        reading     = messages.find_one({ "hash" : reading_hash })
+        response    = render_template("reading.html", reading=reading)
+    except:
+        return errors["error_for_unknown_reason"]
+    else:
+        return response
 
 ###################################################################
 ############################ CRITICAL #############################
@@ -127,16 +132,20 @@ def vote():
     try:
         app.logger.setLevel(100)
 
+        if session.get("username"):
+            raise "invalid_context"
         username = session["username"]
         election = request.values['election']
         vote     = request.values['vote']
 
         Elections.vote(election, vote, username)
         app.logger.setLevel(0)
-    except Exception as e:
-        raise e
+    except "invalid_context":
+        return errors["invalid_context"]
+    except KeyError:
+        return errors["invalid_data"]
     else:
-        return ok
+        return errors["OK"]
 
 ###################################################################
 ############################ /CRITICAL ############################
