@@ -14,10 +14,11 @@ app = Flask( __name__
 app.secret_key = os.environ["SECRET_KEY"]
 
 # Errors
-ok                  = "0"
-invalidData         = "1"
-invalidContext      = "2"
-notLoggedIn         = "3"
+ok                      = "0"
+catch_all_error         = "1"
+invalid_data            = "2"
+invalid_context         = "3"
+not_logged_in           = "4"
 
 """
 Returns either the login.html
@@ -106,39 +107,45 @@ def read(reading_hash):
 
 @app.route("/vote", methods=["POST"])
 def vote():
-    # Stop Logging Temporarily to anything but errors
-    app.logger.setLevel(100) # Higher then **CRITICAL** logs must be send, for them to be logged
+    try:
+        app.logger.setLevel(100)
 
-    username = session.get("username")
-    election = request.values.get('election')
-    vote     = request.values.get('vote')
+        username = session.get("username")
+        election = request.values.get('election')
+        vote     = request.values.get('vote')
 
-    if username and election and vote:
-        Elections.vote(election, vote, username) # After this function is called, nobody has any knowledge of the association between user and vote.
+        if username and election and vote:
+            # After this function is called, nobody has any knowledge of the association between user and vote.
+            Elections.vote(election, vote, username)
 
-    app.logger.setLevel(0) # The crucial unnoticable part has past.
-    # Not even the client is notified, if there was anything wrong, except if they get a timeout.
-    return ok
+            app.logger.setLevel(0) # The crucial unnoticable part has past.
+            # Not even the client is notified, if there was anything wrong, except if they get a timeout.
+            return ok
+    except Exception as e:
+        raise e
+    finally:
+        return ok
 
 ###################################################################
-############################ CRITICAL OVER ########################
+############################ /CRITICAL ############################
 ###################################################################
 
 @app.route("/message", methods=["POST"])
 def message():
-    author      = session.get("username")
-    recipients  = "all"
-    body        = json.loads(request.values.get('body'))
-    keys        = session.get("keys")
-    passphrase  = session.get("passphrase")
+    try:
+        author      = session["username"]
+        body        = json.loads(request.values["body"])
+        keys        = session["keys"]
 
-    if author and recipients and body and keys:
-        message =   { "body"    : body
-                    , "to"      : recipients
-                    , "from"    : author
-                    }
+        message     =   { "body"    : body
+                        , "from"    : author
+                        }
+
         Users.publish( message, keys )
 
-        return ok
+    except KeyError:
+        return invalidData + invalidContext
+    except:
+        return catch_all_error
     else:
-        return invalidData
+        return ok
