@@ -13,6 +13,10 @@ app = Flask( __name__
            , template_folder="output")
 app.secret_key = os.environ["SECRET_KEY"]
 
+client              = MongoClient()
+db                  = client.demnet
+messages            = db.messages
+users               = db.users
 # Errors
 debug                       = os.environ.get("DEBUG")
 errors = { "OK"                         : "0"
@@ -37,18 +41,15 @@ So you can use /read/<hash> to get to reading that upload.
 @app.route("/", methods=["GET"])
 def index():
     try:
-        client      = MongoClient()
-        db          = client.demnet
-        messages    = db.messages
-        messages    = list(messages.find()).sort(key=lambda m: m["upload_time"], reverse=True)
-        messages    = list(map( lambda m:    { "title" : m["body"]["title"]
-                                            , "hash" : m["hash"] }
-                                , list(messages)
-                            )
-                        )
-
+        sorted_messages     = sorted(list(messages.find({})),key=lambda m: m["upload_time"], reverse=True)
+        sorted_messages     = list(map( lambda m:       { "title" : m["body"]["title"]
+                                                        , "hash" : m["hash"] }
+                                                        , sorted_messages
+                                    )
+                                )
+        print(sorted_messages)
         response =  render_template ( "index.html"
-                                    , messages  = messages
+                                    , messages  = sorted_messages
                                     , logged_in = session.get("username") != None
                                     )
 
@@ -91,17 +92,14 @@ with template argument:
 @app.route("/readings", methods=["GET"])
 def readings():
     try:
-        client      = MongoClient()
-        db          = client.demnet
-        messages    = db.messages
         readings    = users.find_one({ "username" : session["username"] })["readings"]
         readings    = [messages.find_one({ "hash" : reading }) for reading in readings]
         readings    = [(reading["body"]["title"], reading["hash"]) for reading in readings]
         response    = render_template("readings-index.html", readings=readings)
     except KeyError:
         return errors["not_logged_in"]
-    except:
-        return errors["error_but_not"] + errors["not_logged_in"]
+    except Exception as e:
+        raise e
     else:
         return response
 
@@ -113,9 +111,6 @@ with argument:
 @app.route("/read/<reading_hash>", methods=["GET"])
 def read(reading_hash):
     try:
-        client      = MongoClient()
-        db          = client.demnet
-        messages    = db.messages
         reading     = messages.find_one({ "hash" : reading_hash })
         response    = render_template("reading.html", reading=reading)
     except Exception as e:
