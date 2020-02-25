@@ -17,6 +17,7 @@ client              = MongoClient()
 db                  = client.demnet
 messages            = db.messages
 users               = db.users
+
 # Errors
 debug                       = os.environ.get("DEBUG")
 errors = { "OK"                         : "0"
@@ -30,14 +31,7 @@ errors = { "OK"                         : "0"
 errors = { key : errors[key] if not debug else key for key in errors }
 
 
-"""
-Returns either the login.html
-or feed.
-If the user is logged in, returns feed
-sorted by most recent uploads as
-dict of "title" and "hash".
-So you can use /read/<hash> to get to reading that upload.
-"""
+
 @app.route("/", methods=["GET"])
 def index():
     try:
@@ -83,12 +77,7 @@ def login():
     else:
         return response
 
-"""
-Returns the readings-index.html template
-with template argument:
-    readings : List[Tuple[title,hash of reading]]
 
-"""
 @app.route("/readings", methods=["GET"])
 def readings():
     try:
@@ -103,11 +92,20 @@ def readings():
     else:
         return response
 
-"""
-Returns the reading.html template
-with argument:
-    reading, the full message.
-"""
+@app.route("/writings", methods=["GET"])
+def writings():
+    try:
+        writings    = users.find_one({ "username" : session["username"] })["writings"]
+        writings    = [messages.find_one({ "hash" : writing }) for writing in writings]
+        writings    = [(writing["body"]["title"],writing["hash"]) for writing in writings]
+        response    = render_template("writings-index.html", writings=writings)
+    except KeyError:
+        return errors["not_logged_in"]
+    except Exception as e:
+        raise e
+    else:
+        return response
+
 @app.route("/read/<reading_hash>", methods=["GET"])
 def read(reading_hash):
     try:
