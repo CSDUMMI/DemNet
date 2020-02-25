@@ -84,7 +84,7 @@ def readings():
 
         return render_template("readings-index.html", readings=readings)
     else:
-        return notLoggedIn
+        return not_logged_in
 """
 Returns the reading.html template
 with argument:
@@ -92,14 +92,11 @@ with argument:
 """
 @app.route("/read/<reading_hash>", methods=["GET"])
 def read(reading_hash):
-    if session.get("username"):
-        client      = MongoClient()
-        db          = client.demnet
-        messages    = db.messages
-        reading     = messages.find_one({ "hash" : reading_hash })
-        return render_template("reading.html", reading=reading)
-    else:
-        return notLoggedIn
+    client      = MongoClient()
+    db          = client.demnet
+    messages    = db.messages
+    reading     = messages.find_one({ "hash" : reading_hash })
+    return render_template("reading.html", reading=reading)
 
 ###################################################################
 ############################ CRITICAL #############################
@@ -110,20 +107,15 @@ def vote():
     try:
         app.logger.setLevel(100)
 
-        username = session.get("username")
-        election = request.values.get('election')
-        vote     = request.values.get('vote')
+        username = session["username"]
+        election = request.values['election']
+        vote     = request.values['vote']
 
-        if username and election and vote:
-            # After this function is called, nobody has any knowledge of the association between user and vote.
-            Elections.vote(election, vote, username)
-
-            app.logger.setLevel(0) # The crucial unnoticable part has past.
-            # Not even the client is notified, if there was anything wrong, except if they get a timeout.
-            return ok
+        Elections.vote(election, vote, username)
+        app.logger.setLevel(0)
     except Exception as e:
         raise e
-    finally:
+    else:
         return ok
 
 ###################################################################
