@@ -40,8 +40,8 @@ def index():
         client      = MongoClient()
         db          = client.demnet
         messages    = db.messages
-        messages    = messages.find().sort('upload_time', pymongo.DESCENDING)
-        messages    = list(map( lambda m:    { "title" : m["title"]
+        messages    = list(messages.find()).sort(key=lambda m: m["upload_time"], reverse=True)
+        messages    = list(map( lambda m:    { "title" : m["body"]["title"]
                                             , "hash" : m["hash"] }
                                 , list(messages)
                             )
@@ -52,8 +52,8 @@ def index():
                                     , logged_in = session.get("username") != None
                                     )
 
-    except:
-        return errors["error_for_unknown_reason"]
+    except Exception as e:
+        raise e
     else:
         return response
 
@@ -77,8 +77,8 @@ def login():
 
     except KeyError:
         return errors["invalid_data"]
-    except:
-        return errors["error_for_unknown_reason"]
+    except Exception as e:
+        raise e
     else:
         return response
 
@@ -118,8 +118,8 @@ def read(reading_hash):
         messages    = db.messages
         reading     = messages.find_one({ "hash" : reading_hash })
         response    = render_template("reading.html", reading=reading)
-    except:
-        return errors["error_for_unknown_reason"]
+    except Exception as e:
+        raise e
     else:
         return response
 
@@ -171,7 +171,7 @@ def message():
         return errors["invalidData"]
     except "invalid_context":
         return errors["invalid_context"]
-    except:
-        return errors["error_for_unknown_reason"]
+    except Exception as e:
+        raise e
     else:
         return errors["OK"]
