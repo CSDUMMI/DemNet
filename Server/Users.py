@@ -12,6 +12,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 from pymongo import MongoClient
+import pymongo
 import datetime, sys, json
 
 client = MongoClient()
@@ -137,19 +138,13 @@ Returns:
 True if successfull
 False if not
 """
-def publish(message, keys):
-    if body != False:
+def publish(message):
+    if message['body'] != False:
         # 2. Publish it in demnet.messages
         messages = db.messages
-        message['body'] = body
-        message['hash'] = SHA256.new(json.dumps(body).encode('utf-8')).hexdigest()
-        message['upload_time'] = messages.find().sort("upload_time", pymongo.DESCENDING).limit(1)[0] + 1 # Some inconsistent (race condition) is possible, but not critical.
+        message['hash'] = SHA256.new(json.dumps(message['body']).encode('utf-8')).hexdigest()
+        message['upload_time'] = messages.find().sort("upload_time", pymongo.DESCENDING).limit(1)[0]["upload_time"] + 1 # Some inconsistent (race condition) is possible, but not critical.
         messages.insert_one(message)
 
-        # 3. Add a notification to the recipient's feed
-        for recipient_name in message['to']:
-            users.update_one({ "username" : recipient_name }
-                             , { "$push" : { "feed" : message["hash"] } }
-                            )
         return True
     return False
