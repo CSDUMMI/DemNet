@@ -154,6 +154,9 @@ def vote():
 @app.route("/message", methods=["POST"])
 def message():
     try:
+        if not session.get("username") or not session.get("keys"):
+            raise "invalid_context"
+
         author      = session["username"]
         body        = json.loads(request.values["body"])
         keys        = session["keys"]
@@ -165,8 +168,10 @@ def message():
         Users.publish( message, keys )
 
     except KeyError:
-        return invalidData + invalidContext
+        return errors["invalidData"]
+    except "invalid_context":
+        return errors["invalid_context"]
     except:
-        return catch_all_error
+        return errors["error_for_unknown_reason"]
     else:
-        return ok
+        return errors["OK"]
