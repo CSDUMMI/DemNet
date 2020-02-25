@@ -14,11 +14,12 @@ app = Flask( __name__
 app.secret_key = os.environ["SECRET_KEY"]
 
 # Errors
-ok                      = "0"
-catch_all_error         = "1"
-invalid_data            = "2"
-invalid_context         = "3"
-not_logged_in           = "4"
+ok                          = "0"
+error_for_unknown_reason    = "1"
+error_but_not               = "2"
+invalid_data                = "3"
+invalid_context             = "4"
+not_logged_in               = "5"
 
 """
 Returns either the login.html
@@ -30,7 +31,7 @@ So you can use /read/<hash> to get to reading that upload.
 """
 @app.route("/", methods=["GET"])
 def index():
-    if session.get("username"):
+    try:
         client      = MongoClient()
         db          = client.demnet
         messages    = db.messages
@@ -39,32 +40,40 @@ def index():
         for message in messages:
             messages_.append({ "title" : message["title"], "hash" : message["hash"] })
 
-        return render_template("index.html", messages=messages_)
+        response =  render_template ( "index.html"
+                                    , messages  = messages_
+                                    , logged_in = session.get("username") != None
+                                    )
+
+    except:
+        return error_for_unknown_reason
     else:
-        return redirect("/login")
+        return response
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == "GET":
-        return render_template("login.html")
-    elif request.method == "POST":
-        username = request.values.get("username")
-        password = request.values.get("password")
+    try:
+        if request.method == "GET":
+            return render_template("login.html")
+        elif request.method == "POST":
+            username = request.values["username"]
+            password = request.values["password"]
 
-        if not session.get("keys") and username and password:
-            sha3_256 = SHA3_256.new()
+            sha3_256            = SHA3_256.new()
             sha3_256.update(password.encode('utf-8'))
-            passphrase = sha3_256.hexdigest()
-            keys = Users.login(username,passphrase)
-            if not keys:
-                return invalidData
-            else:
-                session["keys"] = keys
-                session["SHA3-256_passphrase"] = passphrase
-                session["username"] = username
-                return ok
-        else:
-            return redirect("/login")
+            passphrase          = sha3_256.hexdigest()
+            keys                = Users.login( username, passphrase )
+            session["keys"]     = keys
+            session["username"] = username
+            response            = redirect("/")
+
+    except KeyError:
+        return invalid_data
+    except:
+        return error_for_unknown_reason
+    else:
+        return response
 
 """
 Returns the readings-index.html template
@@ -74,17 +83,21 @@ with template argument:
 """
 @app.route("/readings", methods=["GET"])
 def readings():
-    if session.get("username"):
+    try:
         client      = MongoClient()
         db          = client.demnet
         messages    = db.messages
-        readings    = users.find_one({ "username" : session["username" ] })["readings"]
+        readings    = users.find_one({ "username" : session["username"] })["readings"]
         readings    = [messages.find_one({ "hash" : reading }) for reading in readings]
         readings    = [(reading["body"]["title"], reading["hash"]) for reading in readings]
-
-        return render_template("readings-index.html", readings=readings)
-    else:
+        response    = render_template("readings-index.html", readings=readings)
+    except KeyError:
         return not_logged_in
+    except:
+        return error_but_not + not_logged_in
+    else:
+        return response
+
 """
 Returns the reading.html template
 with argument:
