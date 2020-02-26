@@ -32,6 +32,8 @@ errors = { "OK"                         : "0"
          , "not_logged_in"              : "5"
          , "invalid_user"               : "6"
          , "already_registered"         : "7"
+         , "no_user_with_that_name"     : "8"
+         , "invalid_password"           : "9"
          }
 
 errors = { key : errors[key] if not debug else key for key in errors }
@@ -72,18 +74,22 @@ def login():
             return render_template("login.html")
         elif request.method == "POST":
             username = request.values["username"]
-            password = request.values["password"]
+            password = SHA256.new(request.values["password"].encode("utf-8")).hexdigest()
 
-            sha3_256            = SHA3_256.new()
-            sha3_256.update(password.encode('utf-8'))
-            passphrase          = sha3_256.hexdigest()
-            keys                = Users.login( username, passphrase )
-            session["keys"]     = keys
-            session["username"] = username
+            user = users.find_one({ "username" : username })
+            if user:
+                if password in user["passwords"]:
+                    session["username"] = username
+                else:
+                    raise Invalid_Data("invalid_password")
+            else:
+                raise Invalid_Data("no_user_with_that_name")
             response            = redirect("/")
 
     except KeyError:
         return errors["invalid_data"]
+    except Invalid_Data as e:
+        return errors[e.args[0]]
     except Exception as e:
         raise e
     else:
