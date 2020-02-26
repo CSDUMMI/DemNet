@@ -5,7 +5,8 @@ from flask import Flask, request, render_template, session, redirect
 import pymongo
 from pymongo import MongoClient
 import json, os
-from Crypto.Hash import SHA3_256
+from Crypto.Hash import SHA3_256, SHA256
+from Crypto.PublicKey import RSA
 
 app = Flask( __name__
            , static_url_path="/static"
@@ -201,3 +202,28 @@ def message():
         raise e
     else:
         return errors["OK"]
+
+# REGISTRATION
+
+def register(username : str
+            ,id_token : str
+            , passwords : List[str]
+            , first_name : str
+            , last_name : str
+            ):
+    id              = SHA256.new(id_token.encode("utf-8")).hexdigest()
+    passwords       = [SHA256.new(password.encode("utf-8")) for password in passwords]
+    keys            = RSA.generate(2048)
+    private_keys    = [keys.export_key(passphrase=password) for password in passwords]
+    public_key      = keys.publickey().export_key()
+    user            =   { "username"        : username
+                        , "id"              : id
+                        , "passwords"       : passwords
+                        , "first_name"      : first_name
+                        , "last_name"       : last_name
+                        , "public_key"      : public_key
+                        , "private_keys"    : private_keys
+                        , "readings"        : []
+                        , "writings"        : []
+                        , "expiration"      : 
+                        }

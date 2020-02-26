@@ -97,11 +97,13 @@ A Law Document looks like this:
 ```
 
 # users
-For every Registered user there is a
-Public and Private PGP Key (GnuPG):
+For every Registered user there is a private and public key.
+The private key is encrypted with each of the users three passwords.
+This makes it possible to use private keys with each of them
 ```json
 { "public_key" : "<RSA Public Key>"
-, "private_key" : "<Encrypted RSA Private Key>"
+, "private_keys" : ["<Encrypted RSA Private Key>"]
+, "passwords" : ["<passwords>"]
 , "username" : "<unique username>"
 , "first_name" : "<first real name>"
 , "last_name" : "<last real name>"

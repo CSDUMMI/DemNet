@@ -32,7 +32,7 @@ def login(username, passphrase):
         if keys.publickey().export_key(format="PEM") != user["public_key"]:
             users.update_one({ "username" : username }, { "$set" : { "public_key"  : keys.publickey().export_key(format="PEM") } } )
 
-        if datetime.datetime.strptime(user["expiration"], "%m/%d/%Y") > datetime.datetime.now():
+        if datetime.date.fromisoformat(user["expiration"]) > datetime.datetime.now():
 
             new_keys = RSA.generate(2048)
             new_expiration = datetime.timedelta (weeks=104
@@ -44,8 +44,9 @@ def login(username, passphrase):
                                                 ,microseconds=0
                                                 ) + datetime.datetime.now()
 
-            private_key = new_keys.export_key(format="PEM", passphrase=passphrase)
-            public_key  = new_keys.publickey().export_key(format="PEM")
+            new_expiration  = new_expiration.isoformat()
+            private_key     = new_keys.export_key(format="PEM", passphrase=passphrase)
+            public_key      = new_keys.publickey().export_key(format="PEM")
 
 
             users.update_one(   { "username" : username }
