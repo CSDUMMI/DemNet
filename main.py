@@ -188,9 +188,7 @@ def vote():
             response = errors["OK"]
     except Error as e:
         return e.status()
-    except KeyError:
-        return errors["invalid_data"]
-    except TypeError:
+    except (KeyError, TypeError):
         return errors["invalid_data"]
     except Exception as e:
         raise e
