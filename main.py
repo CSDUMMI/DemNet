@@ -169,14 +169,16 @@ def vote():
                 raise Error("invalid_context")
             username = session["username"]
             hash     = request.values['hash']
-            vote     = request.values['vote']
+            vote     = json.loads(request.values['vote'])
 
             # Don't make or use encryption for voting **yet**
             election = elections.find_one({ "hash" : hash })
             if election:
                 if username not in election["participants"]:
-                    election["participants"].append(username)
-                    election["votes"].append(vote)
+                    elections.update({ "$push" :    { "participants"    : username
+                                                    , "votes"           : vote
+                                                    }
+                                })
                 else:
                     raise Error("already_voted")
             else:
