@@ -38,7 +38,7 @@ class Error_for_unknown_reason (Exception): pass
 class Invalid_Context (Exception): pass
 class Invalid_Data (Exception): pass
 class Invalid_User (Exception): pass
-
+class Already_Registered (Exception): pass
 
 @app.route("/", methods=["GET"])
 def index():
@@ -212,29 +212,41 @@ def register(username       : str
             , first_name    : str
             , last_name     : str
             ):
-    id              = SHA256.new(id_token.encode("utf-8")).hexdigest()
-    passwords       = [SHA256.new(password.encode("utf-8")) for password in passwords]
-    keys            = RSA.generate(2048)
-    private_keys    = [keys.export_key(passphrase=password) for password in passwords]
-    public_key      = keys.publickey().export_key()
-    user            =   { "username"        : username
-                        , "id"              : id
-                        , "passwords"       : passwords
-                        , "first_name"      : first_name
-                        , "last_name"       : last_name
-                        , "public_key"      : public_key
-                        , "private_keys"    : private_keys
-                        , "readings"        : []
-                        , "writings"        : []
-                        , "expiration"      : (datetime.timedelta (weeks=104
-                                                            ,days=0
-                                                            ,hours=0
-                                                            ,minutes=0
-                                                            ,seconds=0
-                                                            ,milliseconds=0
-                                                            ,microseconds=0
-                                                            ) + datetime.datetime.now()).isoformat()
-                        }
+    try:
+        id              = SHA256.new(id_token.encode("utf-8")).hexdigest()
+        passwords       = [SHA256.new(password.encode("utf-8")) for password in passwords]
+        keys            = RSA.generate(2048)
+        private_keys    = [keys.export_key(passphrase=password) for password in passwords]
+        public_key      = keys.publickey().export_key()
+        user            =   { "username"        : username
+                            , "id"              : id
+                            , "passwords"       : passwords
+                            , "first_name"      : first_name
+                            , "last_name"       : last_name
+                            , "public_key"      : public_key
+                            , "private_keys"    : private_keys
+                            , "readings"        : []
+                            , "writings"        : []
+                            , "expiration"      : (datetime.timedelta (weeks=104
+                                                                ,days=0
+                                                                ,hours=0
+                                                                ,minutes=0
+                                                                ,seconds=0
+                                                                ,milliseconds=0
+                                                                ,microseconds=0
+                                                                ) + datetime.datetime.now()).isoformat()
+                            }
+
+        if users.find_one({ "id" : id }):
+            raise Already_Registered
+
+    except Exception as e:
+        raise e
+    else:
+        return True
+
+
+
 
 # CRYPTOGRAPHY
 from Crypto.Cipher      import AES, PKCS1_OAEP
@@ -245,18 +257,22 @@ from Crypto.Signature   import pkcs1_15
 Returns : (Signed encryption key, AES Nonce, tag, ciphertext)
 """
 def encrypt(message : str, recipient_keys : RSA.RsaKey):
+    try:
+        # Create and encrypt AES Key
+        aes_session_key = get_random_bytes(16)
+        cipher_rsa      = PKCS1_OAEP.new(recipient_keys)
+        enc_session_key = cipher_rsa.encrypt(aes_session_key)
 
-    # Create and encrypt AES Key
-    aes_session_key = get_random_bytes(16)
-    cipher_rsa      = PKCS1_OAEP.new(recipient_keys)
-    enc_session_key = cipher_rsa.encrypt(aes_session_key)
+        # Encrypt using previously generated AES Key.
+        cipher_aes      = AES.new(aes_session_key, AES.MODE_EAX)
+        ciphertext, tag = cipher_aes.encrypt_and_digest(message.encode("utf-8"))
+    except Exception as e:
+        raise e
+    else:
+        return (enc_session_key, cipher_aes.nonce, tag, ciphertext)
 
-    # Encrypt using previously generated AES Key.
-    cipher_aes      = AES.new(aes_session_key, AES.MODE_EAX)
-    ciphertext, tag = cipher_aes.encrypt_and_digest(message.encode("utf-8"))
 
-    return (enc_session_key, cipher_aes.nonce, tag, ciphertext)
-
+"""Decrypt 
 """Return signed hash of a string with private key.
 Returns : (signature : bytes, hash : SHA256)
 """
