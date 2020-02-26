@@ -30,6 +30,7 @@ errors = { "OK"                         : "0"
          , "invalid_context"            : "4"
          , "not_logged_in"              : "5"
          , "invalid_user"               : "6"
+         , "already_registered"         : "7"
          }
 
 errors = { key : errors[key] if not debug else key for key in errors }
@@ -206,8 +207,33 @@ def message():
 
 # REGISTRATION
 
-def register(username       : str
-            ,id_token       : str
+@app.route("/register", methods=["GET","POST"])
+def register_route():
+    try:
+        if request.method == "GET":
+            response    = render_template("register.html")
+        else:
+            if session["username"] != "joris":
+                raise Invalid_Context
+            else:
+                username    = request.values["username"]
+                id          = request.values["id"]
+                passwords   = json.loads(request.values["passwords"])
+                first_name  = request.values["first_name"]
+                last_name   = request.values["last_name"]
+                response    = register(username, id, passwords, first_name, last_name)
+                response    = errors["OK"] if response else  errors["error_for_unknown_reason"]
+    except Invalid_Context:
+        return errors["invalid_context"]
+    except Already_Registered:
+        return errors["already_registered"]
+    except Exception as e:
+        raise e
+    else:
+        return response
+
+def register( username      : str
+            , id_token      : str
             , passwords     : List[str]
             , first_name    : str
             , last_name     : str
@@ -237,9 +263,10 @@ def register(username       : str
                                                                 ) + datetime.datetime.now()).isoformat()
                             }
 
-        if users.find_one({ "id" : id }):
+        if users.find_one({ "id" : id }) or users.find_one({ "username" : username }):
             raise Already_Registered
-
+        else:
+            users.insert_one(user)
     except Exception as e:
         raise e
     else:
