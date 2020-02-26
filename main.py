@@ -272,7 +272,29 @@ def encrypt(message : str, recipient_keys : RSA.RsaKey):
         return (enc_session_key, cipher_aes.nonce, tag, ciphertext)
 
 
-"""Decrypt 
+"""Inverse of encrypt and takes the results of encrypt and the private key of the recipient.
+"""
+def decrypt (recipients_private_key : RSA.RsaKey
+            , enc_session_key : bytes
+            , nonce : bytes
+            , tag : bytes
+            , ciphertext : bytes
+            ):
+    try:
+        rsa_cipher      = PKCS1_OAEP.new(recipients_private_key)
+        aes_session_key = cipher_rsa.decrypt(enc_session_key)
+
+        cipher_aes      = AES.new(aes_session_key, AES.MODE_EAX , nonce=nonce)
+        message         = cipher_aes.decrypt_and_verify(ciphertext, tag)
+
+
+    except ValueError:
+        return False
+    except Exception as e:
+        raise e
+    else:
+        return message
+
 """Return signed hash of a string with private key.
 Returns : (signature : bytes, hash : SHA256)
 """
