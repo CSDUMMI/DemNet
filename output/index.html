@@ -7,10 +7,10 @@
   </head>
   <body>
      <form id="mitte">
-     <h2>| Die post und vorschläge anderer personen die am meisten gelikt wurden |</h2>
+     {% for message in messages %}
+      <a href="/read/{{ message.hash }}"> <h2>{{ message.title }} </h2> </a>
+     {% endfor %}
      </form>
-
-
 
       <ul>
       <li><a href="/">Feed</a></li>
