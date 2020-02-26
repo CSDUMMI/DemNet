@@ -7,6 +7,7 @@ from pymongo import MongoClient
 import json, os
 from Crypto.Hash import SHA3_256, SHA256
 from Crypto.PublicKey import RSA
+from typing import List
 
 app = Flask( __name__
            , static_url_path="/static"
@@ -205,11 +206,11 @@ def message():
 
 # REGISTRATION
 
-def register(username : str
-            ,id_token : str
-            , passwords : List[str]
-            , first_name : str
-            , last_name : str
+def register(username       : str
+            ,id_token       : str
+            , passwords     : List[str]
+            , first_name    : str
+            , last_name     : str
             ):
     id              = SHA256.new(id_token.encode("utf-8")).hexdigest()
     passwords       = [SHA256.new(password.encode("utf-8")) for password in passwords]
@@ -225,5 +226,53 @@ def register(username : str
                         , "private_keys"    : private_keys
                         , "readings"        : []
                         , "writings"        : []
-                        , "expiration"      : 
+                        , "expiration"      : (datetime.timedelta (weeks=104
+                                                            ,days=0
+                                                            ,hours=0
+                                                            ,minutes=0
+                                                            ,seconds=0
+                                                            ,milliseconds=0
+                                                            ,microseconds=0
+                                                            ) + datetime.datetime.now()).isoformat()
                         }
+
+# CRYPTOGRAPHY
+from Crypto.Cipher      import AES, PKCS1_OAEP
+from Crypto.Random      import get_random_bytes
+from Crypto.Signature   import pkcs1_15
+
+"""Encrypt string with AES Key and encrypt them with recipients public key.
+Returns : (Signed encryption key, AES Nonce, tag, ciphertext)
+"""
+def encrypt(message : str, recipient_keys : RSA.RsaKey):
+
+    # Create and encrypt AES Key
+    aes_session_key = get_random_bytes(16)
+    cipher_rsa      = PKCS1_OAEP.new(recipient_keys)
+    enc_session_key = cipher_rsa.encrypt(aes_session_key)
+
+    # Encrypt using previously generated AES Key.
+    cipher_aes      = AES.new(aes_session_key, AES.MODE_EAX)
+    ciphertext, tag = cipher_aes.encrypt_and_digest(message.encode("utf-8"))
+
+    return (enc_session_key, cipher_aes.nonce, tag, ciphertext)
+
+"""Return signed hash of a string with private key.
+Returns : (signature : bytes, hash : SHA256)
+"""
+def sign(message : str, author_key : RSA.RsaKey):
+    hash        = SHA256.new(message.encode("utf-8")).hexdigest()
+    signature   = pkcs1_15.new(author_key).sign(hash)
+    return (signature, hash)
+
+"""Verify a message signed by sign().
+"""
+def verify(signature : bytes, hash : SHA256, author_public_key : RSA.RsaKey):
+    try:
+        pkcs1_15.new(author_public_key).verify(hash, signature)
+    except ValueError:
+        return False
+    except Exception as e:
+        raise e
+    else:
+        return True
