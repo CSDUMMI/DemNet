@@ -32,6 +32,10 @@ errors = { "OK"                         : "0"
 
 errors = { key : errors[key] if not debug else key for key in errors }
 
+class Error_for_unknown_reason (Exception): pass
+class Invalid_Context (Exception): pass
+class Invalid_Data (Exception): pass
+class Invalid_User (Exception): pass
 
 
 @app.route("/", methods=["GET"])
@@ -149,8 +153,8 @@ def vote():
         else:
             app.logger.setLevel(100)
 
-            if session.get("username"):
-                raise "invalid_context"
+            if not session.get("username"):
+                raise Invalid_Context()
             username = session["username"]
             hash     = request.values['hash']
             vote     = request.values['vote']
@@ -158,10 +162,14 @@ def vote():
             Elections.vote(election, vote, username)
             app.logger.setLevel(0)
             response = errors["OK"]
-    except "invalid_context":
+    except Invalid_Context:
         return errors["invalid_context"]
     except KeyError:
         return errors["invalid_data"]
+    except TypeError:
+        return errors["invalid_data"]
+    except Exception as e:
+        raise e
     else:
         return response
 
