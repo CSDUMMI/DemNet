@@ -17,6 +17,7 @@ client              = MongoClient()
 db                  = client.demnet
 messages            = db.messages
 users               = db.users
+elections           = db.elections
 
 # Errors
 debug                       = os.environ.get("DEBUG")
@@ -26,6 +27,7 @@ errors = { "OK"                         : "0"
          , "invalid_data"               : "3"
          , "invalid_context"            : "4"
          , "not_logged_in"              : "5"
+         , "invalid_user"               : "6"
          }
 
 errors = { key : errors[key] if not debug else key for key in errors }
@@ -35,13 +37,15 @@ errors = { key : errors[key] if not debug else key for key in errors }
 @app.route("/", methods=["GET"])
 def index():
     try:
-        sorted_messages     = sorted(list(messages.find({})),key=lambda m: m["upload_time"], reverse=True)
+        messages_count      = 10
+        sorted_messages     = list(messages.find({}))
+        upload_time_cut     = max(sorted_messages,key=lambda m: m["upload_time"])["upload_time"] - messages_count
+        sorted_messages     = list(filter(lambda m: m["upload_time"] >= upload_time_cut, sorted_messages))
         sorted_messages     = list(map( lambda m:       { "title" : m["body"]["title"]
                                                         , "hash" : m["hash"] }
                                                         , sorted_messages
                                     )
                                 )
-        print(sorted_messages)
         response =  render_template ( "index.html"
                                     , messages  = sorted_messages
                                     , logged_in = session.get("username") != None
@@ -110,9 +114,23 @@ def writings():
 def read(reading_hash):
     try:
         reading     = messages.find_one({ "hash" : reading_hash })
-        response    = render_template("reading.html", reading=reading)
+        response    = render_template("read.html", reading=reading)
     except Exception as e:
         raise e
+    else:
+        return response
+
+@app.route("/write/<writing_hash>", methods=["GET"])
+def write():
+    try:
+        writing     = messages.find_one({ "hash" : writing_hash })
+
+        if session["username"] == writing["author"]:
+            response    = render_template("write.html", writing=writing)
+        else:
+            response    = errors["invalid_user"]
+    except KeyError:
+        return errors["invalid_context"]
     else:
         return response
 
@@ -120,25 +138,32 @@ def read(reading_hash):
 ############################ CRITICAL #############################
 ###################################################################
 
-@app.route("/vote", methods=["POST"])
+@app.route("/vote", methods=["POST", "GET"])
 def vote():
     try:
-        app.logger.setLevel(100)
+        if request.method == "GET":
+            election    = request.values['hash']
+            election    = elections.find_one({ "hash" : election })
+            election    = { key : election[key] for key in election if (key == "title" or key == "options") }
+            response    = render_template("vote.html", election=election)
+        else:
+            app.logger.setLevel(100)
 
-        if session.get("username"):
-            raise "invalid_context"
-        username = session["username"]
-        election = request.values['election']
-        vote     = request.values['vote']
+            if session.get("username"):
+                raise "invalid_context"
+            username = session["username"]
+            hash     = request.values['hash']
+            vote     = request.values['vote']
 
-        Elections.vote(election, vote, username)
-        app.logger.setLevel(0)
+            Elections.vote(election, vote, username)
+            app.logger.setLevel(0)
+            response = errors["OK"]
     except "invalid_context":
         return errors["invalid_context"]
     except KeyError:
         return errors["invalid_data"]
     else:
-        return errors["OK"]
+        return response
 
 ###################################################################
 ############################ /CRITICAL ############################
