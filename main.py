@@ -34,15 +34,15 @@ errors = { "OK"                         : "0"
          , "already_registered"         : "7"
          , "no_user_with_that_name"     : "8"
          , "invalid_password"           : "9"
+         , "already_voted"              : "A"
          }
 
 errors = { key : errors[key] if not debug else key for key in errors }
 
-class Error_for_unknown_reason (Exception): pass
-class Invalid_Context (Exception): pass
-class Invalid_Data (Exception): pass
-class Invalid_User (Exception): pass
-class Already_Registered (Exception): pass
+class Error (Exception):
+    def status(self):
+        return errors[self.args[0]]
+
 
 @app.route("/", methods=["GET"])
 def index():
@@ -81,15 +81,15 @@ def login():
                 if password in user["passwords"]:
                     session["username"] = username
                 else:
-                    raise Invalid_Data("invalid_password")
+                    raise Error("invalid_password")
             else:
                 raise Invalid_Data("no_user_with_that_name")
             response            = redirect("/")
 
     except KeyError:
         return errors["invalid_data"]
-    except Invalid_Data as e:
-        return errors[e.args[0]]
+    except Error as e:
+        return e.status()
     except Exception as e:
         raise e
     else:
@@ -142,7 +142,9 @@ def write():
         if session["username"] == writing["author"]:
             response    = render_template("write.html", writing=writing)
         else:
-            response    = errors["invalid_user"]
+            raise Error("invalid_user")
+    except Error as e:
+        return e.status()
     except KeyError:
         return errors["invalid_context"]
     else:
@@ -164,16 +166,26 @@ def vote():
             app.logger.setLevel(100)
 
             if not session.get("username"):
-                raise Invalid_Context()
+                raise Error("invalid_context")
             username = session["username"]
             hash     = request.values['hash']
             vote     = request.values['vote']
 
-            Elections.vote(election, vote, username)
+            # Don't make or use encryption for voting **yet**
+            election = elections.find_one({ "hash" : hash })
+            if election:
+                if username not in election["participants"]:
+                    election["participants"].append(username)
+                    election["votes"].append(vote)
+                else:
+                    raise Error("already_voted")
+            else:
+                raise Error("invalid_context")
+
             app.logger.setLevel(0)
             response = errors["OK"]
-    except Invalid_Context:
-        return errors["invalid_context"]
+    except Error as e:
+        return e.status()
     except KeyError:
         return errors["invalid_data"]
     except TypeError:
@@ -191,7 +203,7 @@ def vote():
 def message():
     try:
         if not session.get("username") or not session.get("keys"):
-            raise "invalid_context"
+            raise Error("invalid_context")
 
         author      = session["username"]
         body        = json.loads(request.values["body"])
@@ -204,9 +216,9 @@ def message():
         Users.publish( message, keys )
 
     except KeyError:
-        return errors["invalidData"]
-    except "invalid_context":
-        return errors["invalid_context"]
+        return errors["invalid_data"]
+    except Error as e:
+        return e.status()
     except Exception as e:
         raise e
     else:
@@ -221,7 +233,7 @@ def register_route():
             response    = render_template("register.html")
         else:
             if session["username"] != "joris":
-                raise Invalid_Context
+                raise Error("invalid_context")
             else:
                 username    = request.values["username"]
                 id          = request.values["id"]
@@ -230,10 +242,8 @@ def register_route():
                 last_name   = request.values["last_name"]
                 response    = register(username, id, passwords, first_name, last_name)
                 response    = errors["OK"] if response else  errors["error_for_unknown_reason"]
-    except Invalid_Context:
-        return errors["invalid_context"]
-    except Already_Registered:
-        return errors["already_registered"]
+    except Error as e:
+        return e.status()
     except Exception as e:
         raise e
     else:
@@ -266,7 +276,7 @@ def register( username      : str
                             }
 
         if users.find_one({ "id" : id }) or users.find_one({ "username" : username }):
-            raise Already_Registered
+            raise Error("already_registered")
         else:
             users.insert_one(user)
     except Exception as e:
