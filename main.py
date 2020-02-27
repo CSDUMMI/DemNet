@@ -206,6 +206,72 @@ def write(writing_hash):
     else:
         return response
 
+"""
+# The three stage process of an election.
+The last step of an election is clear, the vote.
+But before that can happen two other steps have to prepare the vote.
+
+0. Proposing the vote
+Here a problem is explained.
+This can be in form of a simple title
+or a long study, containing reasoning,
+technical details and a concret case for why this problem needs addressing.
+
+1. Collecting options
+After the problem has been detailed, everybody is free to create a solution
+and propose it as an option.
+
+2. Voting
+Now every user is held to vote on the issue and select
+the best solution to the problem.
+
+The first stage can take as long as it wants.
+One can research an issue for years and deliver an extremely
+detailed proposal for the issue, but once it is detailed and
+officially proposed, the solutions must be proposed over a one
+month period.
+It is  thus a good advice to anyone proposing a
+problem to have published their results long enough beforehand,
+so a solution can be developed.
+
+After the one month period, voting opens and for 2 weeks voters
+can cast their votes.
+
+In conclusion:
+
+0. Proposing the vote   : as much time as it needs
+1. Collecting options   : 4 weeks
+2. Voting               : 2 weeks
+"""
+
+@app.route("/voting/propose", methods=["GET", "POST"])
+def propose_vote():
+    try:
+        if request.method == "GET":
+            response        = render_template("propose_vote.html")
+        else:
+            if not session.get("username"):
+                raise Errors("not_logged_in")
+            else:
+                title           =   request.values["title"]
+                description     =   request.values["description"]
+                vote            =   { "title"           : title
+                                    , "description"     : description
+                                    , "stage"           : 0
+                                    , "author"          :
+                                    }
+                vote["id"]      =   SHA256.new(json.dumps(vote).encode("utf-8")).hexdigest()
+                elections.insert_one(vote)
+                response    = redirect(f"/voting/option/{vote["id"]}")
+
+    except Error as e:
+        return e.status()
+    except KeyError:
+        return errors["invalid_data"]
+    except Exception as e:
+        raise e
+    else:
+        return response
 ###################################################################
 ############################ CRITICAL #############################
 ###################################################################
