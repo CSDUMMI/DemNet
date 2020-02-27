@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 
+# OWN MODULES
 from Server import Elections, Patches, Users
+# FLASK
 from flask import Flask, request, render_template, session, redirect
+# MONGODB
 import pymongo
 from pymongo import MongoClient
-import json, os
+# PYCRYPTODOME
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
+# UITILS
 from typing import List
-import datetime
+import json, os, datetime, random
 
 app = Flask( __name__
            , static_url_path="/static"
@@ -128,11 +132,47 @@ def writings():
 def read(reading_hash):
     try:
         reading     = messages.find_one({ "hash" : reading_hash })
-        response    = render_template("read.html", reading=reading)
+        if reading["draft"]:
+            raise Error("invalid_context")
+        else:
+            response    = render_template("read.html", reading=reading)
+    except Error as e:
+        return e.status()
     except Exception as e:
         raise e
     else:
         return response
+
+@app.route("/write", methods=["GET","POST"])
+def write_new():
+    try:
+        if request.method =="GET":
+            response    = render_template("write.html", writing={})
+        else:
+            title       = request.values["title"]
+            content     = request.values["content"]
+            author      = session["username"]
+            user_author = users.find_one({ "username" : author })
+            hash        = f"{author}#{str(random.randint(0,99999)).zfill(5)}" #temporary, while files is still changing
+            message     =   { "body"    :   { "title"   : title
+                                            , "content" : content
+                                            }
+                            , "from"    :  author
+                            , "hash"    : hash
+                            , "draft"   : True
+                            }
+            messages.insert_one(message)
+            response    = errors["OK"]
+    except KeyError:
+        return errors["invalid_user"]
+    except Error as e:
+        return e.status()
+    except Exception as e:
+        raise e
+    else:
+        return response
+
+
 
 @app.route("/write/<writing_hash>", methods=["GET"])
 def write(writing_hash):
