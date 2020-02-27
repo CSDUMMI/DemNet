@@ -272,6 +272,15 @@ def propose_vote():
         raise e
     else:
         return response
+
+@app.route("/voting/option/<vote_id>", methods=["GET,POST"])
+def propose_option():
+    try:
+        pass
+    except Exception as e:
+        raise
+    else:
+        pass
 ###################################################################
 ############################ CRITICAL #############################
 ###################################################################
