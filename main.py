@@ -135,7 +135,7 @@ def read(reading_hash):
         return response
 
 @app.route("/write/<writing_hash>", methods=["GET"])
-def write():
+def write(writing_hash):
     try:
         writing     = messages.find_one({ "hash" : writing_hash })
 
