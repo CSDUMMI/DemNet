@@ -157,7 +157,7 @@ def write_new():
             message     =   { "body"    :   { "title"   : title
                                             , "content" : content
                                             }
-                            , "from"    :  author
+                            , "from"    : author
                             , "hash"    : hash
                             , "draft"   : True
                             }
@@ -174,15 +174,30 @@ def write_new():
 
 
 
-@app.route("/write/<writing_hash>", methods=["GET"])
+@app.route("/write/<writing_hash>", methods=["GET", "POST"])
 def write(writing_hash):
     try:
-        writing     = messages.find_one({ "hash" : writing_hash })
+        if request.method == "GET":
+            writing     = messages.find_one({ "hash" : writing_hash })
 
-        if session["username"] == writing["author"]:
-            response    = render_template("write.html", writing=writing)
+            if session["username"] == writing["author"]:
+                response    = render_template("write.html", writing=writing)
+            else:
+                raise Error("invalid_user")
         else:
-            raise Error("invalid_user")
+            hash                = request.values["hash"]
+            message             = messages.find_one({"hash" : hash})
+            message["title"]    = request.values["title"]
+            message["content"]  = request.values["content"]
+            publish             = request.values["publish"] == "1"
+
+            if publish:
+                message["hash"]     = SHA256.new(json.dumps(message).encode("utf-8")).hexdigest()
+                message["draft"]    = not publish
+                messages.replace_one({ "hash" : hash }, message)
+            else:
+                messages.update_one({ "hash" : hash }, message)
+
     except Error as e:
         return e.status()
     except KeyError:
