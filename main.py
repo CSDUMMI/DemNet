@@ -161,8 +161,9 @@ def write_new():
                             , "hash"    : hash
                             , "draft"   : True
                             }
+
             messages.insert_one(message)
-            response    = errors["OK"]
+            response    = redirect(f"/write/{hash}")
     except KeyError:
         return errors["invalid_user"]
     except Error as e:
