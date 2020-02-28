@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # OWN MODULES
-from Server import Elections, Patches, Users
+from Server import Elections, Patches, Users, Type_checks
 # FLASK
 from flask import Flask, request, render_template, session, redirect
 # MONGODB
@@ -257,8 +257,8 @@ def propose_vote():
                 description     =   request.values["description"]
                 vote            =   { "title"           : title
                                     , "description"     : description
-                                    , "stage"           : 0
-                                    , "author"          :
+                                    , "stage"           : 1
+                                    , "author"          : session["username"]
                                     }
                 vote["id"]      =   SHA256.new().update(json.dumps(vote)).encode("utf-8")).hexdigest()
                 elections.insert_one(vote)
@@ -274,7 +274,7 @@ def propose_vote():
         return response
 
 @app.route("/voting/option/<vote_id>", methods=["GET,POST"])
-def propose_option():
+def propose_option(vote_id):
     try:
         if request.method == "GET":
             response        = render_template("propose_option.html")
@@ -284,18 +284,37 @@ def propose_option():
             else:
                 type_of_option  = request.values["type"]
                 author          = session["username"]
-
-                if type_of_option == "text":
-                    title       = request.values["title"]
-                    description = request.values["description"]
-                    proposal    =   { "additions"  : request.values["additions"]
+                election        = elections.find_one({ "id" : vote_id, "stage" : 1 })
+                if not election:
+                    raise Error("invalid_data")
+                elif type_of_option == "text":
+                    title       =   request.values["title"]
+                    description =   request.values["description"]
+                    additions   =   json.loads(request.values["additions"])
+                    amendments  =   json.loads(request.values["amendments"])
+                    repeals     =   json.loads(request.values["repeals"])
+                    Type_checks.check_dictionary_for_type("additions", additions)
+                    Type_checks.check_dictionary_for_type("amendments", amendments)
+                    Type_checks.check_dictionary_for_type("repeals", repeals)
+                    proposal    =   { "title"           : request.values["title"]
+                                    , "description"     : request.values["description"]
+                                    , "additions"       : additions
+                                    , "amendments"      : amendments
+                                    , "repeals"         : repeals
                                     }
-                else:
 
+                else:
+                    pass
+
+    except json.JSONDecodeError as json_error:
+        # See parsing of the request.values for probable cause.
+        return f"{errors["invalid_data"]} { str(json_error) if os.environ.get("DEBUG") else "JSON Error"}"
+    except Type_Check_Error as type_error:
+        return errors["invalid_data"] + type_error.data_name
     except Exception as e:
-        raise
+        raise e
     else:
-        pass
+        return response
 ###################################################################
 ############################ CRITICAL #############################
 ###################################################################
