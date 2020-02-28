@@ -293,9 +293,9 @@ def propose_option(vote_id):
                     additions   =   json.loads(request.values["additions"])
                     amendments  =   json.loads(request.values["amendments"])
                     repeals     =   json.loads(request.values["repeals"])
-                    Type_checks.check_dictionary_for_type("additions", additions)
-                    Type_checks.check_dictionary_for_type("amendments", amendments)
-                    Type_checks.check_dictionary_for_type("repeals", repeals)
+                    Type_checks.check_for_type("additions", additions)
+                    Type_checks.check_for_type("amendments", amendments)
+                    Type_checks.check_for_type("repeals", repeals)
                     proposal    =   { "title"           : request.values["title"]
                                     , "description"     : request.values["description"]
                                     , "additions"       : additions
