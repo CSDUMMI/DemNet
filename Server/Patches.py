@@ -47,7 +47,7 @@ def close(patcher, patch_name, id, merge=False):
                               , "closed"    : False
                               } )
 
-    repo_path = f"{os.environ['PATCHES']}/{patcher}-{patch_name}"
+    repo_path = path_of_patch(patcher, patch_name, check_existence=False)
     if patch and os.path.isdir(repo_path):
         if merge:
             merge(patcher, patch_name)
@@ -59,6 +59,9 @@ def close(patcher, patch_name, id, merge=False):
     else:
         return False
 
-def path_of_patch(patcher, patch_name):
+def path_of_patch(patcher, patch_name, check_existence=True):
     path    = f"{os.environ["PATCHES"]}/{patcher}-{patch_name}"
-    return path if os.path.isdir(path) else False
+    if check_existence:
+        return path if os.path.isdir(path) else False
+    else:
+        return path
