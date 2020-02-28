@@ -276,7 +276,22 @@ def propose_vote():
 @app.route("/voting/option/<vote_id>", methods=["GET,POST"])
 def propose_option():
     try:
-        pass
+        if request.method == "GET":
+            response        = render_template("propose_option.html")
+        else:
+            if not session.get("author"):
+                raise Error("not_logged_in")
+            else:
+                type_of_option  = request.values["type"]
+                author          = session["username"]
+
+                if type_of_option == "text":
+                    title       = request.values["title"]
+                    description = request.values["description"]
+                    proposal    =   { "additions"  : request.values["additions"]
+                                    }
+                else:
+
     except Exception as e:
         raise
     else:
