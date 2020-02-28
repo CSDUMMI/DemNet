@@ -32,6 +32,14 @@ def create  ( patcher                   : str
 def merge(patcher, patch_name):
     subprocess.run(['bash', 'patch.sh', 'merge', patcher, patch_name])
 
+def lock(patcher, patch_name):
+    path_of_patch   = path_of_patch(patcher,patch_name)
+    if not path_of_patch:
+        return False
+    else:
+        os.chmod(path_of_patch, 0444) # readonly to all
+        return True
+
 """
 Closing a patch means:
 Deleting the Git Repo.

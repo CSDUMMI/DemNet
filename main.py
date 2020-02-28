@@ -25,6 +25,7 @@ db                  = client.demnet
 messages            = db.messages
 users               = db.users
 elections           = db.elections
+patches             = db.patches
 
 # Errors
 debug                       = os.environ.get("DEBUG")
@@ -313,15 +314,34 @@ def propose_option(vote_id):
                     elections.update_one({ "id" : vote_id, "stage" : 1 }, { "$push" : { "options" : option}})
 
                 else:
-                    patcher     = request.values["patcher"]
-                    patch_name  = request.values["patch_name"]
-                    os.exists("")
+                    patcher         = request.values["patcher"]
+                    patch_name      = request.values["patch_name"]
+                    comment         = request.values["comment"]
+                    path_of_patch   = Patches.path_of_patch(patcher, patch_name)
 
+                    if path_of_patch and patcher == session["username"]:
+                        Patches.lock(patcher, patch_name)
+                        patch       = patches.find_one({ "patcher" : patcher, "patch_name" : patch_name })
+                        patch_hash  = patch["hash"]
+                        option      =   { "patch"   : patch_hash
+                                        , "comment" : comment
+                                        }
+                        elections.update_one({ "id" : vote_id, "stage" : 1 }, { "$push" : { "options" : option}})
+
+                    elif not path_of_patch:
+                        raise Error("invalid_data")
+                    else:
+                        raise Error("invalid_user")
+                        
     except json.JSONDecodeError as json_error:
         # See parsing of the request.values for probable cause.
         return f"{errors["invalid_data"]} { str(json_error) if os.environ.get("DEBUG") else "JSON Error"}"
     except Type_Check_Error as type_error:
         return errors["invalid_data"] + type_error.data_name
+    except Error as e:
+        return e.status()
+    except KeyError:
+        return Error("invalid_data").status()
     except Exception as e:
         raise e
     else:
