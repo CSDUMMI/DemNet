@@ -259,6 +259,7 @@ def propose_vote():
                                     , "description"     : description
                                     , "stage"           : 1
                                     , "author"          : session["username"]
+                                    , "options"         : []
                                     }
                 vote["id"]      =   SHA256.new().update(json.dumps(vote)).encode("utf-8")).hexdigest()
                 elections.insert_one(vote)
@@ -285,26 +286,36 @@ def propose_option(vote_id):
                 type_of_option  = request.values["type"]
                 author          = session["username"]
                 election        = elections.find_one({ "id" : vote_id, "stage" : 1 })
+
+                title       =   request.values["title"]
+                description =   request.values["description"]
+
                 if not election:
                     raise Error("invalid_data")
-                elif type_of_option == "text":
-                    title       =   request.values["title"]
-                    description =   request.values["description"]
+                elif type_of_option == "0":
+
+
                     additions   =   json.loads(request.values["additions"])
                     amendments  =   json.loads(request.values["amendments"])
                     repeals     =   json.loads(request.values["repeals"])
+
                     Type_checks.check_for_type("additions", additions)
                     Type_checks.check_for_type("amendments", amendments)
                     Type_checks.check_for_type("repeals", repeals)
-                    proposal    =   { "title"           : request.values["title"]
+
+                    option      =   { "title"           : request.values["title"]
                                     , "description"     : request.values["description"]
                                     , "additions"       : additions
                                     , "amendments"      : amendments
                                     , "repeals"         : repeals
+                                    , "kind"            : 0
                                     }
+                    elections.update_one({ "id" : vote_id, "stage" : 1 }, { "$push" : { "options" : option}})
 
                 else:
-                    pass
+                    patcher     = request.values["patcher"]
+                    patch_name  = request.values["patch_name"]
+                    os.exists("")
 
     except json.JSONDecodeError as json_error:
         # See parsing of the request.values for probable cause.
