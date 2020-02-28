@@ -78,7 +78,7 @@ def login():
             return render_template("login.html")
         elif request.method == "POST":
             username = request.values["username"]
-            password = SHA256.new(request.values["password"].encode("utf-8")).hexdigest()
+            password = SHA256.new().update(request.values["password"].encode("utf-8")).hexdigest()
 
             user = users.find_one({ "username" : username })
             if user:
@@ -193,7 +193,7 @@ def write(writing_hash):
             publish             = request.values["publish"] == "1"
 
             if publish:
-                message["hash"]     = SHA256.new(json.dumps(message).encode("utf-8")).hexdigest()
+                message["hash"]     = SHA256.new().update(json.dumps(message).encode("utf-8")).hexdigest()
                 message["draft"]    = not publish
                 messages.replace_one({ "hash" : hash }, message)
             else:
@@ -260,7 +260,7 @@ def propose_vote():
                                     , "stage"           : 0
                                     , "author"          :
                                     }
-                vote["id"]      =   SHA256.new(json.dumps(vote).encode("utf-8")).hexdigest()
+                vote["id"]      =   SHA256.new().update(json.dumps(vote)).encode("utf-8")).hexdigest()
                 elections.insert_one(vote)
                 response    = redirect(f"/voting/option/{vote["id"]}")
 
@@ -402,8 +402,8 @@ def register( username      : str
             , last_name     : str
             ):
     try:
-        id              = SHA256.new(id_token.encode("utf-8")).hexdigest().encode("utf-8")
-        passwords       = [SHA256.new(password.encode("utf-8")).hexdigest() for password in passwords]
+        id              = SHA256.new().update(id_token.encode("utf-8")).hexdigest().encode("utf-8")
+        passwords       = [SHA256.new().update(password.encode("utf-8")).hexdigest() for password in passwords]
         user            =   { "username"        : username
                             , "id"              : id
                             , "passwords"       : passwords
@@ -481,12 +481,11 @@ def decrypt (recipients_private_key : RSA.RsaKey
         return message
 
 """Return signed hash of a string with private key.
-Returns : (signature : bytes, hash : SHA256)
 """
 def sign(message : str, author_key : RSA.RsaKey):
-    hash        = SHA256.new(message.encode("utf-8")).hexdigest()
+    hash        = SHA256.new().update(message.encode("utf-8")).hexdigest()
     signature   = pkcs1_15.new(author_key).sign(hash)
-    return (signature, hash)
+    return (signature : bytes, hash : SHA256)
 
 """Verify a message signed by sign().
 """
