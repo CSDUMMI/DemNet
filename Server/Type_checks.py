@@ -8,22 +8,25 @@ Dict_Values = TypeVar("Dict_Values")
 def check_for_type(dictionary_name : str, dictionary : Dict[str, Dict_Values]):
     try:
         if dictionary_name == "additions":
-            assert check_for_type(dictionary,   { "title"       : ""
-                                                , "book"        : ""
-                                                , "articles"    : []
-                                                }
+            for addition in dictionary:
+                assert check_for_type(addition,     { "title"       : ""
+                                                    , "book"        : ""
+                                                    , "articles"    : []
+                                                    }
                         )
         elif dictionary == "amendments":
-            assert check_for_type(dictionary,   { "book"        : ""
-                                                , "law"         : ""
-                                                , "articles"    : []
-                                                }
-                        )
+            for amendment in dictionary:
+                assert check_for_type(amendment,    { "book"        : ""
+                                                    , "law"         : ""
+                                                    , "articles"    : []
+                                                    }
+                            )
         elif dictionary == "repeals":
-            assert check_for_type(dictionary,   { "books"       : ""
-                                                , "laws"        : []
-                                                })
-        else:
+            for repeal in repeals:
+                assert check_for_type(repael,       { "books"       : []
+                                                    , "laws"        : []
+                                                    })
+            else:
             raise Type_Check_Error(dictionary_name, "unknown dictionary name")
     except AssertionError as assertion_error:
         raise Type_Check_Error(dictionary_name, assertion_error.args[0])
