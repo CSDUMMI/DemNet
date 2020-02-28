@@ -52,7 +52,7 @@ class Error (Exception):
 def index():
     try:
         messages_count      = 10
-        sorted_messages     = list(messages.find({}))
+        sorted_messages     = list(messages.find({ "draft" : False }))
         upload_time_cut     = max(sorted_messages,key=lambda m: m["upload_time"])["upload_time"] - messages_count
         sorted_messages     = list(filter(lambda m: m["upload_time"] >= upload_time_cut, sorted_messages))
         sorted_messages     = list(map( lambda m:       { "title" : m["body"]["title"]
