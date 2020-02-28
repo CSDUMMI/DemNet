@@ -58,3 +58,7 @@ def close(patcher, patch_name, id, merge=False):
         return True
     else:
         return False
+
+def path_of_patch(patcher, patch_name):
+    path    = f"{os.environ["PATCHES"]}/{patcher}-{patch_name}"
+    return path if os.path.isdir(path) else False
