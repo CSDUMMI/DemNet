@@ -2,70 +2,27 @@
 import subprocess, os, json
 from Crypto.Hash import SHA256
 from pymongo import MongoClient
+from typing import List
 
-"""
-Env Variables:
-$PATCHES : Folder with the Git Repositories of the Patches (format: patcher-patch/)
-$ORIGIN_REPOSITORY : Location of the Original Git Repository, from which patches are cloned from
-and to whom patches are pushed after being approved.
-
-create a patch:
-- clone the origin_repository, as stored in the $ORIGIN_REPOSITORY envvar.
-- create an entry in the collection patches on the demnet database.
-
-This patch needs the following options:
-
-- The name of the patcher, that can either be the username in demnet
-or a pseudonyme chosen by a non-user, which will then be noted in a separate
-variable called "is_user".
-
-- The name of the patch, that should be descriptive (hopefully)
-
-- The simple_description of the patcher's intent.
-This is useful for users, if the patcher wants to hold an election before
-starting development. These users won't often be interested in the technical
-details, for whom this description should suffice.
-
-- The technical_description is for all developers trying to understand
-the patcher's intent on a deeper level.
-
-- As part of the technical_description, the patcher can also reference issues,
-bug reports and generally link to ressources, detailing his intention.
-This is separatly done in the "references" field.
-The Patcher should put a most conclusive list here
-and reference only some of it in the descriptions.
-
-- The Patcher may not want to start developing, waste hours and hours of time,
-and see that the users don't even have an interest their patch.
-All patches have to pass an election eventually, but if the patcher wants to,
-they can hold an election before starting to develop, just to see if there
-is any interest. If the election is lost, the patcher will either have to delete
-the patch or modify it substantially. If they want to hold such an election,
-"hold_pre_election" must be set to True.
-
-- After the Patch has been closed and the Patch Repository deleted, the
-patch entry "closed" = True
-
-After creating the patch,
-a SHA256 of all the data is created and
-returned as the reference to the patch.
-This is also put into one field called "sha256".
-(That this isn't included in the calculation of the hash is self-evident.)
-"""
-def create(patcher,patch_name, options):
+def create  ( patcher                   : str
+            , patch_name                : str
+            , is_user                   : bool
+            , simple_description        : str
+            , technical_description     : str
+            , references                : List[str]
+            ):
     client = MongoClient()
     db = client.demnet
     patches = db.patches
     patch = { "patcher" : patcher
-            , "is_user" : options['is_user']
+            , "is_user" : is_user
             , "name" : patch_name
-            , "simple_description" : options['simple_description']
-            , "technical_description" : options['technical_description']
-            , "hold_pre_election" : options['hold_pre_election']
-            , "references" : options['references']
+            , "simple_description" : simple_description
+            , "technical_description" : technical_description
+            , "references" : references
             , "closed" : False
             }
-    patch['hash'] = SHA256.new(data=json.dumps(patch).encode('utf-8')).hexdigest()
+    patch['hash'] = SHA256.new().update(json.dumps(patch)).encode('utf-8')).hexdigest()
     patch_id = patches.insert_one(patch).inserted_id
 
     subprocess.run(['bash', 'patch.sh', 'create', os.environ["ORIGIN_REPOSITORY"], patcher, patch_name])
@@ -74,6 +31,14 @@ def create(patcher,patch_name, options):
 
 def merge(patcher, patch_name):
     subprocess.run(['bash', 'patch.sh', 'merge', patcher, patch_name])
+
+def lock(patcher, patch_name):
+    path_of_patch   = path_of_patch(patcher,patch_name)
+    if not path_of_patch:
+        return False
+    else:
+        os.chmod(path_of_patch, 0444) # readonly to all
+        return True
 
 """
 Closing a patch means:
@@ -90,7 +55,7 @@ def close(patcher, patch_name, id, merge=False):
                               , "closed"    : False
                               } )
 
-    repo_path = f"{os.environ['PATCHES']}/{patcher}-{patch_name}"
+    repo_path = path_of_patch(patcher, patch_name, check_existence=False)
     if patch and os.path.isdir(repo_path):
         if merge:
             merge(patcher, patch_name)
@@ -101,3 +66,10 @@ def close(patcher, patch_name, id, merge=False):
         return True
     else:
         return False
+
+def path_of_patch(patcher, patch_name, check_existence=True):
+    path    = f"{os.environ["PATCHES"]}/{patcher}-{patch_name}"
+    if check_existence:
+        return path if os.path.isdir(path) else False
+    else:
+        return path

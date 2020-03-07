@@ -12,6 +12,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 from pymongo import MongoClient
+import pymongo
 import datetime, sys, json
 
 client = MongoClient()
@@ -31,7 +32,7 @@ def login(username, passphrase):
         if keys.publickey().export_key(format="PEM") != user["public_key"]:
             users.update_one({ "username" : username }, { "$set" : { "public_key"  : keys.publickey().export_key(format="PEM") } } )
 
-        if datetime.datetime.strptime(user["expiration"], "%m/%d/%Y") > datetime.datetime.now():
+        if datetime.date.fromisoformat(user["expiration"]) > datetime.datetime.now():
 
             new_keys = RSA.generate(2048)
             new_expiration = datetime.timedelta (weeks=104
@@ -43,8 +44,9 @@ def login(username, passphrase):
                                                 ,microseconds=0
                                                 ) + datetime.datetime.now()
 
-            private_key = new_keys.export_key(format="PEM", passphrase=passphrase)
-            public_key  = new_keys.publickey().export_key(format="PEM")
+            new_expiration  = new_expiration.isoformat()
+            private_key     = new_keys.export_key(format="PEM", passphrase=passphrase)
+            public_key      = new_keys.publickey().export_key(format="PEM")
 
 
             users.update_one(   { "username" : username }
@@ -129,9 +131,7 @@ def encrypt(message,keys):
 
 """
 Publishing a message works in these steps:
-1. Encrypt/Sign the message
-2. Publish it in demnet.messages
-3. Add a notification to the recipient's feed.
+1. Publish it in demnet.messages
 Parameters:
 - *message* message document with unencrypted body
 - *keys* private and public keys of the author
@@ -139,20 +139,13 @@ Returns:
 True if successfull
 False if not
 """
-def publish(message, keys):
-    # 1. Encrypt/Sign the message
-    body = encrypt(message, keys)
-    if body != False:
+def publish(message):
+    if message['body'] != False:
         # 2. Publish it in demnet.messages
-        message['body'] = body
-        message['hash'] = SHA256.new(json.dumps(body).encode('utf-8')).hexdigest()
         messages = db.messages
+        message['hash'] = SHA256.new(json.dumps(message['body']).encode('utf-8')).hexdigest()
+        message['upload_time'] = messages.find().sort("upload_time", pymongo.DESCENDING).limit(1)[0]["upload_time"] + 1 # Some inconsistent (race condition) is possible, but not critical.
         messages.insert_one(message)
 
-        # 3. Add a notification to the recipient's feed
-        for recipient_name in message['to']:
-            users.update_one({ "username" : recipient_name }
-                             , { "$push" : { "feed" : message["hash"] } }
-                            )
         return True
     return False
