@@ -264,8 +264,10 @@ def propose_vote():
                                     }
                 vote["id"]      =   SHA256.new().update(json.dumps(vote)).encode("utf-8")).hexdigest()
                 elections.insert_one(vote)
-                response    = redirect(f"/voting/option/{vote["id"]}")
 
+                # Initate third stage after four weeks
+                
+                response    = redirect(f"/voting/option/{vote["id"]}")
     except Error as e:
         return e.status()
     except KeyError:
@@ -323,8 +325,8 @@ def propose_option(vote_id):
                         Patches.lock(patcher, patch_name)
                         patch       = patches.find_one({ "patcher" : patcher, "patch_name" : patch_name })
                         patch_hash  = patch["hash"]
-                        option      =   { "patch"   : patch_hash
-                                        , "comment" : comment
+                        option      =   { "patch"       : patch_hash
+                                        , "comment"     : comment
                                         }
                         elections.update_one({ "id" : vote_id, "stage" : 1 }, { "$push" : { "options" : option}})
 
@@ -332,7 +334,7 @@ def propose_option(vote_id):
                         raise Error("invalid_data")
                     else:
                         raise Error("invalid_user")
-                        
+
     except json.JSONDecodeError as json_error:
         # See parsing of the request.values for probable cause.
         return f"{errors["invalid_data"]} { str(json_error) if os.environ.get("DEBUG") else "JSON Error"}"
@@ -346,6 +348,7 @@ def propose_option(vote_id):
         raise e
     else:
         return response
+
 ###################################################################
 ############################ CRITICAL #############################
 ###################################################################
