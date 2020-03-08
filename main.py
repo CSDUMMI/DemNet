@@ -114,7 +114,7 @@ def index():
 def publish():
     try:
         if request.method == "GET":
-            response    = render_template("writing.html")
+            response    = render_template("publish.html")
         else:
 
             title       = request.form["title"]
@@ -156,5 +156,17 @@ def vote(election_id):
             raise e
         else:
             return redirect(url_for("index", message="Sorry, an unknown error occured"))
+    else:
+        return response
+
+# Creating Elections
+@login_required
+@app.route("/election", methods=["POST", "GET"])
+def create_election():
+    try:
+        if request.method == "GET":
+            response = render_template("create_election.html")
+    except Exception as e:
+        raise
     else:
         return response
