@@ -74,7 +74,7 @@ class Message(BaseModel):
     content         = TextField()
     publishing_date = DateTimeField()
 
-
+# Routes used by the average users:
 def login_required(f):
     @wraps(f)
     def inner(*args,**kwargs):
