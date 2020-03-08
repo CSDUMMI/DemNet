@@ -1,83 +1,66 @@
-#!/usr/bin/env python3
+from flask import Flask
+from functools import wraps
+from peewee import *
+from Crypto.Hash import SHA256
+from typing import List
 
-from Server import Elections, Patches, Users
-from flask import Flask, request, render_template, send_file
-import json, os
-from Crypto.Hash import SHA3_256
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
+SECRET_KEY  = os.environ["SECRET_KEY"]
+DEBUG       = "DEBUG" in os.environ
+DATABASE    = os.environ["DATABASE"]
 
-app = Flask(__name__, static_url_path="/static", static_folder="/static")
-app.secret_key = os.environ["SECRET_KEY"]
+app = Flask(__name__)
+app.config.from_object(__name__)
 
-# Errors
-ok = 0
-invalidData = 1
-invalidContext = 2
+database    = SqliteDatabase(DATABASE)
 
-@app.route("/", methods=["GET"])
-def index():
-    return send_file("output/index.html")
+class BaseModel(Model):
+    class Meta():
+        database    = database
 
-@app.route("/login",methods=["POST"])
-def login():
-    username = request.values.get("username")
-    password = request.values.get("password")
+class User(BaseModel):
+    username    = CharField(unique=True)
+    id          = CharField(unique=True)
+    password    = CharField()
+    salt        = CharField()
 
-    if not session.get("keys") and username and password:
-        sha3_256 = SHA3_256.new()
-        sha3_256.update(password.encode('utf-8'))
-        passphrase = sha3_256.hexdigest()
-        keys = Users.login(username,passphrase)
-        if not keys:
-            return invalidData
+    def publish(self, title : str, content : str):
+        Message.create  ( author    = self
+                        , title     = title
+                        , content   = content
+                        )
+        return True
+
+    def can_authenticate(self, password : str):
+        password = SHA256.new()
+            .update(password.encode("utf-8") + self.salt.encode("utf-8"))
+            .hexdigest()
+        if password == self.password:
+            return True
         else:
-            session["keys"] = keys
-            session["SHA3-256_passphrase"] = passphrase
-            session["username"] = username
-            return ok
-    else:
-        return invalidContext
+            return False
 
-###################################################################
-############################ CRITICAL #############################
-###################################################################
+    def vote( self
+            , election : Election
+            , choice : List[str]
+            ):
+        Vote.create(election = election, choice = choice)
 
-@app.route("/vote", methods=["POST"])
-def vote():
-    # Stop Logging Temporarily to anything but errors
-    app.logger.setLevel(100) # Higher then **CRITICAL** logs must be send, for them to be logged
+class Election(BaseModel):
+    options         = TextField()
+    title           = TextField()
+    description     = TextField()
+    creation_date   = DateField()
+    closing_date    = DateField()
 
-    username = session.get("username")
-    election = request.values.get('election')
-    vote     = request.values.get('vote')
+class Vote(BaseModel):
+    election        = ForeignKeyField(Elections, backref="votes")
+    choice          = TextField()
 
-    if username and election and vote:
-        Elections.vote(election, vote, username) # After this function is called, nobody has any knowledge of the association between user and vote.
+class Participant(BaseModel):
+    election        = ForeignKeyField(Election, backref="participants")
+    username        = CharField()
 
-    app.logger.setLevel(0) # The crucial unnoticable part has past.
-    # Not even the client is notified, if there was anything wrong, except if they get a timeout.
-    return ok
-
-###################################################################
-############################ CRITICAL OVER ########################
-###################################################################
-
-@app.route("/message", methods=["POST"])
-def message():
-    author      = session.get("username")
-    recipients  = json.loads(request.values.get('to'))
-    body        = request.values.get('body')
-    keys        = session.get("keys")
-    passphrase  = session.get("passphrase")
-
-    if author and recipients and body and keys:
-        message =   { "body"    : body
-                    , "to"      : recipients
-                    , "from"    : author
-                    }
-        Users.publish( message, keys )
-
-        return ok
-    else:
-        return invalidData
+class Message(BaseModel):
+    author          = ForeignKeyField(User, backref="messages")
+    title           = TextField()
+    content         = TextField()
