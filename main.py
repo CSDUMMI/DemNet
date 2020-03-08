@@ -86,21 +86,27 @@ def login_required(f):
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
-    if request.method == "GET":
-        failed_already  = request.values["failed"] == "true"
-        return render_template( "login.html",
-                                failed_already = failed_already)
-    else:
-        username    = request.values["username"]
-        password    = request.values["password"]
-
-        user        = User.get(User.name == username)
-        if user.can_authenticate(password):
-            session["authenticated"]    = True
-            session["username"]         = user.name
-            return redirect(url_for("index"))
+    try:
+        if request.method == "GET":
+            failed_already  = request.values["failed"] == "true"
+            response = render_template( "login.html", failed_already = failed_already )
         else:
-            return redirect(url_for("login", failed = "true"))
+            username    = request.values["username"]
+            password    = request.values["password"]
+
+            user        = User.get(User.name == username)
+            if user.can_authenticate(password):
+                session["authenticated"]    = True
+                session["username"]         = user.name
+                response = redirect(url_for("index"))
+            else:
+                response = redirect(url_for("login", failed = "true"))
+    except KeyError:
+        return "data not provided"
+    except Exception as e:
+        raise e
+    else:
+        return response
 
 @login_required
 @app.route("/", methods=["GET"])
@@ -167,6 +173,6 @@ def create_election():
         if request.method == "GET":
             response = render_template("create_election.html")
     except Exception as e:
-        raise
+        raise e
     else:
         return response
