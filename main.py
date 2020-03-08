@@ -88,7 +88,7 @@ def login_required(f):
 def login():
     try:
         if request.method == "GET":
-            failed_already  = request.values["failed"] == "true"
+            failed_already  = request.values["failed_already"] == "true"
             response = render_template( "login.html", failed_already = failed_already )
         else:
             username    = request.values["username"]
@@ -100,7 +100,7 @@ def login():
                 session["username"]         = user.name
                 response = redirect(url_for("index"))
             else:
-                response = redirect(url_for("login", failed = "true"))
+                response = redirect(url_for("login", failed_already = "true"))
     except KeyError:
         return "data not provided"
     except Exception as e:
