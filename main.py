@@ -18,7 +18,7 @@ class BaseModel(Model):
         database    = database
 
 class User(BaseModel):
-    username    = CharField(unique=True)
+    name        = CharField(unique=True)
     id          = CharField(unique=True)
     password    = CharField()
     salt        = CharField()
@@ -71,6 +71,7 @@ class Message(BaseModel):
     author          = ForeignKeyField(User, backref="messages")
     title           = TextField()
     content         = TextField()
+    publishing_date = DateTimeField()
 
 
 def login_required(f):
@@ -92,9 +93,37 @@ def login():
         username    = request.values["username"]
         password    = request.values["password"]
 
-        user        = User.get(User.username == username)
+        user        = User.get(User.name == username)
         if user.can_authenticate(password):
-            session["authenticated"] = True
-            return redirect("/")
+            session["authenticated"]    = True
+            session["username"]         = user.name
+            return redirect(url_for("index"))
         else:
-            return redirect("/login")
+            return redirect(url_for("login", failed="true"))
+
+@login_required
+@app.route("/", methods=["GET"])
+def index():
+    feed    = Message.select.order_by(Message.publishing_date.desc()).dicts()
+    return render_template("index.html", feed = feed)
+
+@login_required
+@app.route("/publish". methods=["POST","GET"])
+def publish():
+    try:
+        if request.method == "GET":
+            response    = render_template("writing.html")
+        else:
+
+            title       = request.form["title"]
+            content     = request.form["content"]
+            author      = User.get(User.name == session["username"])
+
+            author.publish(title, content)
+            response    = redirect("/")
+    except KeyError:
+        return "data not provided"
+    except Exception as e:
+        raise e
+    else:
+        return response
