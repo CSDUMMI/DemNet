@@ -111,9 +111,16 @@ def login():
 @login_required
 @app.route("/", methods=["GET"])
 def index():
-    feed    = Message.select.order_by(Message.publishing_date.desc()).dicts()
-    message = request.values["message"]
-    return render_template("index.html", feed = feed, message = message)
+    try:
+        feed        = Message.select.order_by(Message.publishing_date.desc()).dicts()
+        message     = request.values["message"]
+        response    = render_template("index.html", feed = feed, message = message)
+    except KeyError:
+        return "data not provided"
+    except Exception as e:
+        raise e
+    else:
+        return response
 
 @login_required
 @app.route("/publish", methods=["POST","GET"])
