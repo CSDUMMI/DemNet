@@ -39,10 +39,10 @@ class User(BaseModel):
         else:
             return False
 
-    def vote(self, election : Election, choice : str):
+    def vote(self, election : Election, choice : List[str]):
         if Participant.select().where(user == self).count() == 0:
             Vote.create ( election = election
-                        , choice = choice
+                        , choice = json.dumps(choice)
                         )
             Participant.create  ( election  = election
                                 , user      = self
@@ -140,7 +140,7 @@ def vote(election_id):
             options     = json.loads(election.options)
             response    = render_template("vote.html", options = options)
         else:
-            choice      = request.form["choice"]
+            choice      = json.loads(request.form["choice"])
             voter       = User.get(User.name == session["username"])
             if not voter.vote(election, choice):
                 response    = redirect(url_for("index", message="You've already voted"))
@@ -149,6 +149,8 @@ def vote(election_id):
 
     except KeyError:
         return "data not provided"
+    except json.JSONDecodeError as json_error:
+        return "invalid data format"
     except Exception as e:
         if DEBUG:
             raise e
