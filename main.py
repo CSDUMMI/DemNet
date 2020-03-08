@@ -113,7 +113,7 @@ def login():
 def index():
     try:
         feed        = Message.select.order_by(Message.publishing_date.desc()).dicts()
-        message     = request.values["message"]
+        message     = request.values.get("message")
         response    = render_template("index.html", feed = feed, message = message)
     except KeyError:
         return "data not provided"
