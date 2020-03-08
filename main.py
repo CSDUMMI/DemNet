@@ -39,10 +39,10 @@ class User(BaseModel):
         else:
             return False
 
-    def vote(self, election : Election, choice : List[str]):
+    def vote(self, election : Election, choice : str):
         if Participant.select().where(user == self).count() == 0:
             Vote.create ( election = election
-                        , choice = json.dumps(choice)
+                        , choice = choice
                         )
             Participant.create  ( election  = election
                                 , user      = self
@@ -53,7 +53,7 @@ class User(BaseModel):
 
 
 class Election(BaseModel):
-    id              = IntegerField(unique=True)
+    id              = IntegerField(unique=True, index=True, primary_key=True)
     options         = TextField()
     title           = TextField()
     description     = TextField()
@@ -89,7 +89,7 @@ def login():
     if request.method == "GET":
         failed_already  = request.values["failed"] == "true"
         return render_template( "login.html",
-                                failed_already=failed_already)
+                                failed_already = failed_already)
     else:
         username    = request.values["username"]
         password    = request.values["password"]
@@ -100,7 +100,7 @@ def login():
             session["username"]         = user.name
             return redirect(url_for("index"))
         else:
-            return redirect(url_for("login", failed="true"))
+            return redirect(url_for("login", failed = "true"))
 
 @login_required
 @app.route("/", methods=["GET"])
@@ -130,12 +130,28 @@ def publish():
         return response
 
 @login_required
-@app.route("/vote/<election_", methods=["POST","GET"])
-def vote():
+@app.route("/vote/<int : election_id>", methods=["POST","GET"])
+def vote(election_id):
     try:
+        election    = Election.get(Election.id == election_id)
+
         if request.method == "GET":
-            response    = render_template("vote.html", )
+            options     = json.loads(election.options)
+            response    = render_template("vote.html", options = options)
+        else:
+            choice      = request.form["choice"]
+            voter       = User.get(User.name == session["username"])
+            if not voter.vote(election, choice):
+                response    = redirect(url_for("index", message="You've already voted"))
+            else:
+                response    = redirect("/")
+
+    except KeyError:
+        return "data not provided"
     except Exception as e:
-        raise e
+        if DEBUG:
+            raise e
+        else:
+            return redirect(url_for("index", message="Sorry, an unknown error occured"))
     else:
         return response
