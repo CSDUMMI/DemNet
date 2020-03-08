@@ -106,7 +106,8 @@ def login():
 @app.route("/", methods=["GET"])
 def index():
     feed    = Message.select.order_by(Message.publishing_date.desc()).dicts()
-    return render_template("index.html", feed = feed)
+    message = request.values["message"]
+    return render_template("index.html", feed = feed, message = message)
 
 @login_required
 @app.route("/publish", methods=["POST","GET"])
