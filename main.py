@@ -1,8 +1,11 @@
 from flask import Flask, url_for, redirect, request
-from functools import wraps
 from peewee import *
+
 from Crypto.Hash import SHA256
+
+from functools import wraps
 from typing import List
+import datetime
 
 SECRET_KEY  = os.environ["SECRET_KEY"]
 DEBUG       = "DEBUG" in os.environ
@@ -172,13 +175,23 @@ def vote(election_id):
     else:
         return response
 
+
 # Creating Elections
 @login_required
 @app.route("/election", methods=["POST", "GET"])
 def create_election():
     try:
         if request.method == "GET":
-            response = render_template("create_election.html")
+            response                = render_template("create_election.html")
+        else:
+            options                 = json.loads(request.form["options"])
+            title                   = request.form["title"]
+            description             = request.form["description"]
+            creation_date           = datetime.date.today()
+            openning_ballot_date    = creation_date + datetime.timedelta( weeks = 4 )
+            closing_date            = creation_date + datetime.timedelta( weeks = 6 )
+    except KeyError:
+        return "data not provided"
     except Exception as e:
         raise e
     else:
