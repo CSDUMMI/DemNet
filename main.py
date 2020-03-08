@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, url_for, redirect, request
 from functools import wraps
 from peewee import *
 from Crypto.Hash import SHA256
@@ -39,11 +39,18 @@ class User(BaseModel):
         else:
             return False
 
-    def vote( self
-            , election : Election
-            , choice : List[str]
-            ):
-        Vote.create(election = election, choice = choice)
+    def vote(self, election : Election, choice : List[str]):
+        if Participant.select().where(user == self).count() == 0:
+            Vote.create ( election = election
+                        , choice = json.dumps(choice)
+                        )
+            Participant.create  ( election  = election
+                                , user      = self
+                                )
+            return True
+        else:
+            return False
+
 
 class Election(BaseModel):
     options         = TextField()
@@ -58,9 +65,36 @@ class Vote(BaseModel):
 
 class Participant(BaseModel):
     election        = ForeignKeyField(Election, backref="participants")
-    username        = CharField()
+    user            = ForeignKeyField(User, backref="participation")
 
 class Message(BaseModel):
     author          = ForeignKeyField(User, backref="messages")
     title           = TextField()
     content         = TextField()
+
+
+def login_required(f):
+    @wraps(f)
+    def inner(*args,**kwargs):
+        if not session.get("logged_in"):
+            return redirect(url_for("login"))
+        else:
+            return f(*args,**kwargs)
+    return inner
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    if request.method == "GET":
+        failed_already  = request.values["failed"] == "true"
+        return render_template( "login.html",
+                                failed_already=failed_already)
+    else:
+        username    = request.values["username"]
+        password    = request.values["password"]
+
+        user        = User.get(User.username == username)
+        if user.can_authenticate(password):
+            session["authenticated"] = True
+            return redirect("/")
+        else:
+            return redirect("/login")
