@@ -53,6 +53,7 @@ class User(BaseModel):
 
 
 class Election(BaseModel):
+    id              = IntegerField(unique=True)
     options         = TextField()
     title           = TextField()
     description     = TextField()
@@ -108,7 +109,7 @@ def index():
     return render_template("index.html", feed = feed)
 
 @login_required
-@app.route("/publish". methods=["POST","GET"])
+@app.route("/publish", methods=["POST","GET"])
 def publish():
     try:
         if request.method == "GET":
@@ -123,6 +124,17 @@ def publish():
             response    = redirect("/")
     except KeyError:
         return "data not provided"
+    except Exception as e:
+        raise e
+    else:
+        return response
+
+@login_required
+@app.route("/vote/<election_", methods=["POST","GET"])
+def vote():
+    try:
+        if request.method == "GET":
+            response    = render_template("vote.html", )
     except Exception as e:
         raise e
     else:
