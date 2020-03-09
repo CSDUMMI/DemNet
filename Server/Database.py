@@ -60,6 +60,7 @@ class Election(BaseModel):
     title                   = TextField()
     description             = TextField()
     closed                  = BooleanField(default = False)
+    winner                  = TextField(default = None)
     creation_date           = DateField()
     openning_ballot_date    = DateField()
     closing_date            = DateField()
@@ -76,7 +77,11 @@ class Proposal(BaseModel):
     election                = ForeignKeyField(Election, backref="proposals")
     author                  = ForeignKeyField(User, backref="proposals")
     title                   = CharField()
+
+class Patch(BaseModel):
+    proposal                = ForeignKeyField(Proposal, backref="patches")
     patch                   = TextField()
+    index                   = IntegerField()
     conventional            = BooleanField()
 
 class Message(BaseModel):
