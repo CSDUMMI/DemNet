@@ -13,7 +13,9 @@ echo $BUILD >> BUILD.txt
 if ! mypy main.py Server/*.py --ignore-missing-imports;
 then exit 1
 
-python3 -e "import Server.Database;create_tables()"
+if [ $1 = "first-time" ]
+then python3 -e "import Server.Database;create_tables()"
+fi
 
 # Start Server
 gunicorn main:app
