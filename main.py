@@ -225,7 +225,7 @@ def propose(election_id):
             response                = render_template("propose.html")
         else:
             election                = Election.get(Election.id == election_id)
-            conventional            = request.form["conventional"]
+            conventional            = request.form["conventional"] == "true"
             title                   = request.form["title"]
             patch                   = request.files["patch"].stream.read().decode("utf-8")
             author                  = User.get(User.name == session["username"])
