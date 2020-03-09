@@ -37,3 +37,19 @@ def close_elections():
                                 )
         else:
             Change_Log.create(election = closed_election, message = "No one won")
+
+def implement_proposal(proposal : Proposal):
+    # Apply each patch.
+    for patch in proposal.patches.select().order_by(Patch.index):
+        repo        = LAWS_REPO if patch["conventional"] else SOURCE_REPO
+        patch_text  = io.StringIO(initial_value=patch["text"])
+
+        subprocess.run(["git", "apply", "-"], stdin=patch_text, cwd=repo)
+
+    # Add a commit with the new Change Log
+    log_message = f"""[{str(datetime.date.today())}] {proposal.title}
+By {proposal.author}
+{proposal.description}
+"""
+    open(f"{LAWS_REPO}/CHANGELOG", "a").write(log_message)
+    open(f"{SOURCE_REPO}/CHANGELOG", "a").write(log_message)
