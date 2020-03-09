@@ -56,9 +56,10 @@ class User(BaseModel):
 
 
 class Election(BaseModel):
-    id                      = IntegerField(unique=True, index=True, primary_key=True)
+    id                      = IntegerField(unique = True, index = True, primary_key = True)
     title                   = TextField()
     description             = TextField()
+    closed                  = BooleanField(default = False)
     creation_date           = DateField()
     openning_ballot_date    = DateField()
     closing_date            = DateField()
