@@ -103,7 +103,7 @@ class Change_Log(BaseModel):
 
 def create_tables():
     with database:
-        databse.connect()
+        database.connect()
         database.create_tables( [ User
                                 , Election
                                 , Vote

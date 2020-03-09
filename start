@@ -4,7 +4,7 @@
 pip3 install -U -r requirements.txt
 
 if [ $1 = "first-time" ]
-then python3 -e "from Server.Database import create_tables;create_tables()"
+then python3 -c "from Server.Database import create_tables;create_tables()"
 fi
 
 # Start Server
