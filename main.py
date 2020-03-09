@@ -181,7 +181,6 @@ def vote(election_id):
         return response
 
 """
-    options         = TextField()
     title           = TextField()
     description     = TextField()
     creation_date   = DateField()
@@ -200,7 +199,12 @@ def create_election():
             creation_date           = datetime.date.today()
             openning_ballot_date    = creation_date + datetime.timedelta( weeks = 4 )
             closing_date            = creation_date + datetime.timedelta( weeks = 6 )
-            Election.create()
+
+            Election.create ( title                 = title
+                            , description           = description
+                            , creation_date         = creation_date
+                            , openning_ballot_date  = openning_ballot_date
+                            )
     except KeyError:
         return "data not provided"
     except Exception as e:
