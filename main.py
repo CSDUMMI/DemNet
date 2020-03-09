@@ -56,26 +56,30 @@ class User(BaseModel):
 
 
 class Election(BaseModel):
-    id              = IntegerField(unique=True, index=True, primary_key=True)
-    options         = TextField()
-    title           = TextField()
-    description     = TextField()
-    creation_date   = DateField()
-    closing_date    = DateField()
+    id                      = IntegerField(unique=True, index=True, primary_key=True)
+    title                   = TextField()
+    description             = TextField()
+    creation_date           = DateField()
+    openning_ballot_date    = DateField()
+    closing_date            = DateField()
 
 class Vote(BaseModel):
-    election        = ForeignKeyField(Elections, backref="votes")
-    choice          = TextField()
+    election                = ForeignKeyField(Elections, backref="votes")
+    choice                  = TextField()
 
 class Participant(BaseModel):
-    election        = ForeignKeyField(Election, backref="participants")
-    user            = ForeignKeyField(User, backref="participation")
+    election                = ForeignKeyField(Election, backref="participants")
+    user                    = ForeignKeyField(User, backref="participation")
+
+class Proposal(BaseModel):
+    title                   = CharField()
+    patch                   = TextField()
 
 class Message(BaseModel):
-    author          = ForeignKeyField(User, backref="messages")
-    title           = TextField()
-    content         = TextField()
-    publishing_date = DateTimeField()
+    author                  = ForeignKeyField(User, backref="messages")
+    title                   = TextField()
+    content                 = TextField()
+    publishing_date         = DateTimeField()
 
 # Routes used by the average users:
 def login_required(f):
@@ -175,7 +179,13 @@ def vote(election_id):
     else:
         return response
 
-
+"""
+    options         = TextField()
+    title           = TextField()
+    description     = TextField()
+    creation_date   = DateField()
+    closing_date    = DateField()
+"""
 # Creating Elections
 @login_required
 @app.route("/election", methods=["POST", "GET"])
@@ -184,12 +194,12 @@ def create_election():
         if request.method == "GET":
             response                = render_template("create_election.html")
         else:
-            options                 = json.loads(request.form["options"])
             title                   = request.form["title"]
             description             = request.form["description"]
             creation_date           = datetime.date.today()
             openning_ballot_date    = creation_date + datetime.timedelta( weeks = 4 )
             closing_date            = creation_date + datetime.timedelta( weeks = 6 )
+            Election.create()
     except KeyError:
         return "data not provided"
     except Exception as e:
