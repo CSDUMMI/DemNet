@@ -42,12 +42,14 @@ class User(BaseModel):
         else:
             return False
 
-    def propose(self, election : Election, title : str, patches):
+    def propose(self, election : Election, title : str, description : str, patches):
         if election.openning_ballot_date < datetime.date.today():
             proposal = Proposal.create  ( author        = self
                                         , election      = election
                                         , title         = title
+                                        , description   = description
                                         )
+                                        
             for index, patch in enumerate(patches):
                 Patch.create( proposal      = proposal
                             , patch         = patch["text"]
@@ -81,6 +83,7 @@ class Proposal(BaseModel):
     election                = ForeignKeyField(Election, backref="proposals")
     author                  = ForeignKeyField(User, backref="proposals")
     title                   = CharField(unique = True)
+    description             = TextField()
 
 class Patch(BaseModel):
     proposal                = ForeignKeyField(Proposal, backref="patches")
@@ -93,3 +96,7 @@ class Message(BaseModel):
     title                   = TextField()
     content                 = TextField()
     publishing_date         = DateTimeField()
+
+class Change_Log(BaseModel):
+    election                = ForeignKeyField(Election, backref="logs")
+    message                 = TextField()

@@ -161,9 +161,10 @@ def propose(election_id):
         else:
             election                = Election.get(Election.id == election_id)
             title                   = request.form["title"]
+            description             = request.form["description"]
             patches                 = json.loads(request.files["patch"].stream.read().decode("utf-8"))
             author                  = User.get(User.name == session["username"])
-            author.propose(election, title, patches)
+            author.propose(election, title, description, patches)
     except KeyError:
         return "file not provided"
     except Exception as e:
