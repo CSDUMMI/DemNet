@@ -97,7 +97,7 @@ def publish():
         return response
 
 @login_required
-@app.route("/vote/<int : election_id>", methods=["POST","GET"])
+@app.route("/vote/<int:election_id>", methods=["POST","GET"])
 def vote(election_id):
     try:
         election    = Election.get(Election.id == election_id)
@@ -153,10 +153,10 @@ def create_election():
 
 
 @login_required
-@app.route("/propose/<int : election_id>", methods=["POST", "GET"])
+@app.route("/propose/<int:election_id>", methods=["POST", "GET"])
 def propose(election_id):
     try:
-        if request.method = "GET":
+        if request.method == "GET":
             response                = render_template("propose.html")
         else:
             election                = Election.get(Election.id == election_id)

@@ -1,5 +1,6 @@
 import os, datetime
 from peewee import *
+from typing import List, Dict
 
 DATABASE    = os.environ["DATABASE"]
 database    = SqliteDatabase(DATABASE)
@@ -7,6 +8,16 @@ database    = SqliteDatabase(DATABASE)
 class BaseModel(Model):
     class Meta():
         database    = database
+
+class Election(BaseModel):
+    id                      = IntegerField(unique = True, index = True, primary_key = True)
+    title                   = TextField()
+    description             = TextField()
+    closed                  = BooleanField(default = False)
+    winner                  = TextField(default = None)
+    creation_date           = DateField()
+    openning_ballot_date    = DateField()
+    closing_date            = DateField()
 
 class User(BaseModel):
     name        = CharField(unique=True)
@@ -22,16 +33,14 @@ class User(BaseModel):
         return True
 
     def can_authenticate(self, password : str):
-        password = SHA256.new()
-            .update(password.encode("utf-8") + self.salt.encode("utf-8"))
-            .hexdigest()
+        password = SHA256.new().update(password.encode("utf-8") + self.salt.encode("utf-8")).hexdigest()
         if password == self.password:
             return True
         else:
             return False
 
     def vote(self, election : Election, choice : List[str]):
-        if Participant.select().where(user == self).count() == 0 or :
+        if Participant.select().where(user == self).count() == 0:
             Vote.create ( election = election
                         , choice = json.dumps(choice)
                         )
@@ -61,18 +70,8 @@ class User(BaseModel):
             return False
 
 
-class Election(BaseModel):
-    id                      = IntegerField(unique = True, index = True, primary_key = True)
-    title                   = TextField()
-    description             = TextField()
-    closed                  = BooleanField(default = False)
-    winner                  = TextField(default = None)
-    creation_date           = DateField()
-    openning_ballot_date    = DateField()
-    closing_date            = DateField()
-
 class Vote(BaseModel):
-    election                = ForeignKeyField(Elections, backref="votes")
+    election                = ForeignKeyField(Election, backref="votes")
     choice                  = TextField()
 
 class Participant(BaseModel):

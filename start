@@ -3,18 +3,8 @@
 # Install pip3 Packages
 pip3 install -U -r requirements.txt
 
-# BUILD=Variable denoting current build string:
-BUILD=`date -u +"%D-%T"`
-BUILD="$BUILD-$BUILDER"
-
-echo $BUILD >> BUILD.txt
-
-# Test if the static analyses pases
-if ! mypy main.py Server/*.py --ignore-missing-imports;
-then exit 1
-
 if [ $1 = "first-time" ]
-then python3 -e "import Server.Database;create_tables()"
+then python3 -e "from Server.Database import create_tables;create_tables()"
 fi
 
 # Start Server
