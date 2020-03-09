@@ -103,8 +103,8 @@ def vote(election_id):
         election    = Election.get(Election.id == election_id)
 
         if request.method == "GET":
-            options     = json.loads(election.options)
-            response    = render_template("vote.html", options = options)
+            proposals   = map(lambda p: p["title"], election.proposals)
+            response    = render_template("vote.html", proposals = proposals)
         else:
             choice      = json.loads(request.form["choice"])
             voter       = User.get(User.name == session["username"])
@@ -160,11 +160,10 @@ def propose(election_id):
             response                = render_template("propose.html")
         else:
             election                = Election.get(Election.id == election_id)
-            conventional            = request.form["conventional"] == "true"
             title                   = request.form["title"]
-            patch                   = request.files["patch"].stream.read().decode("utf-8")
+            patches                 = json.loads(request.files["patch"].stream.read().decode("utf-8"))
             author                  = User.get(User.name == session["username"])
-            author.propose(election, title, patch, conventional)
+            author.propose(election, title, patches)
     except KeyError:
         return "file not provided"
     except Exception as e:

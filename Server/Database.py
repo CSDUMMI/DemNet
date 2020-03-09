@@ -80,7 +80,7 @@ class Participant(BaseModel):
 class Proposal(BaseModel):
     election                = ForeignKeyField(Election, backref="proposals")
     author                  = ForeignKeyField(User, backref="proposals")
-    title                   = CharField()
+    title                   = CharField(unique = True)
 
 class Patch(BaseModel):
     proposal                = ForeignKeyField(Proposal, backref="patches")
