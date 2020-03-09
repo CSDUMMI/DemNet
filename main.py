@@ -54,6 +54,9 @@ class User(BaseModel):
         else:
             return False
 
+    def propose(self, title : str, patch : str):
+        Proposal.create(author = self, title = title, patch = patch)
+
 
 class Election(BaseModel):
     id                      = IntegerField(unique=True, index=True, primary_key=True)
@@ -180,12 +183,6 @@ def vote(election_id):
     else:
         return response
 
-"""
-    title           = TextField()
-    description     = TextField()
-    creation_date   = DateField()
-    closing_date    = DateField()
-"""
 # Creating Elections
 @login_required
 @app.route("/election", methods=["POST", "GET"])
@@ -207,6 +204,26 @@ def create_election():
                             )
     except KeyError:
         return "data not provided"
+    except Exception as e:
+        raise e
+    else:
+        return response
+
+
+@login_required
+@app.route("/propose", methods=["POST", "GET"])
+def propose():
+    try:
+        if request.method = "GET":
+            response                = render_template("propose.html")
+        else:
+            title                   = request.form["title"]
+            patch                   = request.files["patch"].stream.read().decode("utf-8")
+            author                  = User.get(User.name == session["username"])
+            author.propose(title, patch)
+
+    except KeyError:
+        return "file not provided"
     except Exception as e:
         raise e
     else:
