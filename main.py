@@ -102,6 +102,18 @@ def publish():
         return response
 
 @login_required
+@app.route("/vote", methods=["GET"])
+def vote_index():
+    try:
+        elections   = Election.select().where(not Election.closed)
+        elections   = list(elections)
+        response    = render_template("vote_index.html", elections = elections)
+    except Exception as e:
+        raise e
+    else:
+        return response
+
+@login_required
 @app.route("/vote/<int:election_id>", methods=["POST","GET"])
 def vote(election_id):
     try:
