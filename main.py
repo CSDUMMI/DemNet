@@ -54,8 +54,12 @@ class User(BaseModel):
         else:
             return False
 
-    def propose(self, title : str, patch : str):
-        Proposal.create(author = self, title = title, patch = patch)
+    def propose(self, election : Election, title : str, patch : str):
+        Proposal.create ( author    = self
+                        , election  = election
+                        , title     = title
+                        , patch     = patch
+                        )
 
 
 class Election(BaseModel):
@@ -75,6 +79,7 @@ class Participant(BaseModel):
     user                    = ForeignKeyField(User, backref="participation")
 
 class Proposal(BaseModel):
+    election                = ForeignKeyField(Election, backref="proposals")
     author                  = ForeignKeyField(User, backref="proposals")
     title                   = CharField()
     patch                   = TextField()
@@ -211,17 +216,17 @@ def create_election():
 
 
 @login_required
-@app.route("/propose", methods=["POST", "GET"])
-def propose():
+@app.route("/propose/<int : election_id>", methods=["POST", "GET"])
+def propose(election_id):
     try:
         if request.method = "GET":
             response                = render_template("propose.html")
         else:
+            election                = Election.get(Election.id == election_id)
             title                   = request.form["title"]
             patch                   = request.files["patch"].stream.read().decode("utf-8")
             author                  = User.get(User.name == session["username"])
-            author.propose(title, patch)
-
+            author.propose(election, title, patch)
     except KeyError:
         return "file not provided"
     except Exception as e:
