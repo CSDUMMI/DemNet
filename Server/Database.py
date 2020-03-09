@@ -42,13 +42,17 @@ class User(BaseModel):
         else:
             return False
 
-    def propose(self, election : Election, title : str, patch : str, conventional : bool):
+    def propose(self, election : Election, title : str, patches):
         if election.openning_ballot_date < datetime.date.today():
-            Proposal.create ( author        = self
-                            , election      = election
-                            , title         = title
-                            , patch         = patch
-                            , conventional  = conventional
+            proposal = Proposal.create  ( author        = self
+                                        , election      = election
+                                        , title         = title
+                                        )
+            for index, patch in enumerate(patches):
+                Patch.create( proposal      = proposal
+                            , patch         = patch["text"]
+                            , conventional  = patch["conventional"] == "true"
+                            , index         = index
                             )
             return True
         else:
