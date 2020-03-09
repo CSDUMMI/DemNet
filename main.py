@@ -54,11 +54,12 @@ class User(BaseModel):
         else:
             return False
 
-    def propose(self, election : Election, title : str, patch : str):
-        Proposal.create ( author    = self
-                        , election  = election
-                        , title     = title
-                        , patch     = patch
+    def propose(self, election : Election, title : str, patch : str, conventional : bool):
+        Proposal.create ( author        = self
+                        , election      = election
+                        , title         = title
+                        , patch         = patch
+                        , conventional  = conventional
                         )
 
 
@@ -83,8 +84,8 @@ class Proposal(BaseModel):
     author                  = ForeignKeyField(User, backref="proposals")
     title                   = CharField()
     patch                   = TextField()
-    type                    = BooleanField()
-    
+    conventional            = BooleanField()
+
 class Message(BaseModel):
     author                  = ForeignKeyField(User, backref="messages")
     title                   = TextField()
@@ -224,10 +225,11 @@ def propose(election_id):
             response                = render_template("propose.html")
         else:
             election                = Election.get(Election.id == election_id)
+            conventional            = request.form["conventional"]
             title                   = request.form["title"]
             patch                   = request.files["patch"].stream.read().decode("utf-8")
             author                  = User.get(User.name == session["username"])
-            author.propose(election, title, patch)
+            author.propose(election, title, patch, conventional)
     except KeyError:
         return "file not provided"
     except Exception as e:
