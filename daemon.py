@@ -12,7 +12,6 @@ SOURCE_REPO = os.environ["SOURCE_REPO"] # Git Repo of the source code, not where
 LAWS_REPO   = os.environ["LAWS_REPO"] # Git Repo of the conventional laws. (for applying conventional = True proposals)
 
 database    = SqliteDatabase(DATABASE)
-database.connect()
 
 # Close, count and apply all changes.
 def close_elections():
