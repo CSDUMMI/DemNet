@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect, request
+from flask import Flask, url_for, redirect, request, g
 
 from Crypto.Hash import SHA256
 
@@ -8,13 +8,23 @@ import datetime
 
 from peewee import *
 from Server.Database import *
- 
+
 SECRET_KEY  = os.environ["SECRET_KEY"]
 DEBUG       = "DEBUG" in os.environ
 DATABASE    = os.environ["DATABASE"]
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+
+@app.before_request
+def before_request():
+    g.db    = database
+    g.db.connect()
+
+@app.after_request
+def after_request(response):
+    g.db.close()
+    return response
 
 
 # Routes used by the average users:
