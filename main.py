@@ -72,6 +72,7 @@ class Participant(BaseModel):
     user                    = ForeignKeyField(User, backref="participation")
 
 class Proposal(BaseModel):
+    author                  = ForeignKeyField(User, backref="proposals")
     title                   = CharField()
     patch                   = TextField()
 
