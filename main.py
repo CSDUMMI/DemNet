@@ -13,7 +13,12 @@ SECRET_KEY  = os.environ["SECRET_KEY"]
 DEBUG       = "DEBUG" in os.environ
 DATABASE    = os.environ["DATABASE"]
 
-app = Flask(__name__)
+app = Flask ( __name__
+            , static_folder     = "static"
+            , static_url_path   = "/static"
+            , template_folder   = "output"
+            )
+
 app.config.from_object(__name__)
 
 @app.before_request
@@ -41,7 +46,7 @@ def login_required(f):
 def login():
     try:
         if request.method == "GET":
-            failed_already  = request.values["failed_already"] == "true"
+            failed_already  = request.values.get("failed_already") == "true"
             response = render_template( "login.html", failed_already = failed_already )
         else:
             username    = request.values["username"]
