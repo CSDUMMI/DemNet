@@ -54,5 +54,6 @@ By {proposal.author}
     open(f"{SOURCE_REPO}/CHANGELOG", "a").write(log_message)
 
 if sys.argv[1] == "e" or sys.argv[1] == "execute":
+    database.connect()
     close_elections()
     database.close()
