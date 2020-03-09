@@ -101,3 +101,16 @@ class Change_Log(BaseModel):
     election                = ForeignKeyField(Election, backref="logs")
     message                 = TextField()
     date                    = DateField()
+
+def create_tables():
+    with database:
+        database.create_tables( [ User
+                                , Election
+                                , Vote
+                                , Participant
+                                , Proposal
+                                , Patch
+                                , Message
+                                , Change_Log
+                                ]
+                            )

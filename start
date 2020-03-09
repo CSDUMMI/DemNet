@@ -10,11 +10,10 @@ BUILD="$BUILD-$BUILDER"
 echo $BUILD >> BUILD.txt
 
 # Test if the static analyses pases
-if ! mypy main.py Server/*.py --ignore-issing-imports;
+if ! mypy main.py Server/*.py --ignore-missing-imports;
 then exit 1
 
-# Build Elm frontend
-elm make --output=output/main.js --optimize src/Main.elm
+python3 -e "import Server.Database;create_tables()"
 
 # Start Server
 gunicorn main:app
