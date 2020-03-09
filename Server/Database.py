@@ -1,4 +1,4 @@
-import os
+import os, datetime
 from peewee import *
 
 DATABASE    = os.environ["DATABASE"]
@@ -31,7 +31,7 @@ class User(BaseModel):
             return False
 
     def vote(self, election : Election, choice : List[str]):
-        if Participant.select().where(user == self).count() == 0:
+        if Participant.select().where(user == self).count() == 0 or :
             Vote.create ( election = election
                         , choice = json.dumps(choice)
                         )
@@ -43,12 +43,16 @@ class User(BaseModel):
             return False
 
     def propose(self, election : Election, title : str, patch : str, conventional : bool):
-        Proposal.create ( author        = self
-                        , election      = election
-                        , title         = title
-                        , patch         = patch
-                        , conventional  = conventional
-                        )
+        if election.openning_ballot_date < datetime.date.today():
+            Proposal.create ( author        = self
+                            , election      = election
+                            , title         = title
+                            , patch         = patch
+                            , conventional  = conventional
+                            )
+            return True
+        else:
+            return False
 
 
 class Election(BaseModel):
