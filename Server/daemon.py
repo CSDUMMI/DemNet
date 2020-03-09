@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Executes every day at 00:00 (midnight)
 from peewee import *
-import datetime, subprocess, io
+import datetime, subprocess, io, sys
 
 from Server.Database import *
 from Server.election import count
@@ -53,3 +53,7 @@ By {proposal.author}
 """
     open(f"{LAWS_REPO}/CHANGELOG", "a").write(log_message)
     open(f"{SOURCE_REPO}/CHANGELOG", "a").write(log_message)
+
+if sys.argv[1] == "e" or sys.argv[1] == "execute":
+    close_elections()
+    database.close()
