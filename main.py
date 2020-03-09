@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect, request, g
+from flask import Flask, url_for, redirect, request, g, render_template
 
 from Crypto.Hash import SHA256
 
@@ -65,7 +65,7 @@ def login():
 @app.route("/", methods=["GET"])
 def index():
     try:
-        feed        = Message.select.order_by(Message.publishing_date.desc()).dicts()
+        feed        = Message.select().order_by(Message.publishing_date.desc()).dicts()
         message     = request.values.get("message")
         response    = render_template("index.html", feed = feed, message = message)
     except KeyError:
