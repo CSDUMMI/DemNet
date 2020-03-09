@@ -28,8 +28,12 @@ def close_elections():
         closed_election.winner = str(winner)
         closed_election.save()
         # Implement changes
-        winner      = closed_election.proposals.get(title = winner)
-        for patch in winner.patches:
-            if patch.conventional:
-                subprocessio.StringIO(initial_value = patch["text"])
-            else:
+        if winner != None:
+            winner      = closed_election.proposals.get(Proposal.title == str(winner))
+            implement_proposal(winner)
+            Change_Log.create   ( election  = closed_election
+                                , message   = f"Title:{winner.title}\nAuthor:{winner.author}\nDescription{winner.description}"
+                                , date      = datetime.date.today()
+                                )
+        else:
+            Change_Log.create(election = closed_election, message = "No one won")

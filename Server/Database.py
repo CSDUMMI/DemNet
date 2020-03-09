@@ -49,7 +49,7 @@ class User(BaseModel):
                                         , title         = title
                                         , description   = description
                                         )
-                                        
+
             for index, patch in enumerate(patches):
                 Patch.create( proposal      = proposal
                             , patch         = patch["text"]
@@ -100,3 +100,4 @@ class Message(BaseModel):
 class Change_Log(BaseModel):
     election                = ForeignKeyField(Election, backref="logs")
     message                 = TextField()
+    date                    = DateField()
