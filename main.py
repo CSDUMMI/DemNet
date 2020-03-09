@@ -83,7 +83,8 @@ class Proposal(BaseModel):
     author                  = ForeignKeyField(User, backref="proposals")
     title                   = CharField()
     patch                   = TextField()
-
+    type                    = BooleanField()
+    
 class Message(BaseModel):
     author                  = ForeignKeyField(User, backref="messages")
     title                   = TextField()
