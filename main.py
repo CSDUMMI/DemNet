@@ -86,6 +86,19 @@ def index():
         return response
 
 @login_required
+@app.route("/read/<int:message_id>", methods=["GET"])
+def read(message_id : str):
+    try:
+        message     = Message.get(Message.id == message_id)
+        response    = render_template("read.html", message = message)
+    except DoesNotExist:
+        return "Message id doesn't exists"
+    except Exception as e:
+        after_request("")
+        raise e
+    else:
+        return response
+@login_required
 @app.route("/publish", methods=["POST","GET"])
 def publish():
     try:
