@@ -1,5 +1,5 @@
 from flask import Flask, url_for, redirect, request, g, render_template, session
-
+from flask.ext.markdown import Markdown
 from Crypto.Hash import SHA256
 
 from functools import wraps
@@ -19,6 +19,7 @@ app = Flask ( __name__
             , template_folder   = "output"
             )
 
+md = Markdown(app, extensions=['fenced_code'])
 app.config.from_object(__name__)
 
 @app.before_request
@@ -90,9 +91,8 @@ def index():
 def read(message_id : str):
     try:
         message         = Message.get(Message.id == message_id)
-        publishing_date = message.publishing_date.strftime("%x")
+        publishing_date = message.publishing_date.strftime("%B %d. %Y")
         response        = render_template   ( "read.html"
-                                            , message           = message
                                             , publishing_date   = publishing_date
                                             )
     except DoesNotExist:
