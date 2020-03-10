@@ -2,6 +2,9 @@ import os, datetime
 from peewee import *
 from typing import List, Dict
 
+from Crypto.Hash import SHA256
+from Crypto.Random import get_random_bytes
+
 DATABASE    = os.environ["DATABASE"]
 database    = SqliteDatabase(DATABASE)
 
@@ -20,10 +23,12 @@ class Election(BaseModel):
     closing_date            = DateField()
 
 class User(BaseModel):
-    name        = CharField(unique=True)
-    id          = CharField(unique=True)
+    name        = CharField(unique = True)
+    first_name  = TextField()
+    last_name   = TextField()
+    id          = CharField(unique = True)
     password    = CharField()
-    salt        = CharField()
+    salt        = FixedCharField(max_length = 2**3)
 
     def publish(self, title : str, content : str):
         Message.create  ( author    = self
@@ -102,7 +107,7 @@ class Change_Log(BaseModel):
     date                    = DateField()
 
 def create_tables():
-    with database:
+    try:
         database.connect()
         database.create_tables( [ User
                                 , Election
@@ -113,5 +118,11 @@ def create_tables():
                                 , Message
                                 , Change_Log
                                 ]
-                            )
+                                )
         database.close()
+    except OperationalError:
+        return False
+    except Exception as e:
+        raise e
+    else:
+        return True
