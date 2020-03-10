@@ -51,14 +51,16 @@ def login():
         else:
             username        = request.values["username"]
             password        = request.values["password"]
-
+            print(username)
+            print(password)
             user            = User.get(User.name == username)
             if user.can_authenticate(password):
                 session["authenticated"]    = True
                 session["username"]         = user.name
-                response                    = redirect(url_for("index"))
+                response                    = redirect("/")
             else:
                 raise DoesNotExist()
+
     except DoesNotExist:
         return redirect(url_for("login", failed_already = "true"))
     except KeyError:

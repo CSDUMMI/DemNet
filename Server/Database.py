@@ -28,7 +28,7 @@ class User(BaseModel):
     last_name   = TextField()
     id          = CharField(unique = True)
     password    = CharField()
-    salt        = FixedCharField(max_length = 2**3)
+    salt        = FixedCharField(max_length = 64)
 
     def publish(self, title : str, content : str):
         Message.create  ( author    = self
@@ -37,8 +37,9 @@ class User(BaseModel):
                         )
         return True
 
-    def can_authenticate(self, password : str):
-        password = SHA256.new(data = password.encode("utf-8") + self.salt.encode("utf-8")).hexdigest()
+    def can_authenticate(self, password : str) -> bool:
+        password = hash_passwords(password, self.salt)
+
         if password == self.password:
             return True
         else:
@@ -127,6 +128,9 @@ def create_tables():
     else:
         return True
 
+def hash_passwords(password : str, salt : str) -> bytes:
+    return SHA256.new(data = password.encode("utf-8") + salt.encode("utf-8")).hexdigest()
+
 def register( username      : str
             , first_name    : str
             , last_name     : str
@@ -134,9 +138,9 @@ def register( username      : str
             , password      : str
             ):
             try:
-                id          = SHA256.new(data = id.encode("utf-8")).hexdigest()
-                password    = SHA256.new(data = password.encode("utf-8")).hexdigest()
-                salt        = get_random_bytes(2**3).decode("utf-8")
+                id          = hash_passwords(id, None)
+                salt        = SHA256.new(data = get_random_bytes(2**3)).hexdigest()
+                password    = hash_passwords(password, salt)
 
                 if User.select().where(User.id == id or User.name == user).count() >= 1:
                     response    = False
