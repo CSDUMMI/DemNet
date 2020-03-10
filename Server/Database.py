@@ -134,9 +134,9 @@ def register( username      : str
             , password      : str
             ):
             hash        = SHA256.new()
-            id          = hash.update(id).hexdigest()
+            id          = hash.update(id.encode("utf-8")).hexdigest()
             hash        = SHA256.new()
-            password    = hash.update(password).hexdigest()
+            password    = hash.update(password.encode("utf-8")).hexdigest()
             salt        = str(get_random_bytes(2**3))
 
             if User.select().where(User.id == id or User.name == user).count() >= 1:
