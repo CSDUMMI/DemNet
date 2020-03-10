@@ -126,3 +126,27 @@ def create_tables():
         raise e
     else:
         return True
+
+def register( username      : str
+            , first_name    : str
+            , last_name     : str
+            , id            : str
+            , password      : str
+            ):
+            hash        = SHA256.new()
+            id          = hash.update(id).hexdigest()
+            hash        = SHA256.new()
+            password    = hash.update(password).hexdigest()
+            salt        = str(get_random_bytes(2**3))
+
+            if User.select().where(User.id == id or User.name == user).count() >= 1:
+                return False
+            else:
+                User.create ( name          = username
+                            , first_name    = first_name
+                            , last_name     = last_name
+                            , id            = id
+                            , password      = password
+                            , salt          = salt
+                            )
+                return True
