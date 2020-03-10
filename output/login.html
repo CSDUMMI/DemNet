@@ -1,1 +1,18 @@
-login
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Login to DemNet</title>
+  </head>
+  <body>
+    <form class="login_form" action="/login" method="post">
+      username    = request.values["username"]
+      password    = request.values["password"]
+      <label for="username">Username</label>
+      <input type="text" name="username">
+      <label for="password">Password</label>
+      <input type="password" name="password">
+      <input type="submit" value="Login">
+    </form>
+  </body>
+</html>
