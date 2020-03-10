@@ -147,7 +147,6 @@ def unpublish(message_id : int):
 def vote_index():
     try:
         elections   = Election.select().where(not Election.closed)
-        elections   = list(elections)
         response    = render_template("vote_index.html", elections = elections)
     except Exception as e:
         after_request("")
