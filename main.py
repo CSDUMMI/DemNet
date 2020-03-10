@@ -64,6 +64,7 @@ def login():
     except KeyError:
         return "data not provided"
     except Exception as e:
+        after_request("")
         raise e
     else:
         return response
@@ -72,18 +73,19 @@ def login():
 @app.route("/", methods=["GET"])
 def index():
     try:
-        feed        = Message.select().order_by(Message.publishing_date.desc()).dicts()
+        feed        = Message.select().order_by(Message.publishing_date.desc())
         feed        = [ { "title" : m["title"]
                         , "author_first" : m["author"]["first_name"]
                         , "author_last" : m["author"]["last_name"]
                         } for m in feed
                     ]
-                    
+
         message     = request.values.get("message")
         response    = render_template("index.html", feed = feed, message = message)
     except KeyError:
         return "data not provided"
     except Exception as e:
+        after_request("")
         raise e
     else:
         return response
@@ -105,6 +107,7 @@ def publish():
     except KeyError:
         return "data not provided"
     except Exception as e:
+        after_request("")
         raise e
     else:
         return response
@@ -117,6 +120,7 @@ def vote_index():
         elections   = list(elections)
         response    = render_template("vote_index.html", elections = elections)
     except Exception as e:
+        after_request("")
         raise e
     else:
         return response
@@ -144,6 +148,7 @@ def vote(election_id):
         return "invalid data format"
     except Exception as e:
         if DEBUG:
+            after_request("")
             raise e
         else:
             return redirect(url_for("index", message="Sorry, an unknown error occured"))
@@ -172,6 +177,7 @@ def create_election():
     except KeyError:
         return "data not provided"
     except Exception as e:
+        after_request("")
         raise e
     else:
         return response
@@ -193,6 +199,7 @@ def propose(election_id):
     except KeyError:
         return "file not provided"
     except Exception as e:
+        after_request("")
         raise e
     else:
         return response
@@ -217,7 +224,7 @@ def register_route():
     except KeyError:
         return "data not provided"
     except Exception as e:
-        g.db.close()
+        after_request("")
         raise e
     else:
         return response

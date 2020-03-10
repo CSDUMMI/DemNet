@@ -31,9 +31,10 @@ class User(BaseModel):
     salt        = FixedCharField(max_length = 64)
 
     def publish(self, title : str, content : str):
-        Message.create  ( author    = self
-                        , title     = title
-                        , content   = content
+        Message.create  ( author            = self
+                        , title             = title
+                        , content           = content
+                        , publishing_date   = datetime.date.today()
                         )
         return True
 
