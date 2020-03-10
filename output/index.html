@@ -9,7 +9,7 @@
     <p>{{ message }}</p>
     {% endif %}
     {% for message in feed %}
-    <a class="message" src="/read/{{message.id}}">
+    <a class="message" href="/read/{{message.id}}">
       <h2> {{ message.title }} </h2>
       <p>{{ message.author.first_name }} {{ message.author.last_name }}
       </p>
