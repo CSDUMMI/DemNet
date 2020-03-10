@@ -38,7 +38,7 @@ class User(BaseModel):
         return True
 
     def can_authenticate(self, password : str):
-        password = SHA256.new().update(password.encode("utf-8") + self.salt.encode("utf-8")).hexdigest()
+        password = SHA256.new(data = password.encode("utf-8") + self.salt.encode("utf-8")).hexdigest()
         if password == self.password:
             return True
         else:
