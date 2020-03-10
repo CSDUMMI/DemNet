@@ -51,8 +51,6 @@ def login():
         else:
             username        = request.values["username"]
             password        = request.values["password"]
-            print(username)
-            print(password)
             user            = User.get(User.name == username)
             if user.can_authenticate(password):
                 session["authenticated"]    = True

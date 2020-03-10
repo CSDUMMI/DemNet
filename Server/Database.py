@@ -39,7 +39,6 @@ class User(BaseModel):
 
     def can_authenticate(self, password : str) -> bool:
         password = hash_passwords(password, self.salt)
-
         if password == self.password:
             return True
         else:
@@ -138,7 +137,7 @@ def register( username      : str
             , password      : str
             ):
             try:
-                id          = hash_passwords(id, None)
+                id          = hash_passwords(id, "")
                 salt        = SHA256.new(data = get_random_bytes(2**3)).hexdigest()
                 password    = hash_passwords(password, salt)
 
