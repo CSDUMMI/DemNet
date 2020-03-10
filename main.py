@@ -1,5 +1,5 @@
 from flask import Flask, url_for, redirect, request, g, render_template, session
-from flask.ext.markdown import Markdown
+from flaskext.markdown import Markdown
 from Crypto.Hash import SHA256
 
 from functools import wraps
@@ -74,8 +74,7 @@ def login():
 @app.route("/", methods=["GET"])
 def index():
     try:
-        feed        = Message.select().order_by(Message.publishing_date.desc())
-
+        feed        = list(Message.select().order_by(-Message.id))
         message     = request.values.get("message")
         response    = render_template("index.html", feed = feed, message = message)
     except KeyError:
@@ -93,6 +92,7 @@ def read(message_id : str):
         message         = Message.get(Message.id == message_id)
         publishing_date = message.publishing_date.strftime("%B %d. %Y")
         response        = render_template   ( "read.html"
+                                            , message           = message
                                             , publishing_date   = publishing_date
                                             )
     except DoesNotExist:
@@ -102,6 +102,7 @@ def read(message_id : str):
         raise e
     else:
         return response
+
 @login_required
 @app.route("/publish", methods=["POST","GET"])
 def publish():
@@ -124,6 +125,23 @@ def publish():
     else:
         return response
 
+@login_required
+@app.route("/unpublish/<int:message_id>", methods=["POST"])
+def unpublish(message_id : int):
+    try:
+        message = Message.get_by_id(message_id)
+        if session["username"] == message.author.name:
+            message.delete_instance()
+            response    = "Done"
+        else:
+            response    = "You don't have the right to do this"
+    except DoesNotExist:
+        return "Doesn't exist"
+    except Exception as e:
+        after_request("")
+        raise e
+    else:
+        return response
 @login_required
 @app.route("/vote", methods=["GET"])
 def vote_index():
