@@ -6,8 +6,9 @@
   </head>
   <body>
     <form class="login_form" action="/login" method="post">
-      username    = request.values["username"]
-      password    = request.values["password"]
+      {% if failed_already %}
+      <p class="error"> Password or username wrong.</p>
+      {% endif %}
       <label for="username">Username</label>
       <input type="text" name="username">
       <label for="password">Password</label>
