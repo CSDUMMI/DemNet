@@ -74,11 +74,6 @@ def login():
 def index():
     try:
         feed        = Message.select().order_by(Message.publishing_date.desc())
-        feed        = [ { "title" : m["title"]
-                        , "author_first" : m["author"]["first_name"]
-                        , "author_last" : m["author"]["last_name"]
-                        } for m in feed
-                    ]
 
         message     = request.values.get("message")
         response    = render_template("index.html", feed = feed, message = message)
