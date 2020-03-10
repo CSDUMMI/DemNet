@@ -58,14 +58,14 @@ def login():
                 session["username"]         = user.name
                 response                    = redirect(url_for("index"))
             else:
-                raise UserDoesNotExist()
+                response                    = redirect(url_for("login", failed_already = "true"))
     except UserDoesNotExist:
-        response    = redirect(url_for("login", failed_already = "true"))
+        return redirect(url_for("login", failed_already = "true"))
     except KeyError:
-        response    = "data not provided"
+        return "data not provided"
     except Exception as e:
         raise e
-    finally:
+    else:
         return response
 
 @login_required
