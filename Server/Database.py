@@ -17,7 +17,7 @@ class Election(BaseModel):
     title                   = TextField()
     description             = TextField()
     closed                  = BooleanField(default = False)
-    winner                  = TextField(default = None)
+    winner                  = TextField(default = None, null=True)
     creation_date           = DateField()
     openning_ballot_date    = DateField()
     closing_date            = DateField()
