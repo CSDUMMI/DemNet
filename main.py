@@ -202,6 +202,7 @@ def create_election():
                             , description           = description
                             , creation_date         = creation_date
                             , openning_ballot_date  = openning_ballot_date
+                            , closing_date          = closing_date
                             )
     except KeyError:
         return "data not provided"
