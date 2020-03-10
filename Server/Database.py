@@ -133,18 +133,23 @@ def register( username      : str
             , id            : str
             , password      : str
             ):
-            id          = SHA256.new(data = id.encode("utf-8")).hexdigest()
-            password    = SHA256.new(data = password.encode("utf-8")).hexdigest()
-            salt        = str(get_random_bytes(2**3))
+            try:
+                id          = SHA256.new(data = id.encode("utf-8")).hexdigest()
+                password    = SHA256.new(data = password.encode("utf-8")).hexdigest()
+                salt        = get_random_bytes(2**3).decode("utf-8")
 
-            if User.select().where(User.id == id or User.name == user).count() >= 1:
-                return False
+                if User.select().where(User.id == id or User.name == user).count() >= 1:
+                    response    = False
+                else:
+                    User.create ( name          = username
+                                , first_name    = first_name
+                                , last_name     = last_name
+                                , id            = id
+                                , password      = password
+                                , salt          = salt
+                                )
+                    response    = True
+            except Exception as e:
+                raise e
             else:
-                User.create ( name          = username
-                            , first_name    = first_name
-                            , last_name     = last_name
-                            , id            = id
-                            , password      = password
-                            , salt          = salt
-                            )
-                return True
+                return response
