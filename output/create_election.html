@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Create vote</title>
+  </head>
+  <body>
+    <p>
+      Please detail your problem and then
+      everybody has 4 weeks to propose solutions.
+      Then there will be an election and the users
+      can vote between the proposals.
+      (It is always an option that no proposal is implemented)
+    </p>
+    title                   = request.form["title"]
+    description             = request.form["description"]
+    <form class="creating_election" action="/election" method="post">
+      <label for="title">Title</label>
+      <input type="text" name="title">
+      <label for="description">Description</label>
+      <textarea name="description" rows="auto" cols="120">
+      </textarea>
+      <input type="submit" value="Issue">
+    </form>
+  </body>
+</html>
