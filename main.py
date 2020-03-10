@@ -59,8 +59,6 @@ def login():
                 response                    = redirect(url_for("index"))
             else:
                 response                    = redirect(url_for("login", failed_already = "true"))
-    except UserDoesNotExist:
-        return redirect(url_for("login", failed_already = "true"))
     except KeyError:
         return "data not provided"
     except Exception as e:
