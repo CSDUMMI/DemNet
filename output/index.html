@@ -1,1 +1,18 @@
-index
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>DemNet</title>
+  </head>
+  <body>
+    {% if message %}
+    <p>{{ message }}</p>
+    {% endif %}
+    {% for message in feed %}
+    <div class="message">
+      <h2> {{ message.title }} </h2>
+      <p>{{ message.author_first }} {{ message.author_last }}
+      </p>
+    </div>
+  </body>
+</html>
