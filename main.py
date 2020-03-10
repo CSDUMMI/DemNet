@@ -47,23 +47,25 @@ def login():
     try:
         if request.method == "GET":
             failed_already  = request.values.get("failed_already") == "true"
-            response = render_template( "login.html", failed_already = failed_already )
+            response        = render_template( "login.html", failed_already = failed_already )
         else:
-            username    = request.values["username"]
-            password    = request.values["password"]
+            username        = request.values["username"]
+            password        = request.values["password"]
 
-            user        = User.get(User.name == username)
+            user            = User.get(User.name == username)
             if user.can_authenticate(password):
                 session["authenticated"]    = True
                 session["username"]         = user.name
-                response = redirect(url_for("index"))
+                response                    = redirect(url_for("index"))
             else:
-                response = redirect(url_for("login", failed_already = "true"))
+                raise UserDoesNotExist()
+    except UserDoesNotExist:
+        response    = redirect(url_for("login", failed_already = "true"))
     except KeyError:
-        return "data not provided"
+        response    = "data not provided"
     except Exception as e:
         raise e
-    else:
+    finally:
         return response
 
 @login_required
