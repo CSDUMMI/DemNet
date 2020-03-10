@@ -188,3 +188,26 @@ def propose(election_id):
         raise e
     else:
         return response
+
+@login_required
+@app.route("/register", methods=["POST","GET"])
+def register_route():
+    try:
+        if request.method == "GET":
+            response    = render_template("register.html")
+        else:
+            if session["username"] == "joris":
+                username    = request.values["username"]
+                first_name  = request.values["first_name"]
+                last_name   = request.values["last_name"]
+                id          = request.values["id"]
+                password    = request.values["password"]
+                response    = register(username, first_name, last_name, id, password)
+            else:
+                response    = "invalid user"
+    except KeyError:
+        return "data not provided"
+    except Exception as e:
+        raise e
+    else:
+        return response
