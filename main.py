@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect, request, g, render_template
+from flask import Flask, url_for, redirect, request, g, render_template, session
 
 from Crypto.Hash import SHA256
 
@@ -36,7 +36,7 @@ def after_request(response):
 def login_required(f):
     @wraps(f)
     def inner(*args,**kwargs):
-        if not session.get("logged_in"):
+        if not session.get("authenticated"):
             return redirect(url_for("login"))
         else:
             return f(*args,**kwargs)
@@ -142,7 +142,7 @@ def vote(election_id):
     else:
         return response
 
-# Creating Elections
+# CREATING ELECTIONS
 @login_required
 @app.route("/election", methods=["POST", "GET"])
 def create_election():
@@ -189,25 +189,27 @@ def propose(election_id):
     else:
         return response
 
+# ADMIN ONLY
 @login_required
 @app.route("/register", methods=["POST","GET"])
 def register_route():
     try:
-        if request.method == "GET":
-            response    = render_template("register.html")
-        else:
-            if session["username"] == "joris":
+        if session["username"] == "joris":
+            if request.method == "GET":
+                response    = render_template("register.html")
+            else:
                 username    = request.values["username"]
                 first_name  = request.values["first_name"]
                 last_name   = request.values["last_name"]
                 id          = request.values["id"]
                 password    = request.values["password"]
-                response    = register(username, first_name, last_name, id, password)
-            else:
-                response    = "invalid user"
+                response    = str(register(username, first_name, last_name, id, password))
+        else:
+            response    = "invalid user"
     except KeyError:
         return "data not provided"
     except Exception as e:
+        g.db.close()
         raise e
     else:
         return response
