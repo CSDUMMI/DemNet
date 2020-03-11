@@ -9,7 +9,7 @@
     <h2> Open for voting </h2>
     {% for election in stage_2_elections %}
     <h3>{{ election.title }}</h3>
-    <p>{{ election.content|markdown}}</p>
+    <p>{{ election.description|markdown}}</p>
     <a href="/vote/{{ election.id }}">Vote</a>
     {% endfor %}
     <hr>
@@ -18,7 +18,7 @@
     <h2>Make proposal to a problem</h2>
     {% for election in stage_1_elections %}
     <h3>{{ election.title }}</h3>
-    <p>{{ election.content|markdown}}</p>
+    <p>{{ election.description|markdown}}</p>
     <a href="/propose/{{ election.id }}">Propose solution</a>
     {% endfor %}
   </body>
