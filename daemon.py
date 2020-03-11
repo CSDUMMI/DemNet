@@ -17,7 +17,7 @@ database    = SqliteDatabase(DATABASE)
 def close_elections():
     closed_elections    = Election.select().where(
                                     Election.closing_date <= datetime.date.today \
-                                    and not Election.closed
+                                    and not Election.stage >= 3
                                     )
 
     for closed_election in closed_elections:
