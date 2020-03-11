@@ -146,7 +146,15 @@ def unpublish(message_id : int):
 @app.route("/vote", methods=["GET"])
 def vote_index():
     try:
-        elections   = Election.select().where(not Election.closed)
+        elections   = Election.select().where(Election.closed == False)
+        for election in elections:
+            if election.openning_ballot_date > datetime.date.today():
+                election["stage"]   = 1
+            elif election.closing_date > datetime.date.today():
+                election["stage"]   = 2
+            else:
+                continue
+        
         response    = render_template("vote_index.html", elections = elections)
     except Exception as e:
         after_request("")
