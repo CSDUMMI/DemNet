@@ -57,7 +57,13 @@ class User(BaseModel):
         else:
             return False
 
-    def propose(self, election : Election, title : str, description : str, patches):
+    def propose ( self
+                , election : Election
+                , title : str
+                , description : str
+                , patches : List[str]
+                , patches_type : List[bool]
+                ):
         if election.openning_ballot_date < datetime.date.today():
             proposal = Proposal.create  ( author        = self
                                         , election      = election
@@ -67,8 +73,8 @@ class User(BaseModel):
 
             for index, patch in enumerate(patches):
                 Patch.create( proposal      = proposal
-                            , patch         = patch["text"]
-                            , conventional  = patch["conventional"] == "true"
+                            , patch         = patch
+                            , conventional  = patches_type[i]
                             , index         = index
                             )
             return True
