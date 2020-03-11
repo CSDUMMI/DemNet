@@ -16,7 +16,7 @@ class Election(BaseModel):
     id                      = IntegerField(unique = True, index = True, primary_key = True)
     title                   = TextField()
     description             = TextField()
-    closed                  = BooleanField(default = False)
+    stage                   = IntegerField(default = 1)
     winner                  = TextField(default = None, null=True)
     creation_date           = DateField()
     openning_ballot_date    = DateField()
