@@ -146,8 +146,9 @@ def unpublish(message_id : int):
 @app.route("/vote", methods=["GET"])
 def vote_index():
     try:
-        elections   = list(Election.select().where(Election.closed == False))
-        response    = render_template("vote_index.html", elections = elections)
+        stage_1_elections       = Election.select().where(Election.stage == 1)
+        stage_2_elections       = Election.select().where(Election.stage == 2)
+        response    = render_template("vote_index.html", stage_1_elections = stage_1_elections, stage_2_elections = stage_2_elections)
     except Exception as e:
         after_request("")
         raise e
