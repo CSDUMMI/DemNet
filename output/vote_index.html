@@ -5,17 +5,21 @@
     <title>Votes</title>
   </head>
   <body>
-    <h1>Votes</h1>
+    <h1>Elections</h1>
+    <h2> Open for voting </h2>
+    {% for election in stage_2_elections %}
+    <h3>{{ election.title }}</h3>
+    <p>{{ election.content|markdown}}</p>
+    <a href="/vote/{{ election.id }}">Vote</a>
+    {% endfor %}
+    <hr>
     <a href="/election">Propose an issue to hold a vote upon</a>
-    {% for election in elections %}
-    <h2>{{ election.title }}</h2>
-    <p>{{ election.description|markdown }} </p>
-    {% if election.stage == 1 %}
-    <a href="/propose/{{election.id}}">Propose</a>
-    {% endif %}
-    {% if election.stage == 2 %}
-    <a href="/vote/{{election.id}}">Vote</a>
-    {% endif %}
+
+    <h2>Make proposal to a problem</h2>
+    {% for election in stage_1_elections %}
+    <h3>{{ election.title }}</h3>
+    <p>{{ election.content|markdown}}</p>
+    <a href="/propose/{{ election.id }}">Propose solution</a>
     {% endfor %}
   </body>
 </html>
