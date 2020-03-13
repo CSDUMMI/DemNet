@@ -3,11 +3,11 @@
 # Install pip3 Packages
 pip3 install -U -r requirements.txt
 
+elm make src/Vote.elm --output=static/vote.js
 
 if [ "$1" = "init" ]
 then
 python3 -c "from Server.Database import create_tables;create_tables()"
-elm make src/Vote.elm --output=static/vote.js
 fi
 
 # Start Server
