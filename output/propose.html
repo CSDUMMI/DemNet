@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ proposal.title }}</title>
+  </head>
+  <body>
+    <h1>Proposal for {{ proposal.election.title }}</h1>
+    <form class="proposal" action="/propose" method="post">
+      <input type="text" name="title">
+      <textarea name="description" rows="auto" cols="80"></textarea>
+      <input type="file" name="patches" multiple>
+      <input type="submit" value="Propose">
+    </form>
+  </body>
+</html>
