@@ -2,11 +2,12 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>{{ proposal.title }}</title>
+    <title>{{ election.title }}</title>
   </head>
   <body>
-    <h1>Proposal for {{ proposal.election.title }}</h1>
-    <form class="proposal" action="/propose" method="post">
+    <h1>Proposal for {{ election.title }}</h1>
+    <p>{{ election.description | markdown}}</p>
+    <form class="proposal" action="/propose/{{ election.id }}" method="post">
       <input type="text" name="title">
       <textarea name="description" rows="auto" cols="80"></textarea>
       <input type="file" name="patches" multiple>

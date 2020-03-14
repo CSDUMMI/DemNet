@@ -219,10 +219,10 @@ def create_election():
 @app.route("/propose/<int:election_id>", methods=["POST", "GET"])
 def propose(election_id):
     try:
+        election                = Election.get(Election.id == election_id)
         if request.method == "GET":
-            response                = render_template("propose.html")
+            response                = render_template("propose.html", election = election)
         else:
-            election                = Election.get(Election.id == election_id)
             title                   = request.form["title"]
             description             = request.form["description"]
             patches                 = json.loads(request.files["patch"].stream.read().decode("utf-8"))
