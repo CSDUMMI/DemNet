@@ -1,6 +1,6 @@
-model Vote exposing ( vote
-                    , main
-                    )
+module Vote exposing  ( vote
+                      , main
+                      )
 
 import Browser
 import Element

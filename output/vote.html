@@ -7,29 +7,16 @@
   <body>
     <form class="ballot" action="/vote" method="post">
       <table>
-        <tr>
-          {% for i in proposal_nums %}
-          <th>
-            {{ i }}
-          </th>
-          {% endfor %}
-        </tr>
-
         {% for proposal in proposals %}
         <tr>
-          <td>
-            <a href="/proposal/{{ proposal.id }}">
-              {{ proposal.title }}
-            </a>
-          </td>
-          {% for i in proposal_nums %}
-          <td>
-            <input type="checkbox" name="vote_{{ i }}_{{ proposal.id }}">
-          </td>
-          {% endfor %}
+          <td>{{ proposal.title }}</td>
+          <td>{{ prposal.description }}</td>
         </tr>
         {% endfor %}
       </table>
+      [title 1, title 2, title 3]
+      <textarea name="vote" rows="auto" cols="80">
+      </textarea>
     </form>
   </body>
 </html>
