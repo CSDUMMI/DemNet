@@ -162,10 +162,9 @@ def vote(election_id):
         election    = Election.get(Election.id == election_id)
 
         if request.method == "GET":
-            proposals   = map(lambda p: p["title"], election.proposals)
-            response    = render_template("vote.html", proposals = proposals)
+            response    = render_template("vote.html", proposals = election.proposals)
         else:
-            choice      = json.loads(request.form["choice"])
+            choice      = json.loads(request.form["vote"])
             voter       = User.get(User.name == session["username"])
             if not voter.vote(election, choice):
                 response    = redirect(url_for("index", message="You've already voted"))
@@ -175,7 +174,7 @@ def vote(election_id):
     except KeyError:
         return "data not provided"
     except json.JSONDecodeError as json_error:
-        return "invalid data format"
+        return f"invalid data format: {json_error.msg}"
     except Exception as e:
         if DEBUG:
             after_request("")
