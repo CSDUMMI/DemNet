@@ -1,4 +1,7 @@
-.env
+env
 node_modules
 Server/__pycache__
 __pycache__
+elm-stuff
+demnet.db
+BUILD.txt

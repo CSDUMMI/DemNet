@@ -4,7 +4,7 @@ from Crypto.Hash import SHA256
 
 from functools import wraps
 from typing import List
-import datetime
+import datetime, json
 
 from peewee import *
 from Server.Database import *
@@ -225,7 +225,12 @@ def propose(election_id):
         else:
             title                   = request.form["title"]
             description             = request.form["description"]
-            patches                 = json.loads(request.files["patch"].stream.read().decode("utf-8"))
+
+            if request.files.get("patch"):
+                patches                 = json.loads(request.files["patch"].stream.read().decode("utf-8"))
+            else:
+                patches                 = ""
+                
             author                  = User.get(User.name == session["username"])
             author.propose(election, title, description, patches)
     except KeyError:
