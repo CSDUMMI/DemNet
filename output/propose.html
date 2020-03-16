@@ -7,11 +7,17 @@
   <body>
     <h1>Proposal for {{ election.title }}</h1>
     <p>{{ election.description | markdown}}</p>
-    <form class="proposal" action="/propose/{{ election.id }}" method="post">
-      <input type="text" name="title">
-      <textarea name="description" rows="auto" cols="80"></textarea>
-      <input type="file" name="patches" multiple>
-      <input type="submit" value="Propose">
-    </form>
+    <center>
+      <form class="proposal" action="/propose/{{ election.id }}" method="post">
+        <label for="title">Title</label>
+        <input type="text" name="title">
+        <label for="description">Description</label>
+        <textarea name="description" rows="auto" cols="80"></textarea>
+        <label for="patches">Patch files</label>
+        <code>[{ "patch": <patch 1>, "source" : <true if repo == SOURCE> }]</code>
+        <input type="file" name="patch">
+        <input type="submit" value="Propose">
+      </form>
+    </center>
   </body>
 </html>
