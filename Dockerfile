@@ -9,11 +9,9 @@ ARG first_name=Joris
 ARG last_name=Gutjahr
 ARG password
 ARG id
-
-RUN python register.py $username $first_name $last_name $id $password
-
 ENV DATABASE demnet.db
 
+RUN python register.py $username $first_name $last_name $id $password
 
 EXPOSE 80
 CMD ["gunicorn", "--bind", "0.0.0.0:80", "main:app"]
