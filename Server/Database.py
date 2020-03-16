@@ -145,6 +145,7 @@ def register( username      : str
             , password      : str
             ):
             try:
+                database.connect()
                 id          = hash_passwords(id, "")
                 salt        = SHA256.new(data = get_random_bytes(2**3)).hexdigest()
                 password    = hash_passwords(password, salt)
@@ -160,6 +161,8 @@ def register( username      : str
                                 , salt          = salt
                                 )
                     response    = True
+
+                database.close()
             except Exception as e:
                 raise e
             else:

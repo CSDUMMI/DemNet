@@ -118,7 +118,7 @@ def publish():
             author.publish(title, content)
             response    = redirect("/")
     except KeyError:
-        return "data not provided"
+        return "data not provided or not logged in"
     except Exception as e:
         after_request("")
         raise e
@@ -230,7 +230,7 @@ def propose(election_id):
                 patches                 = json.loads(request.files["patch"].stream.read().decode("utf-8"))
             else:
                 patches                 = ""
-                
+
             author                  = User.get(User.name == session["username"])
             author.propose(election, title, description, patches)
     except KeyError:
