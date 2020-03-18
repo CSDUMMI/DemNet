@@ -57,29 +57,6 @@ class User(BaseModel):
         else:
             return False
 
-    def propose ( self
-                , election : Election
-                , title : str
-                , description : str
-                , patches : List[str]
-                , patches_type : List[bool]
-                ):
-        if election.openning_ballot_date < datetime.date.today():
-            proposal = Proposal.create  ( author        = self
-                                        , election      = election
-                                        , title         = title
-                                        , description   = description
-                                        )
-
-            for index, patch in enumerate(patches):
-                Patch.create( proposal      = proposal
-                            , patch         = patch
-                            , conventional  = patches_type[i]
-                            , index         = index
-                            )
-            return True
-        else:
-            return False
 
 
 class Vote(BaseModel):
@@ -89,18 +66,6 @@ class Vote(BaseModel):
 class Participant(BaseModel):
     election                = ForeignKeyField(Election, backref="participants")
     user                    = ForeignKeyField(User, backref="participation")
-
-class Proposal(BaseModel):
-    election                = ForeignKeyField(Election, backref="proposals")
-    author                  = ForeignKeyField(User, backref="proposals")
-    title                   = CharField(unique = True)
-    description             = TextField()
-
-class Patch(BaseModel):
-    proposal                = ForeignKeyField(Proposal, backref="patches")
-    patch                   = TextField()
-    index                   = IntegerField()
-    conventional            = BooleanField()
 
 class Message(BaseModel):
     author                  = ForeignKeyField(User, backref="messages")
@@ -126,7 +91,7 @@ def create_tables():
                                 , Message
                                 , Change_Log
                                 ]
-                                )
+                            )
         database.close()
     except OperationalError:
         return False
