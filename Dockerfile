@@ -1,8 +1,10 @@
 FROM python:3.7
 
-COPY . /usr/app
-WORKDIR /usr/app
+COPY . /app
+WORKDIR /app
 RUN pip install -r requirements.txt
+
+
 
 ARG username=joris
 ARG first_name=Joris
