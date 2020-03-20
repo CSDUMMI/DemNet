@@ -16,11 +16,24 @@ class Election(BaseModel):
     id                      = IntegerField(unique = True, index = True, primary_key = True)
     title                   = TextField()
     description             = TextField()
+    link                    = TextField()
     stage                   = IntegerField(default = 1)
     winner                  = TextField(default = None, null=True)
     creation_date           = DateField()
     openning_ballot_date    = DateField()
     closing_date            = DateField()
+    def propose ( self
+                , author        : str
+                , link          : str
+                , title         : str
+                , description   : str
+                ):
+        Proposal.create ( election      = self
+                        , link          = relative_link
+                        , title         = title
+                        , description   = description
+                        , author        = author
+                        )
 
 class User(BaseModel):
     name        = CharField(unique = True)
@@ -57,6 +70,13 @@ class User(BaseModel):
         else:
             return False
 
+
+class Proposal(BaseModel):
+    election                = ForeignKeyField(Election, backref="proposals")
+    link                    = TextField()
+    title                   = TextField()
+    description             = TextField()
+    author                  = TextField()
 
 
 class Vote(BaseModel):
