@@ -284,26 +284,3 @@ def create_election ( title         : str
         raise e
     else:
         return response
-
-
-def propose ( election_id   : int
-            , link          : str
-            , title         : str
-            , description   : str
-            , author        : str
-            ):
-    try:
-        election                = Election.get(Election.id == election_id)
-
-        author                  = User.get(User.name ==author)
-        author.propose  ( election
-                        , link
-                        , title
-                        , description
-                        )
-    except KeyError:
-        return "file not provided"
-    except Exception as e:
-        raise e
-    else:
-        return response
