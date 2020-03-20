@@ -184,63 +184,6 @@ def vote(election_id):
     else:
         return response
 
-# CREATING ELECTIONS
-@login_required
-@app.route("/election", methods=["POST", "GET"])
-def create_election():
-    try:
-        if request.method == "GET":
-            response                = render_template("create_election.html")
-        else:
-            title                   = request.form["title"]
-            description             = request.form["description"]
-            creation_date           = datetime.date.today()
-            openning_ballot_date    = creation_date + datetime.timedelta( weeks = 4 )
-            closing_date            = creation_date + datetime.timedelta( weeks = 6 )
-
-            Election.create ( title                 = title
-                            , description           = description
-                            , creation_date         = creation_date
-                            , openning_ballot_date  = openning_ballot_date
-                            , closing_date          = closing_date
-                            )
-
-            response                = "Done"
-    except KeyError:
-        return "data not provided"
-    except Exception as e:
-        after_request("")
-        raise e
-    else:
-        return response
-
-
-@login_required
-@app.route("/propose/<int:election_id>", methods=["POST", "GET"])
-def propose(election_id):
-    try:
-        election                = Election.get(Election.id == election_id)
-        if request.method == "GET":
-            response                = render_template("propose.html", election = election)
-        else:
-            title                   = request.form["title"]
-            description             = request.form["description"]
-
-            if request.files.get("patch"):
-                patches                 = json.loads(request.files["patch"].stream.read().decode("utf-8"))
-            else:
-                patches                 = ""
-
-            author                  = User.get(User.name == session["username"])
-            author.propose(election, title, description, patches)
-    except KeyError:
-        return "file not provided"
-    except Exception as e:
-        after_request("")
-        raise e
-    else:
-        return response
-
 # ADMIN ONLY
 @login_required
 @app.route("/register", methods=["POST","GET"])
@@ -262,6 +205,105 @@ def register_route():
         return "data not provided"
     except Exception as e:
         after_request("")
+        raise e
+    else:
+        return response
+
+
+# WEBHOOKS
+@app.route("/hook")
+def hook():
+    try:
+
+        event   = request.headers.get("X-Gitlab-Event")
+        body    = request.get_json()
+
+        if event == "Issue Hook": # Create election
+            action          = body["object_attributes"]["action"]
+            if action == "open" or action == "reopen":
+                open_election   = "Hold Election" in map(lambda l: l["title"], body["labels"])
+                if open_election:
+                    title       = body["object_attributes"]["title"]
+                    description = body["object_attributes"]["description"]
+                    link        = body["object_attributes"]["url"]
+                    create_election ( title
+                                    , description
+                                    , link
+                                    )
+
+        elif event == "Merge Request Hook":
+            action          = body["object_attributes"]["action"]
+            if action == "open":
+                title           = body["object_attributes"]["title"].split("-", maxsplit = 1)
+                election_id     = int(title[0])
+                title           = title[1]
+                election        = Election.get_by_id(election_id)
+
+                link            = body["object_attributes"]["url"]
+                description     = body["object_attributes"]["description"]
+                author          = body["user"]["username"]
+                last_commit     = body["object_attributes"]["last_commit"]["id"]
+                election.propose( author
+                                , link
+                                , title
+                                , description
+                                , last_commit
+                                )
+
+
+
+    except ValueError:
+        return "Invalid title"
+    except Exception as e:
+        raise e
+    else:
+        return "OK"
+
+# CREATING ELECTIONS
+def create_election ( title         : str
+                    , description   : str
+                    , link          : str
+                    ):
+    try:
+        creation_date           = datetime.date.today()
+        openning_ballot_date    = creation_date + datetime.timedelta( weeks = 4 )
+        closing_date            = creation_date + datetime.timedelta( weeks = 6 )
+
+        Election.create ( title                 = title
+                        , description           = description
+                        , link                  = link
+                        , creation_date         = creation_date
+                        , openning_ballot_date  = openning_ballot_date
+                        , closing_date          = closing_date
+                        )
+
+        response                = "Done"
+    except KeyError:
+        return "data not provided"
+    except Exception as e:
+        raise e
+    else:
+        return response
+
+
+def propose ( election_id   : int
+            , link          : str
+            , title         : str
+            , description   : str
+            , author        : str
+            ):
+    try:
+        election                = Election.get(Election.id == election_id)
+
+        author                  = User.get(User.name ==author)
+        author.propose  ( election
+                        , link
+                        , title
+                        , description
+                        )
+    except KeyError:
+        return "file not provided"
+    except Exception as e:
         raise e
     else:
         return response

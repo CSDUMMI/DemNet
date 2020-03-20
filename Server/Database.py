@@ -27,12 +27,14 @@ class Election(BaseModel):
                 , link          : str
                 , title         : str
                 , description   : str
+                , last_commit   : str
                 ):
         Proposal.create ( election      = self
                         , link          = relative_link
                         , title         = title
                         , description   = description
                         , author        = author
+                        , last_commit   = last_commit
                         )
 
 class User(BaseModel):
@@ -77,6 +79,7 @@ class Proposal(BaseModel):
     title                   = TextField()
     description             = TextField()
     author                  = TextField()
+    last_commit             = FixedCharField(max_length=40)
 
 
 class Vote(BaseModel):
