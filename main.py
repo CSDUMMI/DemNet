@@ -4,7 +4,7 @@ from Crypto.Hash import SHA256
 
 from functools import wraps
 from typing import List
-import datetime, json
+import datetime, json, requests
 
 from peewee import *
 from Server.Database import *
@@ -12,6 +12,7 @@ from Server.Database import *
 SECRET_KEY  = os.environ["SECRET_KEY"]
 DEBUG       = "DEBUG" in os.environ
 DATABASE    = os.environ["DATABASE"]
+GITLAB_URI  = os.environ["GITLAB_URI"]
 
 app = Flask ( __name__
             , static_folder     = "static"
@@ -223,9 +224,9 @@ def hook():
             if action == "open" or action == "reopen":
                 open_election   = "Hold Election" in map(lambda l: l["title"], body["labels"])
                 if open_election:
-                    title       = body["object_attributes"]["title"]
-                    description = body["object_attributes"]["description"]
-                    link        = body["object_attributes"]["url"]
+                    title           = body["object_attributes"]["title"]
+                    description     = body["object_attributes"]["description"]
+                    link            = body["object_attributes"]["url"]
                     create_election ( title
                                     , description
                                     , link
@@ -234,21 +235,34 @@ def hook():
         elif event == "Merge Request Hook":
             action          = body["object_attributes"]["action"]
             if action == "open":
-                title           = body["object_attributes"]["title"].split("-", maxsplit = 1)
-                election_id     = int(title[0])
-                title           = title[1]
-                election        = Election.get_by_id(election_id)
+                title               = body["object_attributes"]["title"].split("-", maxsplit = 1)
+                election_id         = int(title[0])
+                title               = title[1]
+                election            = Election.get_by_id(election_id)
 
-                link            = body["object_attributes"]["url"]
-                description     = body["object_attributes"]["description"]
-                author          = body["user"]["username"]
-                last_commit     = body["object_attributes"]["last_commit"]["id"]
+                link                = body["object_attributes"]["url"]
+                description         = body["object_attributes"]["description"]
+                author              = body["user"]["username"]
+                last_commit         = body["object_attributes"]["last_commit"]["id"]
                 election.propose( author
                                 , link
                                 , title
                                 , description
                                 , last_commit
                                 )
+
+                # Protect the source branch
+                branch_to_protect   = body["object_attributes"]["source_branch"]
+                requests.post   ( f"{GITLAB_URI}/projects/1/protected_branches"
+                                , data      =   { "name"                    : branch_to_protect
+                                                , "push_access_level"       : 0
+                                                , "merge_access_level"      : 0
+                                                , "unprotect_access_level"  : 60
+                                                }
+                                , headers   =   { "PRIVATE-TOKEN" : GITLAB_TOKEN
+                                                }
+                                )
+
 
 
 
