@@ -110,7 +110,6 @@ def create_tables():
                                 , Vote
                                 , Participant
                                 , Proposal
-                                , Patch
                                 , Message
                                 , Change_Log
                                 ]
