@@ -249,7 +249,6 @@ def hook():
         event   = request.headers.get("X-Gitlab-Event")
         body    = request.get_json()
 
-        print(json.dumps(body))
 
         if event == "Issue Hook": # Create election
             action          = body["object_attributes"]["action"]
