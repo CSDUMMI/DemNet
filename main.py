@@ -9,11 +9,12 @@ import datetime, json, requests
 from peewee import *
 from Server.Database import *
 
-SECRET_KEY  = os.environ["SECRET_KEY"]
-DEBUG       = "DEBUG" in os.environ
-DATABASE    = os.environ["DATABASE"]
-GITLAB_URI  = os.environ["GITLAB_URI"]
-
+SECRET_KEY      = os.environ["SECRET_KEY"]
+DEBUG           = "DEBUG" in os.environ
+DATABASE        = os.environ["DATABASE"]
+GITLAB_URI      = os.environ["GITLAB_URI"]
+GITLAB_TOKEN    = os.environ["GITLAB_TOKEN"]
+DEMNET_ID       = os.environ["DEMNET_ID"]
 app = Flask ( __name__
             , static_folder     = "static"
             , static_url_path   = "/static"
@@ -253,7 +254,7 @@ def hook():
 
                 # Protect the source branch
                 branch_to_protect   = body["object_attributes"]["source_branch"]
-                requests.post   ( f"{GITLAB_URI}/projects/1/protected_branches"
+                requests.post   ( f"{GITLAB_URI}/projects/{DEMNET_ID}/protected_branches"
                                 , data      =   { "name"                    : branch_to_protect
                                                 , "push_access_level"       : 0
                                                 , "merge_access_level"      : 0
