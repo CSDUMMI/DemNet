@@ -200,7 +200,7 @@ def register_route():
                 last_name   = request.values["last_name"]
                 id          = request.values["id"]
                 password    = request.values["password"]
-                response    = str(register(username, first_name, last_name, id, password))
+                response    = str(register(username, first_name, last_name, id, password, connected = true ))
         else:
             response    = "invalid user"
     except KeyError:

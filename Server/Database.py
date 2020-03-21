@@ -130,9 +130,11 @@ def register( username      : str
             , last_name     : str
             , id            : str
             , password      : str
+            , connected     : str   = false
             ):
             try:
-                database.connect()
+                if not connected:
+                    database.connect()
                 id          = hash_passwords(id, "")
                 salt        = SHA256.new(data = get_random_bytes(2**3)).hexdigest()
                 password    = hash_passwords(password, salt)
@@ -148,8 +150,8 @@ def register( username      : str
                                 , salt          = salt
                                 )
                     response    = True
-
-                database.close()
+                if not connected:
+                    database.close()
             except Exception as e:
                 raise e
             else:
