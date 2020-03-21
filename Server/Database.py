@@ -130,7 +130,7 @@ def register( username      : str
             , last_name     : str
             , id            : str
             , password      : str
-            , connected     : str   = false
+            , connected     : bool  = False
             ):
             try:
                 if not connected:
