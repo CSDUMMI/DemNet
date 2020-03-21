@@ -1,0 +1,18 @@
+image: "python:3.7"
+
+before_script:
+  - apt-get update -qy
+  - apt-get install -y git
+
+stages:
+  - production
+
+production:
+  type: deploy
+  stage: production
+  image: python:3.7
+  script:
+    - git push heroku
+  only:
+    - master
+    - Backend
