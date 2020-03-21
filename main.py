@@ -205,6 +205,7 @@ def change_password():
                     user.password       = new_passsword
                     user.salt           = new_salt
                     user.save()
+                    response            = "Done"
                 else:
                     response            = "Passwords don't match"
             else:
