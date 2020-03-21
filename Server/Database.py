@@ -38,7 +38,7 @@ class Election(BaseModel):
                         )
 
 class User(BaseModel):
-    name        = CharField(unique = True)
+    name        = CharField(unique = True, primary_key = True)
     first_name  = TextField()
     last_name   = TextField()
     id          = CharField(unique = True)

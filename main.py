@@ -186,6 +186,35 @@ def vote(election_id):
     else:
         return response
 
+@login_required
+@app.route("/change_password", methods=["GET", "POST"])
+def change_password():
+    try:
+        if request.method == "GET":
+            response                = render_template("change_password.html")
+        else:
+            user                    = User.get(User.name == session["username"])
+            password                = request.form["password"]
+            password                = hash_passwords(password, user.salt)
+            new_passsword           = request.form["new_passsword"], user.salt
+            new_repeated_password   = request.form["new_repeated_password"]
+            if password == user.password:
+                if new_passsword == new_repeated_password:
+                    new_salt            = SHA256.new(data = get_random_bytes(2**3)).hexdigest()
+                    new_passsword       = hash_passwords(new_passsword, new_salt)
+                    user.password       = new_passsword
+                    user.salt           = new_salt
+                    user.save()
+                else:
+                    response            = "Passwords don't match"
+            else:
+                response    = "Invalid current password"
+    except KeyError:
+        return "Data not provided"
+    except Exception as e:
+        raise e
+    else:
+        return response
 # ADMIN ONLY
 @login_required
 @app.route("/register", methods=["POST","GET"])
@@ -210,7 +239,6 @@ def register_route():
         raise e
     else:
         return response
-
 
 # WEBHOOKS
 @app.route("/hook")
