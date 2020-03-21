@@ -260,7 +260,7 @@ def hook():
                                                 , "merge_access_level"      : 0
                                                 , "unprotect_access_level"  : 60
                                                 }
-                                , headers   =   { "PRIVATE-TOKEN" : GITLAB_TOKEN
+                                , headers   =   { "Private-Token" : GITLAB_TOKEN
                                                 }
                                 )
 
