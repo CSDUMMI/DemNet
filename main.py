@@ -262,6 +262,10 @@ def hook():
                                     , description
                                     , link
                                     )
+            elif action == "close":
+                if "Hold Election" in map(lambda l: l["title"], body["labels"]):
+                    link            = body["object_attributes"]["url"]
+                    Election.get(Election.link == link).delete_instance()
 
         elif event == "Merge Request Hook":
             action          = body["object_attributes"]["action"]
