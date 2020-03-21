@@ -242,7 +242,7 @@ def register_route():
         return response
 
 # WEBHOOKS
-@app.route("/hook")
+@app.route("/hook", methods=["GET", "POST"])
 def hook():
     try:
 
