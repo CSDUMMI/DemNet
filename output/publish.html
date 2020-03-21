@@ -2,11 +2,9 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="/static/styles/font-awesome.min.css">
-    <link href="/static/styles/mte.css" rel="stylesheet">
-    <script src="/static/scripts/editor.min.js"></script>
-    <script src="/static/scripts/mte.js"></script>
     <title>Write | DemNet</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
   </head>
   <body>
     <form class="writing" action="/publish" method="post">
@@ -14,36 +12,13 @@
       <input type="text" name="title">
       <br>
       <label for="content"></label>
-      <textarea name="content" class="editor-area" id="editor-area" spellcheck="false">
-      </textarea>
+      <textarea name="content" id="editor"></textarea>
       <input type="submit" value="Publish">
     </form>
     <script type="text/javascript">
-    let editor = new MTE(document.getElementById('editor-area'), {
-        tabSize: '    ',
-        shortcut: true,
-        keydown: function(e, base) {
-            console.log('Updated! (keydown:' + base.grip.key(e) + ')');
-        },
-        update: function() {
-            console.log('Updated!');
-        },
-        click: function(e, base, type) {
-            console.log('Updated! (click:' + type + ')');
-        },
-        ready: function() {
-            console.log('Ready!');
-        },
-        cut: function(selection) {
-            console.log(selection);
-        },
-        copy: function(selection) {
-            console.log(selection);
-        },
-        paste: function(selection) {
-            console.log(selection);
-        }
-    });
+      const simplemde = new SimpleMDE({ element : document.getElementById("editor")
+                                      , styleSelectedText : false
+                                      })
     </script>
   </body>
 </html>
