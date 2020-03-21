@@ -196,7 +196,7 @@ def change_password():
             user                    = User.get(User.name == session["username"])
             password                = request.form["password"]
             password                = hash_passwords(password, user.salt)
-            new_passsword           = request.form["new_passsword"], user.salt
+            new_passsword           = request.form["new_passsword"]
             new_repeated_password   = request.form["new_repeated_password"]
             if password == user.password:
                 if new_passsword == new_repeated_password:
