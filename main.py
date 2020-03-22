@@ -259,9 +259,6 @@ def hook():
                     description     = body["object_attributes"]["description"]
                     link            = body["object_attributes"]["url"]
                     id              = body["object_attributes"]["iid"]
-
-                    print(json.dumps(body["object_attributes"]))
-
                     create_election ( title
                                     , description
                                     , link
@@ -288,9 +285,7 @@ def hook():
                 description         = body["object_attributes"]["description"]
                 author              = body["user"]["username"]
                 last_commit         = body["object_attributes"]["last_commit"]["id"]
-
-                print(description)
-
+                
                 election.propose( author
                                 , link
                                 , title
