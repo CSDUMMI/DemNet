@@ -14,7 +14,7 @@ password        = DATABASE_URL.password
 host            = DATABASE_URL.hostname
 
 database        = PostgresqlDatabase( DATABASE_NAME
-                                    , username  = username
+                                    , user      = username
                                     , password  = password
                                     , host      = host
                                     , sslmode   = "require"
