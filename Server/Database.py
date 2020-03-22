@@ -1,12 +1,12 @@
 import os, datetime
 from peewee import *
 from typing import List, Dict
-import urlparse
+from urllib.parse import urlparse
 
 from Crypto.Hash import SHA256
 from Crypto.Random import get_random_bytes
 
-DATABASE_URL    = urlparse.urlparse(os.environ["DATABASE_URL"])
+DATABASE_URL    = urlparse(os.environ["DATABASE_URL"])
 
 DATABASE_NAME   = url.path[1:]
 username        = url.username
