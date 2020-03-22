@@ -19,7 +19,6 @@ database        = PostgresqlDatabase( DATABASE_NAME
                                     , host      = host
                                     , sslmode   = "require"
                                     )
-
 class BaseModel(Model):
     class Meta():
         database    = database
@@ -114,26 +113,6 @@ class Change_Log(BaseModel):
     message                 = TextField()
     date                    = DateField()
 
-def create_tables():
-    try:
-        database.connect()
-        database.create_tables( [ User
-                                , Election
-                                , Vote
-                                , Participant
-                                , Proposal
-                                , Message
-                                , Change_Log
-                                ]
-                            )
-        database.close()
-    except OperationalError:
-        return False
-    except Exception as e:
-        raise e
-    else:
-        return True
-
 def hash_passwords(password : str, salt : str) -> bytes:
     return SHA256.new(data = password.encode("utf-8") + salt.encode("utf-8")).hexdigest()
 
@@ -168,3 +147,27 @@ def register( username      : str
                 raise e
             else:
                 return response
+
+
+def create_tables():
+    try:
+        database.connect()
+        database.create_tables( [ User
+                                , Election
+                                , Vote
+                                , Participant
+                                , Proposal
+                                , Message
+                                , Change_Log
+                                ]
+                            )
+        database.close()
+    except OperationalError:
+        return False
+    except Exception as e:
+        raise e
+    else:
+        return True
+
+if not Election.select().exists():
+    create_tables()
