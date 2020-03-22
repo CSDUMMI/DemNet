@@ -18,7 +18,9 @@
     <h2>Make proposal to a problem</h2>
     {% for election in stage_1_elections %}
     <h3>{{ election.title }}</h3>
-    <p>{{ election.description|markdown}}</p>
+    <p>
+      {{ election.description|markdown}}
+    </p>
     <a href="https://gitlab.com/CSDUMMI/DemNet/-/merge_requests">Propose solution</a>
     {% endfor %}
   </body>
