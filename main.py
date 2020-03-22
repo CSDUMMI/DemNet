@@ -14,6 +14,7 @@ DATABASE        = os.environ["DATABASE"]
 GITLAB_URI      = os.environ["GITLAB_URI"]
 GITLAB_TOKEN    = os.environ["GITLAB_TOKEN"]
 DEMNET_ID       = os.environ["DEMNET_ID"]
+
 app = Flask ( __name__
             , static_folder     = "static"
             , static_url_path   = "/static"
