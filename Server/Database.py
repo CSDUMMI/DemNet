@@ -1,13 +1,22 @@
 import os, datetime
 from peewee import *
 from typing import List, Dict
+import urlparse
 
 from Crypto.Hash import SHA256
 from Crypto.Random import get_random_bytes
 
-DATABASE        = os.environ["DATABASE"]
-DATABASE_URL    = os.environ["DATABASE_URL"]
-database        = PostgresqlDatabase( DATABASE
+DATABASE_URL    = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+DATABASE_NAME   = url.path[1:]
+username        = url.username
+password        = url.password
+host            = url.hostname
+
+database        = PostgresqlDatabase( DATABASE_NAME
+                                    , username  = username
+                                    , password  = password
+                                    , host      = host
                                     , sslmode   = "require"
                                     )
 
