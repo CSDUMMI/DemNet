@@ -21,7 +21,9 @@ app = Flask ( __name__
             , template_folder   = "output"
             )
 
-md          = Markdown(app)
+md          = Markdown  ( app
+                        , auto_escape = True
+                        )
 app.config.from_object(__name__)
 
 @app.before_request
