@@ -8,10 +8,10 @@ from Crypto.Random import get_random_bytes
 
 DATABASE_URL    = urlparse(os.environ["DATABASE_URL"])
 
-DATABASE_NAME   = url.path[1:]
-username        = url.username
-password        = url.password
-host            = url.hostname
+DATABASE_NAME   = DATABASE_URL.path[1:]
+username        = DATABASE_URL.username
+password        = DATABASE_URL.password
+host            = DATABASE_URL.hostname
 
 database        = PostgresqlDatabase( DATABASE_NAME
                                     , username  = username
