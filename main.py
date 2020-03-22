@@ -285,6 +285,9 @@ def hook():
                 description         = body["object_attributes"]["description"]
                 author              = body["user"]["username"]
                 last_commit         = body["object_attributes"]["last_commit"]["id"]
+
+                print(description)
+
                 election.propose( author
                                 , link
                                 , title
