@@ -1,6 +1,5 @@
 from flask import Flask, url_for, redirect, request, g, render_template, session
-from flaskext.markdown import Markdown
-from Crypto.Hash import SHA256
+from flask_mistune import Mistune, markdown
 
 from functools import wraps
 from typing import List
@@ -21,10 +20,8 @@ app = Flask ( __name__
             , template_folder   = "output"
             )
 
-md          = Markdown  ( app
-                        , safe_mode = True
-                        ,
-                        )
+md          = Mistune(app)
+
 app.config.from_object(__name__)
 
 @app.before_request
