@@ -20,7 +20,6 @@ database        = PostgresqlDatabase( DATABASE_NAME
                                     , sslmode   = "require"
                                     )
 
-create_tables()                                    
 class BaseModel(Model):
     class Meta():
         database    = database
@@ -170,3 +169,5 @@ def create_tables():
         raise e
     else:
         return True
+
+create_tables()
