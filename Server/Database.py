@@ -13,7 +13,7 @@ class BaseModel(Model):
         database    = database
 
 class Election(BaseModel):
-    id                      = IntegerField(unique = True, index = True, primary_key = True)
+    id                      = IntegerField(unique = True, primary_key = True)
     title                   = TextField()
     description             = TextField()
     link                    = TextField()

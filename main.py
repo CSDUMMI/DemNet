@@ -258,14 +258,16 @@ def hook():
                     title           = body["object_attributes"]["title"]
                     description     = body["object_attributes"]["description"]
                     link            = body["object_attributes"]["url"]
+                    id              = body["object_attributes"]["iid"]
                     create_election ( title
                                     , description
                                     , link
+                                    , id
                                     )
             elif action == "close":
                 if "Hold Election" in map(lambda l: l["title"], body["labels"]):
-                    link            = body["object_attributes"]["url"]
-                    election        = Election.get(Election.link == link)
+                    id              = body["object_attributes"]["iid"]
+                    election        = Election.get_by_id(id)
 
                     if election and election.openning_ballot_date > datetime.date.today():
                         election.delete_instance()
@@ -273,8 +275,9 @@ def hook():
         elif event == "Merge Request Hook":
             action          = body["object_attributes"]["action"]
             if action == "open":
-                title               = body["object_attributes"]["title"].split("-", maxsplit = 1)
-                election_id         = int(title[0])
+                # Title: #<election_id>:<title>
+                title               = body["object_attributes"]["title"].split(":", maxsplit = 1)
+                election_id         = int(title[0][1:])
                 title               = title[1]
                 election            = Election.get_by_id(election_id)
 
@@ -315,13 +318,15 @@ def hook():
 def create_election ( title         : str
                     , description   : str
                     , link          : str
+                    , id            : int
                     ):
     try:
         creation_date           = datetime.date.today()
         openning_ballot_date    = creation_date + datetime.timedelta( weeks = 4 )
         closing_date            = creation_date + datetime.timedelta( weeks = 6 )
 
-        Election.create ( title                 = title
+        Election.create ( id                    = id
+                        , title                 = title
                         , description           = description
                         , link                  = link
                         , creation_date         = creation_date
