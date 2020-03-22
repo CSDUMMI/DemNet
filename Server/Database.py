@@ -19,6 +19,8 @@ database        = PostgresqlDatabase( DATABASE_NAME
                                     , host      = host
                                     , sslmode   = "require"
                                     )
+
+create_tables()                                    
 class BaseModel(Model):
     class Meta():
         database    = database
@@ -168,6 +170,3 @@ def create_tables():
         raise e
     else:
         return True
-
-if not Election.select().exists():
-    create_tables()
