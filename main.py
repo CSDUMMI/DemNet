@@ -21,7 +21,7 @@ app = Flask ( __name__
             , template_folder   = "output"
             )
 
-md = Markdown(app)
+md          = Markdown(app)
 app.config.from_object(__name__)
 
 @app.before_request
@@ -285,7 +285,7 @@ def hook():
                 description         = body["object_attributes"]["description"]
                 author              = body["user"]["username"]
                 last_commit         = body["object_attributes"]["last_commit"]["id"]
-                
+
                 election.propose( author
                                 , link
                                 , title
