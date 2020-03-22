@@ -260,8 +260,8 @@ def hook():
                     link            = body["object_attributes"]["url"]
                     id              = body["object_attributes"]["iid"]
 
-                    print(description)
-                    
+                    print(body["object_attributes"])
+
                     create_election ( title
                                     , description
                                     , link
