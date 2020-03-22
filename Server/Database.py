@@ -8,7 +8,6 @@ from Crypto.Random import get_random_bytes
 DATABASE        = os.environ["DATABASE"]
 DATABASE_URL    = os.environ["DATABASE_URL"]
 database        = PostgresqlDatabase( DATABASE
-                                    , host      = DATABASE_URL
                                     , sslmode   = "require"
                                     )
 
