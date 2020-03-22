@@ -22,7 +22,8 @@ app = Flask ( __name__
             )
 
 md          = Markdown  ( app
-                        , auto_escape = True
+                        , safe_mode = True
+                        ,
                         )
 app.config.from_object(__name__)
 
