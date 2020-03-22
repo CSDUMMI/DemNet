@@ -104,7 +104,7 @@ class Participant(BaseModel):
 
 class Message(BaseModel):
     author                  = ForeignKeyField(User, backref="messages")
-    id                      = IntegerField(primary_key = True, index = True)
+    id                      = AutoField(primary_key = True, index = True)
     title                   = TextField()
     content                 = TextField()
     publishing_date         = DateTimeField()
