@@ -277,34 +277,44 @@ def hook():
             action          = body["object_attributes"]["action"]
             if action == "open":
                 # Title: #<election_id>:<title>
-                title               = body["object_attributes"]["title"].split(":", maxsplit = 1)
-                election_id         = int(title[0][1:])
-                title               = title[1]
-                election            = Election.get_by_id(election_id)
+                try:
+                    title               = body["object_attributes"]["title"].split(":", maxsplit = 1)
+                    election_id         = int(title[0][1:])
+                    title               = title[1]
+                    election            = Election.get_by_id(election_id)
 
-                link                = body["object_attributes"]["url"]
-                description         = body["object_attributes"]["description"]
-                author              = body["user"]["username"]
-                last_commit         = body["object_attributes"]["last_commit"]["id"]
+                    link                = body["object_attributes"]["url"]
+                    description         = body["object_attributes"]["description"]
+                    author              = body["user"]["username"]
+                    last_commit         = body["object_attributes"]["last_commit"]["id"]
 
-                election.propose( author
-                                , link
-                                , title
-                                , description
-                                , last_commit
-                                )
+                    election.propose( author
+                    , link
+                    , title
+                    , description
+                    , last_commit
+                    )
 
-                # Protect the source branch
-                branch_to_protect   = body["object_attributes"]["source_branch"]
-                requests.post   ( f"{GITLAB_URI}/projects/{DEMNET_ID}/protected_branches"
-                                , data      =   { "name"                    : branch_to_protect
-                                                , "push_access_level"       : 0
-                                                , "merge_access_level"      : 0
-                                                , "unprotect_access_level"  : 60
-                                                }
-                                , headers   =   { "Private-Token" : GITLAB_TOKEN
-                                                }
-                                )
+                    # Protect the source branch
+                    branch_to_protect   = body["object_attributes"]["source_branch"]
+                    requests.post   ( f"{GITLAB_URI}/projects/{DEMNET_ID}/protected_branches"
+                    , data      =   { "name"                    : branch_to_protect
+                    , "push_access_level"       : 0
+                    , "merge_access_level"      : 0
+                    , "unprotect_access_level"  : 60
+                    }
+                    , headers   =   { "Private-Token" : GITLAB_TOKEN
+                    }
+                    )
+                except ValueError:
+                    # Invalid format for title
+                    iid                 = body["object_attributes"]["iid"]
+                    req                 = requests.delete   ( f"{GITLAB_URI}/projects/{DEMNET_ID}/merge_requests/{iid}"
+                                                            , headers   = { "Private-Token" : GITLAB_TOKEN }
+                                                            )
+
+                except Exception as e:
+                    raise e
 
 
 
