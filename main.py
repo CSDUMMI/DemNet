@@ -29,7 +29,6 @@ app.config.from_object(__name__)
 def before_request():
     g.db    = database
     g.db.connect()
-    update_elections()
 
 @app.after_request
 def after_request(response):
