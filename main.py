@@ -29,6 +29,7 @@ app.config.from_object(__name__)
 def before_request():
     g.db    = database
     g.db.connect()
+    update_elections()
 
 @app.after_request
 def after_request(response):
@@ -283,29 +284,30 @@ def hook():
                     title               = title[1]
                     election            = Election.get_by_id(election_id)
 
+                    id                  = body["object_attributes"]["iid"]
                     link                = body["object_attributes"]["url"]
                     description         = body["object_attributes"]["description"]
                     author              = body["user"]["username"]
                     last_commit         = body["object_attributes"]["last_commit"]["id"]
 
                     election.propose( author
-                    , link
-                    , title
-                    , description
-                    , last_commit
-                    )
+                                    , id
+                                    , title
+                                    , description
+                                    , last_commit
+                                    )
 
                     # Protect the source branch
                     branch_to_protect   = body["object_attributes"]["source_branch"]
                     requests.post   ( f"{GITLAB_URI}/projects/{DEMNET_ID}/protected_branches"
-                    , data      =   { "name"                    : branch_to_protect
-                    , "push_access_level"       : 0
-                    , "merge_access_level"      : 0
-                    , "unprotect_access_level"  : 60
-                    }
-                    , headers   =   { "Private-Token" : GITLAB_TOKEN
-                    }
-                    )
+                                    , data      =   { "name"                    : branch_to_protect
+                                                    , "push_access_level"       : 0
+                                                    , "merge_access_level"      : 0
+                                                    , "unprotect_access_level"  : 60
+                                                    }
+                                    , headers   =   { "Private-Token" : GITLAB_TOKEN
+                                                    }
+                                    )
                 except ValueError:
                     # Invalid format for title
                     iid                 = body["object_attributes"]["iid"]
