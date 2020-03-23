@@ -6,6 +6,8 @@ from urllib.parse import urlparse
 from Crypto.Hash import SHA256
 from Crypto.Random import get_random_bytes
 
+from Server.election import count
+
 DATABASE_URL    = urlparse(os.environ["DATABASE_URL"])
 
 DATABASE_NAME   = DATABASE_URL.path[1:]
@@ -34,16 +36,17 @@ class Election(BaseModel):
     creation_date           = DateField()
     openning_ballot_date    = DateField()
     closing_date            = DateField()
+
     def propose ( self
                 , author        : str
-                , link          : str
+                , id            : int
                 , title         : str
                 , description   : str
                 , last_commit   : str
                 ):
         Proposal.create ( election      = self
-                        , link          = relative_link
                         , title         = title
+                        , id            = id
                         , description   = description
                         , author        = author
                         , last_commit   = last_commit
@@ -87,7 +90,7 @@ class User(BaseModel):
 
 class Proposal(BaseModel):
     election                = ForeignKeyField(Election, backref="proposals")
-    link                    = TextField()
+    id                      = IntegerField(unique = True)
     title                   = TextField()
     description             = TextField()
     author                  = TextField()
@@ -148,6 +151,21 @@ def register( username      : str
                 raise e
             else:
                 return response
+
+def update_elections():
+    elections   = Election.select().where(Election.openning_ballot_date >= datetime.date.today() and Election.stage == 1)
+    for election in elections:
+        election.stage = 2
+        election.save()
+
+    elections   = Election.select().where(Election.closing_date <= datetime.date.today() and Election.stage == 2)
+    for election in elections:
+        votes       : List[List[str]]   = [json.loads(v.choice) for v in election.votes]
+        proposals   : List[str]         = [p.title for p in election.proposals]
+
+        winner                          = count(votes, proposals)
+        winner                          = Proposal.get(Proposal.title == winner)
+        iid                             = winner.link.split("/")[-1]
 
 
 def create_tables():
