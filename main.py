@@ -355,3 +355,29 @@ def create_election ( title         : str
         raise e
     else:
         return response
+
+# CLOSING / MERGING ELECTIONS
+def update_elections():
+    elections   = Election.select().where(Election.openning_ballot_date >= datetime.date.today() and Election.stage == 1)
+    for election in elections:
+        election.stage = 2
+        election.save()
+
+    elections   = Election.select().where(Election.closing_date <= datetime.date.today() and Election.stage == 2)
+    for election in elections:
+        votes       : List[List[str]]   = [json.loads(v.choice) for v in election.votes]
+        proposals   : List[str]         = [p.title for p in election.proposals]
+
+        winner                          = count(votes, proposals)
+        winner                          = Proposal.get(Proposal.title == winner)
+        id                              = winner.id
+
+        req     = requests.put  ( f"{GITLAB_URI}/projects/{DEMNET_ID}/merge_requests/{id}/merge"
+                                , params    =   { "sha"                         : winner.last_commit
+                                                , "should_remove_source_branch" : True
+                                                }
+                                , headers   =   { "Private-Token" : GITLAB_TOKEN }
+                                )
+
+        if not req.status_code == 200:
+            print(f"Error {req.status_code}")

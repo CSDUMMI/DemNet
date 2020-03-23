@@ -2,6 +2,7 @@ import os, datetime
 from peewee import *
 from typing import List, Dict
 from urllib.parse import urlparse
+import requests
 
 from Crypto.Hash import SHA256
 from Crypto.Random import get_random_bytes
@@ -151,21 +152,6 @@ def register( username      : str
                 raise e
             else:
                 return response
-
-def update_elections():
-    elections   = Election.select().where(Election.openning_ballot_date >= datetime.date.today() and Election.stage == 1)
-    for election in elections:
-        election.stage = 2
-        election.save()
-
-    elections   = Election.select().where(Election.closing_date <= datetime.date.today() and Election.stage == 2)
-    for election in elections:
-        votes       : List[List[str]]   = [json.loads(v.choice) for v in election.votes]
-        proposals   : List[str]         = [p.title for p in election.proposals]
-
-        winner                          = count(votes, proposals)
-        winner                          = Proposal.get(Proposal.title == winner)
-        iid                             = winner.link.split("/")[-1]
 
 
 def create_tables():
