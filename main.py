@@ -4,8 +4,10 @@ from Server import Elections, Patches, Users
 from flask import Flask, request, render_template, send_file
 import json, os
 from Crypto.Hash import SHA3_256
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
 
-app = Flask(__name__, static_url_path="/static", static_folder="/output")
+app = Flask(__name__, static_url_path="/static", static_folder="/static")
 app.secret_key = os.environ["SECRET_KEY"]
 
 # Errors

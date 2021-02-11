@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+
 # Install pip3 Packages
-pip3 install -r requirements.txt
+pip3 install -U -r requirements.txt
 
 # BUILD=Variable denoting current build string:
 BUILD=`date -u +"%D-%T"`
@@ -8,6 +9,10 @@ BUILD="$BUILD-$BUILDER"
 
 echo $BUILD >> BUILD.txt
 
+# Test if the static analyses pases
+if ! mypy main.py Server/*.py --ignore-issing-imports;
+then exit 1
+fi
 # Build Elm frontend
 elm make --output=output/main.js --optimize src/Main.elm
 

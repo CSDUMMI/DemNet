@@ -21,6 +21,7 @@ A sample Election Document looks like this:
 , "closed" : <Bool: is Closed?>
 , "winner" : <Winner Proposal>
 , "type" : "<either machine or human>"
+, "votes" : [{ "username" : "<username of voter>", "vote" : b"<encrypted vote>" }]
 }
 ```
 There can be two kinds of proposals:
